@@ -160,7 +160,8 @@ public abstract class JSONElement extends GameDataElement {
         else if (chance.equals(0.1d)) return "1/1000";
         else if (chance.equals(0.01d)) return "1/10000";
         else {
-        	//TODO Better handling of fractions. Chance description need a complete rehaul in AT.
+        	if (chance.intValue() == chance) return Integer.toString(chance.intValue());
+        	//TODO Better handling of fractions. Chance description need a complete overhaul in AT.
         	//This part does not output the input content of parseDouble(String s) in the case of fractions.
         	return chance.toString();
         }

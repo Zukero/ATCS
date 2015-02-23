@@ -263,6 +263,7 @@ public class QuestEditor extends JSONElementEditor {
 		}
 
 		public void createStage() {
+			if (quest.stages == null) quest.stages = new ArrayList<Quest.QuestStage>();
 			quest.stages.add(new Quest.QuestStage());
 			for (TableModelListener l: listeners) {
 				l.tableChanged(new TableModelEvent(this, quest.stages.size() - 1));
@@ -283,6 +284,7 @@ public class QuestEditor extends JSONElementEditor {
 			for (TableModelListener l: listeners) {
 				l.tableChanged(new TableModelEvent(this, rowNumber, quest.stages.size()));
 			}
+			if (quest.stages.isEmpty()) quest.stages = null;
 		}
 		
 		public List<TableModelListener> listeners = new ArrayList<TableModelListener>();
