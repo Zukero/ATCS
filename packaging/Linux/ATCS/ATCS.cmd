@@ -1,0 +1,1 @@
+start "" "javaw.exe" -Xmx512M -cp "lib\jide-oss.jar;lib\ui.jar;lib\junit-4.10.jar;lib\json_simple-1.1.jar;lib\rsyntaxtextarea.jar;lib\prefuse.jar;lib\ATCS_v0.3.3.jar;lib\AndorsTrainer_v0.1.1.jar" com.gpl.rpg.atcontentstudio.ATContentStudio

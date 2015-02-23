@@ -1,0 +1,235 @@
+package com.gpl.rpg.atcontentstudio.ui.sprites;
+
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.ScrollPaneConstants;
+
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
+import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet.Category;
+
+
+public class SpriteChooser extends JDialog {
+
+	private static final long serialVersionUID = -6018113265015159521L;
+	
+	private static final int STD_WIDTH = 32;
+	private static final int STD_HEIGHT = 32;
+	private static final int MAX_PER_ROW = 10;
+	
+	public static Map<Project, Map<Spritesheet.Category, SpriteChooser>> cache = new HashMap<Project, Map<Spritesheet.Category,SpriteChooser>>();
+
+	public static SpriteChooser getChooser(Project proj, Spritesheet.Category category) {
+		if (cache.get(proj) == null) {
+			cache.put(proj, new HashMap<Spritesheet.Category, SpriteChooser>());
+		}
+		if (cache.get(proj).get(category) == null) {
+			cache.get(proj).put(category, new SpriteChooser(proj, category));
+		}
+		SpriteChooser wanted = cache.get(proj).get(category);
+		wanted.group.clearSelection();
+		wanted.selectedIconId = null;
+//		wanted.selectedOne = null;
+		wanted.listener = null;
+//		wanted.ok.setEnabled(false);
+		wanted.pack();
+		return wanted;
+	}
+	
+	private ButtonGroup group;
+//	private IconButton selectedOne = null;
+//	private JButton ok;
+//	private JButton cancel;
+	
+	public String selectedIconId = null;
+	
+	public SpriteChooser(Project proj, Category category) {
+		super(ATContentStudio.frame);
+		setTitle("Select a sprite");
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		List<Spritesheet> spritesheets = new ArrayList<Spritesheet>();
+		for (Spritesheet sheet : proj.baseContent.gameSprites.spritesheets) {
+			if (sheet.category == category) {
+				spritesheets.add(sheet);
+			}
+		}
+		
+		
+		JPanel pane = new JPanel();
+		pane.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.weightx = 1;
+		c.weighty = 1;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.gridwidth = 1;
+		c.gridheight = 1;
+		c.anchor = GridBagConstraints.NORTHWEST;
+		c.fill = GridBagConstraints.BOTH;
+		
+		List<Point> reservedSlots = new ArrayList<Point>();
+		Point nextFreeSlot = new Point(0, 0);
+		
+		int i;
+		Image img;
+		group = new ButtonGroup();
+		for (Spritesheet sheet : spritesheets) {
+			i = 0;
+			while ((img = sheet.getImage(i)) != null) {
+				IconButton button = new IconButton(img, sheet.id, i);
+				group.add(button);
+				if (sheet.spriteWidth == STD_WIDTH && sheet.spriteHeight == STD_HEIGHT) {
+					pane.add(button, c);
+					c.gridx++;
+					if (c.gridx >= MAX_PER_ROW) {
+						c.gridx = 0;
+						c.gridy++;
+					}
+					nextFreeSlot.setLocation(c.gridx,  c.gridy);
+				} else {
+					c.gridwidth = (sheet.spriteWidth / STD_WIDTH) + (sheet.spriteWidth % STD_WIDTH == 0 ? 0 : 1);
+					c.gridheight = (sheet.spriteHeight / STD_HEIGHT) + (sheet.spriteHeight % STD_HEIGHT == 0 ? 0 : 1);
+					boolean slotOk = false;
+					while (!slotOk) {
+						slotOk = true;
+						for (int x = c.gridx; x < c.gridx + c.gridwidth; x++) {
+							for (int y = c.gridy; y < c.gridy + c.gridwidth; y++) {
+								if (reservedSlots.contains(new Point(x, y))) {
+									slotOk = false;
+								}
+							}
+						}
+						if (slotOk && c.gridx + c.gridwidth > MAX_PER_ROW) {
+							c.gridx = 0;
+							c.gridy++;
+							slotOk = false;
+						}
+					}
+					pane.add(button, c);
+					for (int x = c.gridx; x < c.gridx + c.gridwidth; x++) {
+						for (int y = c.gridy; y < c.gridy + c.gridwidth; y++) {
+							reservedSlots.add(new Point(x, y));
+						}
+					}
+					c.gridwidth = 1;
+					c.gridheight = 1;
+					c.gridx = nextFreeSlot.x;
+					c.gridy = nextFreeSlot.y;
+				}
+				while (reservedSlots.contains(nextFreeSlot)) {
+					c.gridx++;
+					if (c.gridx >= MAX_PER_ROW) {
+						c.gridx = 0;
+						c.gridy++;
+					}
+					nextFreeSlot.setLocation(c.gridx,  c.gridy);
+				}
+				i++;
+			}
+		}
+		
+//		ok = new JButton("Ok");
+//		cancel = new JButton("Cancel");
+		
+		c.gridx = 0;
+		boolean emptyLine = false;
+		while (!emptyLine) {
+			c.gridy++;
+			emptyLine = true;
+			for (i = MAX_PER_ROW - 1; i >= 0; i--) {
+				if (reservedSlots.contains(new Point(i, c.gridy))) {
+					emptyLine = false;
+					continue;
+				}
+			}
+		}
+		
+//		JPanel buttonPane = new JPanel();
+//		buttonPane.add(cancel, BorderLayout.WEST);
+//		buttonPane.add(ok, BorderLayout.EAST);
+
+		JPanel wrapper = new JPanel();
+		wrapper.setLayout(new BorderLayout());
+		JScrollPane scroller = new JScrollPane(pane);
+		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		wrapper.add(scroller, BorderLayout.CENTER);
+//		wrapper.add(buttonPane, BorderLayout.SOUTH);
+		
+//		ok.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				selectedIconId = selectedOne.sheetId+":"+selectedOne.spriteIndex;
+//				SpriteChooser.this.setVisible(false);
+//				SpriteChooser.this.dispose();
+//				if (listener != null) listener.iconSelected(selectedIconId);
+//			}
+//		});
+		
+//		cancel.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				selectedIconId = null;
+//				SpriteChooser.this.setVisible(false);
+//				SpriteChooser.this.dispose();
+//				if (listener != null) listener.iconSelected(null);
+//			}
+//		});
+		
+		setContentPane(wrapper);
+	}
+	
+	private SpriteChooser.SelectionListener listener = null;
+	
+	public void setSelectionListener(SpriteChooser.SelectionListener l) {
+		listener = l;
+	}
+	
+	
+	public class IconButton extends JToggleButton {
+		
+		private static final long serialVersionUID = 7559407153561178455L;
+		
+		public String sheetId;
+		public int spriteIndex;
+
+		public IconButton(Image img, String sheetId, int spriteIndex) {
+			super(new ImageIcon(img));
+			this.sheetId = sheetId;
+			this.spriteIndex = spriteIndex;
+			setToolTipText(sheetId+":"+spriteIndex);
+			addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (IconButton.this.isSelected()) {
+						selectedIconId = IconButton.this.sheetId+":"+IconButton.this.spriteIndex;
+						SpriteChooser.this.setVisible(false);
+						SpriteChooser.this.dispose();
+						if (listener != null) listener.iconSelected(selectedIconId);
+					}
+				}
+			});
+		}
+	}
+	
+	public static interface SelectionListener {
+		public void iconSelected(String selected);
+	}
+	
+}
