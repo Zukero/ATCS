@@ -166,7 +166,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 			} else if (source == positiveBox) {
 				aCond.positive = (Integer) value;
 			} else if (source == stackingBox) {
-				aCond.positive = (Integer) value;
+				aCond.stacking = (Integer) value;
 			} else if (source == categoryBox) {
 				aCond.category = (ActorCondition.ACCategory) value;
 			} else if (source == roundVisualField) {
