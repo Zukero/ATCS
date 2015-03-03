@@ -64,7 +64,7 @@ public class QuestEditor extends JSONElementEditor {
 
 		addTextField(pane, "Internal ID: ", quest.id, quest.writable, listener);
 		addTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
-		addIntegerBasedCheckBox(pane, "Visible in quest log", quest.visible_in_log, quest.writable, listener);
+		visibleBox = addIntegerBasedCheckBox(pane, "Visible in quest log", quest.visible_in_log, quest.writable, listener);
 
 		JPanel stagesPane = new JPanel();
 		stagesPane.setLayout(new JideBoxLayout(stagesPane, JideBoxLayout.PAGE_AXIS, 6));
