@@ -171,12 +171,12 @@ public class ActorCondition extends JSONElement {
 		if (roundEffect != null) {
 			this.round_effect = new RoundEffect();
 			if (roundEffect.get("increaseCurrentHP") != null) {
-				this.round_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentHP")).get("min")));
-				this.round_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentHP")).get("max")));
+				this.round_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentHP")).get("max")));
+				this.round_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentHP")).get("min")));
 			}
 			if (roundEffect.get("increaseCurrentAP") != null) {
-				this.round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("min")));
-				this.round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("max")));
+				this.round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("max")));
+				this.round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("min")));
 			}
 			this.round_effect.visual_effect = (String) roundEffect.get("visualEffectID");
 		}
@@ -184,12 +184,12 @@ public class ActorCondition extends JSONElement {
 		if (fullRoundEffect != null) {
 			this.full_round_effect = new RoundEffect();
 			if (fullRoundEffect.get("increaseCurrentHP") != null) {
-				this.full_round_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentHP")).get("min")));
-				this.full_round_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentHP")).get("max")));
+				this.full_round_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentHP")).get("max")));
+				this.full_round_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentHP")).get("min")));
 			}
 			if (fullRoundEffect.get("increaseCurrentAP") != null) {
-				this.full_round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("min")));
-				this.full_round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("max")));
+				this.full_round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("max")));
+				this.full_round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("min")));
 			}
 			this.full_round_effect.visual_effect = (String) fullRoundEffect.get("visualEffectID");
 		}
@@ -322,14 +322,14 @@ public class ActorCondition extends JSONElement {
 				else jsonAD.put("min", 0);
 				if (this.constant_ability_effect.increase_damage_max != null) jsonAD.put("max", this.constant_ability_effect.increase_damage_max);
 				else jsonAD.put("max", 0);
-				jsonAbility.put("increaseCurrentAP", jsonAD);
+				jsonAbility.put("increaseAttackDamage", jsonAD);
 			}
 			if (this.constant_ability_effect.max_hp_boost != null) jsonAbility.put("increaseMaxHP", this.constant_ability_effect.max_hp_boost);
 			if (this.constant_ability_effect.max_ap_boost != null) jsonAbility.put("increaseMaxAP", this.constant_ability_effect.max_ap_boost);
 			if (this.constant_ability_effect.increase_move_cost != null) jsonAbility.put("increaseMoveCost", this.constant_ability_effect.increase_move_cost);
 			if (this.constant_ability_effect.increase_use_cost != null) jsonAbility.put("increaseUseItemCost", this.constant_ability_effect.increase_use_cost);
-			if (this.constant_ability_effect.increase_reequip_cost != null) jsonAbility.put("increaseUseItemCost", this.constant_ability_effect.increase_reequip_cost);
-			if (this.constant_ability_effect.increase_attack_cost != null) jsonAbility.put("increaseReequipCost", this.constant_ability_effect.increase_attack_cost);
+			if (this.constant_ability_effect.increase_reequip_cost != null) jsonAbility.put("increaseReequipCost", this.constant_ability_effect.increase_reequip_cost);
+			if (this.constant_ability_effect.increase_attack_cost != null) jsonAbility.put("increaseAttackCost", this.constant_ability_effect.increase_attack_cost);
 			if (this.constant_ability_effect.increase_critical_skill != null) jsonAbility.put("increaseCriticalSkill", this.constant_ability_effect.increase_critical_skill);
 			if (this.constant_ability_effect.increase_block_chance != null) jsonAbility.put("increaseBlockChance", this.constant_ability_effect.increase_block_chance);
 			if (this.constant_ability_effect.increase_damage_resistance != null) jsonAbility.put("increaseDamageResistance", this.constant_ability_effect.increase_damage_resistance);
