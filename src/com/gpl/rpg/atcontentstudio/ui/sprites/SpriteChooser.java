@@ -168,6 +168,7 @@ public class SpriteChooser extends JDialog {
 		JPanel wrapper = new JPanel();
 		wrapper.setLayout(new BorderLayout());
 		JScrollPane scroller = new JScrollPane(pane);
+		scroller.getVerticalScrollBar().setUnitIncrement(16);
 		scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		wrapper.add(scroller, BorderLayout.CENTER);
 //		wrapper.add(buttonPane, BorderLayout.SOUTH);
