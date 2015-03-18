@@ -64,7 +64,8 @@ public class Dialogue extends JSONElement {
 			removeSpawnArea,
 			deactivateSpawnArea,
 			activateMapChangeArea,
-			deactivateMapChangeArea
+			deactivateMapChangeArea,
+			removeQuestProgress
 		}
 	}
 	
@@ -269,6 +270,9 @@ public class Dialogue extends JSONElement {
 						break;
 					case skillIncrease:
 						//Nothing to do (yet ?).
+						break;
+					case removeQuestProgress:
+						reward.reward_obj = proj.getQuest(reward.reward_obj_id);
 						break;
 					}
 					if (reward.reward_obj != null) reward.reward_obj.addBacklink(this);

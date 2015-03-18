@@ -53,7 +53,8 @@ public class Requirement extends JSONElement {
 		usedItem,
 		spentGold,
 		consumedBonemeals,
-		hasActorCondition
+		hasActorCondition,
+		removeQuestProgress
 	}
 	
 	@Override

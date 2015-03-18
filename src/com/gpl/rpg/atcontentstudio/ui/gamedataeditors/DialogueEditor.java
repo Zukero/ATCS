@@ -372,7 +372,12 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObj = null;
 				rewardValue = null;
 				break;
-
+			case removeQuestProgress:
+				rewardMap = null;
+				rewardObjId = null;
+				rewardObj = addQuestBox(pane, ((Dialogue)target).getProject(), "Quest: ", (Quest) reward.reward_obj, writable, listener);
+				rewardValue = addIntegerField(pane, "Step ID: ", reward.reward_value, false, writable, listener);;
+				break;
 			}
 		}
 		pane.revalidate();
@@ -637,6 +642,11 @@ public class DialogueEditor extends JSONElementEditor {
 				requirementObjId = null;
 				requirementValue = null;
 				break;
+			case removeQuestProgress:
+				requirementObj = addQuestBox(pane, project, "Quest: ", (Quest) requirement.required_obj, writable, listener);
+				requirementObjId = null;
+				requirementValue = addIntegerField(pane, "Quest stage: ", requirement.required_value, false, writable, listener);
+				break;
 			}
 			requirementNegated = addBooleanBasedCheckBox(pane, "Negate this requirement.", requirement.negated, writable, listener);
 		}
@@ -764,6 +774,10 @@ public class DialogueEditor extends JSONElementEditor {
 						break;
 					case spawnAll:
 						label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+						break;
+					case removeQuestProgress:
+						label.setText("Remove quest progress "+rewardObjDesc+":"+reward.reward_value);
+						if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
 						break;
 					}
 				} else {
