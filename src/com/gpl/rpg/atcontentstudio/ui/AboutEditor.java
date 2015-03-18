@@ -47,7 +47,10 @@ public class AboutEditor extends Editor {
 			"<br/>" +
 			"Author: <a href=\"http://andorstrail.com/memberlist.php?mode=viewprofile&u=2875\">Zukero</a><br/>" +
 			"Licence: <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPL v3</a><br/>" +
-			"Sources are included in this package.<br/>" +
+			"Sources are included in this package and on <a href=\"https://github.com/Zukero/ATCS\">GitHub</a>.<br/>" +
+			"<br/>" +
+			"Contributors: <br/>" +
+			"Quentin Delvallet<br/>" +
 			"<br/>" +
 			"This project uses the following libraries:<br/>" +
 			"<a href=\"http://code.google.com/p/json-simple/\">JSON.simple</a> by Yidong Fang & Chris Nokleberg.<br/>" +
