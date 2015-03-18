@@ -189,12 +189,12 @@ public class NPC extends JSONElement {
 		if (hitEffect != null) {
 			this.hit_effect = new HitEffect();
 			if (hitEffect.get("increaseCurrentHP") != null) {
-				this.hit_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentHP")).get("min")));
-				this.hit_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentHP")).get("max")));
+				this.hit_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentHP")).get("max")));
+				this.hit_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentHP")).get("min")));
 			}
 			if (hitEffect.get("increaseCurrentAP") != null) {
-				this.hit_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentAP")).get("min")));
-				this.hit_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentAP")).get("max")));
+				this.hit_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentAP")).get("max")));
+				this.hit_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)hitEffect.get("increaseCurrentAP")).get("min")));
 			}
 			List conditionsSourceJson = (List) hitEffect.get("conditionsSource");
 			if (conditionsSourceJson != null && !conditionsSourceJson.isEmpty()) {

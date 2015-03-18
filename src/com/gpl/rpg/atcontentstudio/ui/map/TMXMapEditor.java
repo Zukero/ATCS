@@ -154,9 +154,11 @@ public class TMXMapEditor extends Editor {
 		editorTabsHolder.setShowCloseButtonOnTab(false);
 		add(editorTabsHolder, BorderLayout.CENTER);
 		
-		JScrollPane tmxScroller = new JScrollPane(getTmxEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);;
+		JScrollPane tmxScroller = new JScrollPane(getTmxEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane xmlScroller = new JScrollPane(getXmlEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		xmlScroller.getVerticalScrollBar().setUnitIncrement(16);
 		editorTabsHolder.add("TMX", tmxScroller);
-		editorTabsHolder.add("XML", new JScrollPane(getXmlEditorPane()));
+		editorTabsHolder.add("XML", xmlScroller);
 		
 	}
 	
@@ -559,6 +561,7 @@ public class TMXMapEditor extends Editor {
 		editorPane.setEditable(false);
 		editorPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
 		pane.add(editorPane, JideBoxLayout.VARY);
+
 		return pane;
 	}
 	
@@ -1061,7 +1064,7 @@ public class TMXMapEditor extends Editor {
 			listeners.remove(l);
 		}
 		
-		public void fireListChanged() {
+		public void fireListChanged() { 
 			for (ListDataListener l : listeners) {
 				l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, this.getSize()));
 			}
