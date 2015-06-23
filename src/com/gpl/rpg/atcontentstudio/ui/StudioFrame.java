@@ -136,12 +136,15 @@ public class StudioFrame extends JFrame {
 		projectMenu.add(new JSeparator());
 		projectMenu.add(new JMenuItem(actions.createGDE));
 		projectMenu.add(new JMenuItem(actions.importJSON));
+		projectMenu.add(new JMenuItem(actions.createWorldmap));
 		projectMenu.add(new JMenuItem(actions.loadSave));
 		getJMenuBar().add(projectMenu);
 		
 		JMenu toolsMenu = new JMenu("Tools");
 		toolsMenu.add(new JMenuItem(actions.compareItems));
 		toolsMenu.add(new JMenuItem(actions.compareNPCs));
+		toolsMenu.add(new JSeparator());
+		toolsMenu.add(new JMenuItem(actions.runBeanShell));
 		toolsMenu.add(new JSeparator());
 		toolsMenu.add(new JMenuItem(actions.exportProject));
 		getJMenuBar().add(toolsMenu);

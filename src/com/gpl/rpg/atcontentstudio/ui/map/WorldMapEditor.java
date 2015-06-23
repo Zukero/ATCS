@@ -5,9 +5,12 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -30,9 +33,11 @@ import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
+import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment.NamedArea;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.SaveItemsWizard;
+import com.gpl.rpg.atcontentstudio.ui.WorldmapLabelEditionWizard;
 import com.jidesoft.swing.ComboBoxSearchable;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
@@ -47,10 +52,12 @@ public class WorldMapEditor extends Editor {
 		moveViewSelect,
 		moveMaps,
 		deleteMaps,
-		addMap
+		addMap,
+		editLabelCoverage
 	}
 	
 	public String mapBeingAddedID = null;
+	public String selectedLabel = null;
 
 	public WorldMapEditor(WorldmapSegment worldmap) {
 		target = worldmap;
@@ -94,6 +101,11 @@ public class WorldMapEditor extends Editor {
 		zoomSliderPane.add(zoomSlider, JideBoxLayout.VARY);
 		zoomSliderPane.add(new JLabel(new ImageIcon(DefaultIcons.getZoomIcon())), JideBoxLayout.FIX);
 		
+		final JRadioButton editLabelCoverage = new JRadioButton("Edit label coverage");
+		final JButton editLabel = new JButton("Edit map label");
+		final JButton createLabel = new JButton("Create map label");
+		final JButton deleteLabel = new JButton("Delete map label");
+		
 		if (target.writable) {
 			JPanel mapToolsPane = new JPanel();
 			mapToolsPane.setLayout(new JideBoxLayout(mapToolsPane, JideBoxLayout.LINE_AXIS));
@@ -136,7 +148,23 @@ public class WorldMapEditor extends Editor {
 			mapToolsPane.add(new JPanel(), JideBoxLayout.VARY);
 			moveView.setSelected(true);
 			pane.add(mapToolsPane, JideBoxLayout.FIX);
-
+			
+			JPanel labelToolsPane = new JPanel();
+			labelToolsPane.setLayout(new JideBoxLayout(labelToolsPane, JideBoxLayout.LINE_AXIS));
+			mapToolsGroup.add(editLabelCoverage);
+			editLabelCoverage.setEnabled(false);
+			labelToolsPane.add(editLabelCoverage, JideBoxLayout.FIX);
+			editLabel.setEnabled(false);
+			labelToolsPane.add(editLabel, JideBoxLayout.FIX);
+			deleteLabel.setEnabled(false);
+			labelToolsPane.add(deleteLabel, JideBoxLayout.FIX);
+			createLabel.setEnabled(false);
+			labelToolsPane.add(createLabel, JideBoxLayout.FIX);
+			
+			labelToolsPane.add(new JPanel(), JideBoxLayout.VARY);
+			pane.add(labelToolsPane, JideBoxLayout.FIX);
+			
+			
 			moveView.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -196,10 +224,114 @@ public class WorldMapEditor extends Editor {
 					if (mapBox.getSelectedItem() == null) {
 						mapBeingAddedID = null;
 					} else {
+						if (mapBeingAddedID != null) {
+							mapView.updateFromModel();
+						}
 						mapBeingAddedID = ((TMXMap)mapBox.getSelectedItem()).id;
+						if (mapView.mapLocations.isEmpty()) {
+							TMXMap map = target.getProject().getMap(mapBeingAddedID);
+							int w = map.tmxMap.getWidth() * WorldMapView.TILE_SIZE;
+							int h = map.tmxMap.getHeight() * WorldMapView.TILE_SIZE;
+							mapView.mapLocations.put(mapBeingAddedID, new Rectangle(0, 0, w, h));
+							mapView.recomputeSize();
+							mapView.revalidate();
+							mapView.repaint();
+						}
 					}
 				}
 			});
+			
+			editLabelCoverage.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					editMode = EditMode.editLabelCoverage;
+					mapBox.setEnabled(false);
+					mapView.selected.clear();
+					mapView.selected.addAll(((WorldmapSegment)target).labelledMaps.get(selectedLabel));
+					if (mapBeingAddedID != null) {
+						mapView.mapLocations.remove(mapBeingAddedID);
+						mapBeingAddedID = null;
+					}
+					mapView.revalidate();
+					mapView.repaint();
+				}
+			});
+			
+			editLabelCoverage.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.DESELECTED) {
+						WorldmapSegment map = (WorldmapSegment)target;
+						if (map.labelledMaps.get(selectedLabel) != null) {
+							map.labelledMaps.get(selectedLabel).clear();
+						} else {
+							map.labelledMaps.put(selectedLabel, new LinkedList<String>());
+						}
+						for (String s : mapView.selected) {
+							map.labelledMaps.get(selectedLabel).add(s);
+						}
+						mapView.revalidate();
+						mapView.repaint();
+					}
+				}
+			});
+			
+			editLabel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					mapView.selected.clear();
+					mapView.selected.addAll(((WorldmapSegment)target).labelledMaps.get(selectedLabel));
+					mapView.revalidate();
+					mapView.repaint();
+					WorldmapLabelEditionWizard wiz = new WorldmapLabelEditionWizard(worldmap, worldmap.labels.get(selectedLabel));
+					wiz.addCreationListener(new WorldmapLabelEditionWizard.CreationCompletedListener() {
+						@Override
+						public void labelCreated(NamedArea created) {
+							if (!created.id.equals(selectedLabel)) {
+								worldmap.labelledMaps.put(created.id, worldmap.labelledMaps.get(selectedLabel));
+								worldmap.labelledMaps.remove(selectedLabel);
+								worldmap.labels.put(created.id, created);
+								worldmap.labels.remove(selectedLabel);
+								selectedLabel = created.id;
+								mapView.revalidate();
+								mapView.repaint();
+							}
+						}
+					});
+					wiz.setVisible(true);
+				}
+			});
+			
+			deleteLabel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					worldmap.labelledMaps.remove(selectedLabel);
+					worldmap.labels.remove(selectedLabel);
+					selectedLabel = null;
+					mapView.revalidate();
+					mapView.repaint();
+				}
+			});
+			
+			createLabel.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					WorldmapLabelEditionWizard wiz = new WorldmapLabelEditionWizard(worldmap);
+					wiz.addCreationListener(new WorldmapLabelEditionWizard.CreationCompletedListener() {
+						@Override
+						public void labelCreated(NamedArea created) {
+							worldmap.labelledMaps.put(created.id, new LinkedList<String>());
+							worldmap.labelledMaps.get(created.id).addAll(mapView.selected);
+							mapView.revalidate();
+							mapView.repaint();
+						}
+					});
+					wiz.setVisible(true);
+				}
+			});
+			
+			
+			
 
 		}
 		
@@ -247,20 +379,25 @@ public class WorldMapEditor extends Editor {
 						break;
 					}
 				}
-				if (editMode == EditMode.moveViewSelect) {
+				if (editMode == EditMode.moveViewSelect || editMode == EditMode.editLabelCoverage) {
 					if (selectedMap == null) return;
 					if (e.getButton() == MouseEvent.BUTTON1) {
 						if (e.isControlDown() || e.isShiftDown()) {
 							if (mapView.selected.contains(selectedMap)) {
-								mapView.selected.remove(selectedMap);
-								update = true;
+								if (editMode != EditMode.editLabelCoverage || mapView.selected.size() > 1) {
+									mapView.selected.remove(selectedMap);
+									mapSelectionChanged();
+									update = true;
+								}
 							} else {
 								mapView.selected.add(selectedMap);
+								mapSelectionChanged();
 								update = true;
 							}
 						} else {
 							mapView.selected.clear();
 							mapView.selected.add(selectedMap);
+							mapSelectionChanged();
 							update = true;
 						}
 						if (e.getClickCount() == 2) {
@@ -269,8 +406,9 @@ public class WorldMapEditor extends Editor {
 					}
 				} else if (editMode == EditMode.deleteMaps) {
 					worldmap.mapLocations.remove(selectedMap);
-					worldmap.labelLocations.remove(selectedMap);
+					worldmap.labels.remove(selectedMap);
 					mapView.selected.remove(selectedMap);
+					mapSelectionChanged();
 					mapView.updateFromModel();
 					update = true;
 				} else if (editMode == EditMode.addMap && mapBeingAddedID != null) {
@@ -358,6 +496,47 @@ public class WorldMapEditor extends Editor {
 
 					mapView.revalidate();
 					mapView.repaint();
+				}
+			}
+			
+			public void mapSelectionChanged() {
+				if (mapView.selected.isEmpty()) {
+					editLabelCoverage.setEnabled(false);
+					editLabel.setEnabled(false);
+					createLabel.setEnabled(false);
+					selectedLabel = null;
+				} else {
+					String label = null;
+					boolean multiLabel = false;
+					for (String map : mapView.selected) {
+						for (String existingLabel : ((WorldmapSegment)target).labelledMaps.keySet()) {
+							if (((WorldmapSegment)target).labelledMaps.get(existingLabel).contains(map)) {
+								if (label != null && !label.equals(existingLabel)) {
+									multiLabel = true;
+								}
+								label = existingLabel;
+							}
+						}
+					}
+					if (multiLabel) {
+						editLabelCoverage.setEnabled(false);
+						editLabel.setEnabled(false);
+						createLabel.setEnabled(false);
+						deleteLabel.setEnabled(false);
+						selectedLabel = null;
+					} else if (label != null) {
+						editLabelCoverage.setEnabled(true);
+						editLabel.setEnabled(true);
+						deleteLabel.setEnabled(true);
+						createLabel.setEnabled(false);
+						selectedLabel = label;
+					} else {
+						editLabelCoverage.setEnabled(false);
+						editLabel.setEnabled(false);
+						deleteLabel.setEnabled(false);
+						createLabel.setEnabled(true);
+						selectedLabel = null;
+					}
 				}
 			}
 		};

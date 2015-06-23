@@ -773,6 +773,26 @@ public class Project implements ProjectTreeNode, Serializable {
 		((JSONElement) target).jsonFile = new File(baseContent.gameData.getGameDataElement(((JSONElement)target).getClass(), target.id).jsonFile.getAbsolutePath());
 		alteredContent.gameData.addElement((JSONElement) target);
 	}
+	
+	public void createWorldmapSegment(WorldmapSegment node) {
+		node.writable = true;
+		if (getWorldmapSegment(node.id) != null) {
+			WorldmapSegment existingNode = getWorldmapSegment(node.id);
+			for (GameDataElement backlink : existingNode.getBacklinks()) {
+				backlink.elementChanged(existingNode, node);
+			}
+			existingNode.getBacklinks().clear();
+			node.writable = true;
+			node.state = GameDataElement.State.created;
+			alteredContent.worldmap.addSegment(node);
+			node.link();
+		} else {
+			createdContent.worldmap.addSegment(node);
+			node.state =  GameDataElement.State.created;
+			node.link();
+		}
+		fireElementAdded(node, getNodeIndex(node));
+	}
 
 	
 	@Override

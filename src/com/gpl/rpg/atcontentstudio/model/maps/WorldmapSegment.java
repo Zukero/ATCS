@@ -3,6 +3,8 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +23,9 @@ public class WorldmapSegment extends GameDataElement {
 	
 	public int segmentX;
 	public int segmentY;
-	public Map<String, Point> mapLocations = new HashMap<String, Point>();
-	public Map<String, NamedArea> labelLocations = new HashMap<String, NamedArea>();
+	public Map<String, Point> mapLocations = new LinkedHashMap<String, Point>();
+	public Map<String, List<String>> labelledMaps = new LinkedHashMap<String, List<String>>();
+	public Map<String, NamedArea> labels = new LinkedHashMap<String, NamedArea>();
 	public Element xmlNode;
 	
 	public WorldmapSegment(Worldmap parent, String name, Element xmlNode) {
@@ -49,11 +52,18 @@ public class WorldmapSegment extends GameDataElement {
 		for (int j = 0; j < mapsList.getLength(); j++) {
 			Element mapNode = (Element) mapsList.item(j);
 			mapLocations.put(mapNode.getAttribute("id"), new Point(Integer.parseInt(mapNode.getAttribute("x")) - segmentX, Integer.parseInt(mapNode.getAttribute("y")) - segmentY));
+			String area;
+			if ((area = mapNode.getAttribute("area")) != null && !"".equals(area)) {
+				if (labelledMaps.get(area) == null) {
+					labelledMaps.put(area, new LinkedList<String>());
+				}
+				labelledMaps.get(area).add(mapNode.getAttribute("id"));
+			}
 		}
 		NodeList namedAreasNodeList = xmlNode.getElementsByTagName("namedarea");
 		for (int j = 0; j < namedAreasNodeList.getLength(); j++) {
 			Element namedAreaNode = (Element) namedAreasNodeList.item(j);
-			labelLocations.put(namedAreaNode.getAttribute("id"), new NamedArea(namedAreaNode.getAttribute("id"), namedAreaNode.getAttribute("name"), namedAreaNode.getAttribute("type")));
+			labels.put(namedAreaNode.getAttribute("id"), new NamedArea(namedAreaNode.getAttribute("id"), namedAreaNode.getAttribute("name"), namedAreaNode.getAttribute("type")));
 		}
 		this.state = State.parsed;
 	}
@@ -104,10 +114,15 @@ public class WorldmapSegment extends GameDataElement {
 			map.setAttribute("id", s);
 			map.setAttribute("x", Integer.toString(mapLocations.get(s).x + segmentX));
 			map.setAttribute("y", Integer.toString(mapLocations.get(s).y + segmentY));
+			for (String label : labelledMaps.keySet()) {
+				if (labelledMaps.get(label).contains(s)) {
+					map.setAttribute("area", label);
+				}
+			}
 			element.appendChild(map);
 		}
 		
-		for (NamedArea area : labelLocations.values()) {
+		for (NamedArea area : labels.values()) {
 			Element namedArea = doc.createElement("namedarea");
 			namedArea.setAttribute("id", area.id);
 			namedArea.setAttribute("name", area.name);
@@ -117,6 +132,7 @@ public class WorldmapSegment extends GameDataElement {
 		
 		return element;
 	}
+	
 
 	@Override
 	public List<SaveEvent> attemptSave() {
@@ -126,9 +142,9 @@ public class WorldmapSegment extends GameDataElement {
 	}
 
 	public static class NamedArea {
-		String id;
-		String name;
-		String type;
+		public String id;
+		public String name;
+		public String type;
 		
 		public NamedArea(String id, String name, String type) {
 			this.id = id;

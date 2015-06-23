@@ -3,10 +3,16 @@ package com.gpl.rpg.atcontentstudio.ui.map;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,6 +92,30 @@ public class WorldMapView extends JComponent implements Scrollable {
         	
         	g2.translate(-x, -y);
         	
+        }
+        
+        
+        Font f = g2.getFont();
+        f = f.deriveFont(70f).deriveFont(Font.BOLD);
+        g2.setFont(f);
+        g2.setStroke(new BasicStroke(3));
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        FontMetrics fm = g2.getFontMetrics();
+        FontRenderContext frc = g2.getFontRenderContext();
+        
+        for (String s : worldmap.labels.keySet()) {
+        	String label = worldmap.labels.get(s).name;
+        	Rectangle areaCovered = new Rectangle(0, 0, -1, -1);
+        	for (String map : worldmap.labelledMaps.get(s)) {
+        		areaCovered.add(mapLocations.get(map));
+        	}
+        	
+        	Rectangle2D stringBounds = fm.getStringBounds(label, g2);
+        	GlyphVector gv = f.createGlyphVector(frc, label);
+        	g2.setColor(Color.WHITE);
+        	g2.fill(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
+        	g2.setColor(Color.BLACK);
+        	g2.draw(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
         }
 	}
 	
@@ -202,6 +232,8 @@ public class WorldMapView extends JComponent implements Scrollable {
 		return originMoved;
 	}
 	
+	
+	
 	public void updateFromModel() {
 		mapLocations.clear();
 		sizeX = sizeY = 0;
@@ -232,13 +264,13 @@ public class WorldMapView extends JComponent implements Scrollable {
 		}
 		
 		List<String> toRemove = new ArrayList<String>();
-		for (String s : worldmap.labelLocations.keySet()) {
+		for (String s : worldmap.labels.keySet()) {
 			if (!mapLocations.containsKey(s)) {
 				toRemove.add(s);
 			}
 		}
 		for (String s : toRemove) {
-			worldmap.labelLocations.remove(s);
+			worldmap.labels.remove(s);
 		}
 	}
 	

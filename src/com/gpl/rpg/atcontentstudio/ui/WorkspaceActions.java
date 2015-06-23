@@ -19,6 +19,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
+import bsh.util.JConsole;
+
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.ClosedProject;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
@@ -32,6 +34,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
+import com.gpl.rpg.atcontentstudio.ui.tools.BeanShellView;
 import com.gpl.rpg.atcontentstudio.ui.tools.ItemsTableView;
 import com.gpl.rpg.atcontentstudio.ui.tools.NPCsTableView;
 
@@ -213,6 +216,17 @@ public class WorkspaceActions {
 		}
 	};
 	
+
+	public ATCSAction createWorldmap = new ATCSAction("Create Worldmap segment", "Opens the worldmap segment creation wizard") {
+		public void actionPerformed(ActionEvent e) {
+			if (selectedNode == null || selectedNode.getProject() == null) return;
+			new WorldmapCreationWizard(selectedNode.getProject()).setVisible(true);
+		}
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(selectedNode != null && selectedNode.getProject() != null);
+		}
+	};
+	
 	public ATCSAction importJSON = new ATCSAction("Import JSON data", "Opens the JSON import wizard") {
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
@@ -278,6 +292,12 @@ public class WorkspaceActions {
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode != null && selectedNode.getProject() != null);
+		};
+	};
+	
+	public ATCSAction runBeanShell = new ATCSAction("Run Beanshell console", "Opens a beanshell scripting pad."){
+		public void actionPerformed(ActionEvent e) {
+			new BeanShellView();
 		};
 	};
 	

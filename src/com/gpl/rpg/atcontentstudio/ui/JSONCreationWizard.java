@@ -262,6 +262,7 @@ public class JSONCreationWizard extends JDialog {
 		buttonPane.add(cancel, JideBoxLayout.FIX);
 		ok = new JButton("Ok");
 		buttonPane.add(ok, JideBoxLayout.FIX);
+		pane.add(new JPanel(), JideBoxLayout.VARY);
 		pane.add(buttonPane, JideBoxLayout.FIX);
 		
 		ok.addActionListener(new ActionListener() {

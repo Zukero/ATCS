@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -48,6 +49,12 @@ public class TMXMapSet implements ProjectTreeNode {
 				}
 			}
 		}
+		Collections.sort(tmxMaps, new Comparator<TMXMap>() {
+			@Override
+			public int compare(TMXMap o1, TMXMap o2) {
+				return o1.id.compareTo(o2.id);
+			}
+		});
 	}
 	
 	@Override

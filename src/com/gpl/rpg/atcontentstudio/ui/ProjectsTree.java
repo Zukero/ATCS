@@ -201,6 +201,10 @@ public class ProjectsTree extends JPanel {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.importJSON));
 		}
+		if (actions.createWorldmap.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.createWorldmap));
+		}
 		if (actions.loadSave.isEnabled()) {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.loadSave));
@@ -218,6 +222,10 @@ public class ProjectsTree extends JPanel {
 		if (actions.compareNPCs.isEnabled()) {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.compareNPCs));
+		}
+		if (actions.runBeanShell.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.runBeanShell));
 		}
 		if (actions.exportProject.isEnabled()) {
 			addNextSeparator = true;
