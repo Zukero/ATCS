@@ -849,6 +849,11 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 			alreadyAdded = false;
 		}
+		if (result.isEmpty()) {
+			//Fallback case. A single NPC does not declare a spawn group, but is referred by its ID in maps' spawn areas.
+			NPC npc = getNPC(spawngroup_id);
+			if (npc != null) result.add(npc);
+		}
 		return result;
 	}
 	

@@ -1,6 +1,6 @@
 !include MUI2.nsh
 
-!define VERSION "0.3.3"
+!define VERSION "0.4.0"
 !define JAVA_BIN "java"
 
 Name "Andor's Trail Content Studio v${VERSION}"
@@ -57,18 +57,19 @@ Section install
   Call GetJRE
   Pop $R0
   FileOpen $9 "ATCS.cmd" w
-  FileWrite $9 'start "" "$R0" -Xmx512M -cp "lib\AndorsTrainer_v0.1.1.jar;lib\jide-oss.jar;lib\ui.jar;lib\junit-4.10.jar;lib\json_simple-1.1.jar;lib\rsyntaxtextarea.jar;lib\prefuse.jar;lib\ATCS_v${VERSION}.jar" com.gpl.rpg.atcontentstudio.ATContentStudio'
+  FileWrite $9 'start "" "$R0" -Xmx512M -cp "lib\AndorsTrainer_v0.1.1.jar;lib\jide-oss.jar;lib\ui.jar;lib\junit-4.10.jar;lib\json_simple-1.1.jar;lib\rsyntaxtextarea.jar;lib\prefuse.jar;lib\bsh-2.0b4.jar;lib\ATCS_v${VERSION}.jar" com.gpl.rpg.atcontentstudio.ATContentStudio'
   FileClose $9
   
   SetOutPath "$INSTDIR\lib\"
   file "jide-oss.jar"
   file "ui.jar"
-  file "AndorsTrainer_v0.1.1.jar"
+  file "AndorsTrainer_v0.1.2.jar"
   file "junit-4.10.jar"
   file "json_simple-1.1.jar"
   file "ATCS_v${VERSION}.jar"
   file "rsyntaxtextarea.jar"
   file "prefuse.jar"
+  file "bsh-2.0b4.jar"
 
   SetOutPath $INSTDIR
   
@@ -92,7 +93,7 @@ Section uninstall
   Delete "$INSTDIR\lib\ui.jar"
   Delete "$INSTDIR\lib\junit-4.10.jar"
   Delete "$INSTDIR\lib\json_simple-1.1.jar"
-  Delete "$INSTDIR\lib\AndorsTrainer_v0.1.1.jar"
+  Delete "$INSTDIR\lib\AndorsTrainer_v0.1.2.jar"
   Delete "$INSTDIR\lib\ATCS_v${VERSION}.jar"
   Delete "$INSTDIR\lib\rsyntaxtextarea.jar"
   Delete "$INSTDIR\lib\prefuse.jar"
