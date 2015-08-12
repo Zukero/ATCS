@@ -257,7 +257,11 @@ public class TMXMapWriter
         if (tileBitmapFile != null) {
             w.startElement("image");
             w.writeAttribute("source", getRelativePath(wp, tileBitmapFile));
-
+            if (set.sheetDimensions != null) {
+            	w.writeAttribute("width", set.sheetDimensions.width);
+            	w.writeAttribute("height", set.sheetDimensions.height);
+            }
+            
             Color trans = set.getTransparentColor();
             if (trans != null) {
                 w.writeAttribute("trans", Integer.toHexString(

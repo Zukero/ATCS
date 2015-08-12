@@ -6,9 +6,12 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -108,9 +111,15 @@ public class WorkspaceSelector extends JFrame {
 		//Layout, labels and dialog behavior.
 		setTitle("Select your workspace");
 		
+		JLabel logoLabel = new JLabel();
+		try {
+			logoLabel = new JLabel(new ImageIcon(ImageIO.read(WorkspaceSelector.class.getResource("/com/gpl/rpg/atcontentstudio/img/atcs_logo_banner.png"))), JLabel.CENTER);
+		} catch (IOException e1) {}
+		
 		JPanel dialogPane = new JPanel();
 		dialogPane.setLayout(new BorderLayout());
 		
+		dialogPane.add(logoLabel, BorderLayout.NORTH);
 		dialogPane.add(new JLabel("Workspace : "), BorderLayout.WEST);
 		dialogPane.add(combo, BorderLayout.CENTER);
 		dialogPane.add(browse, BorderLayout.EAST);

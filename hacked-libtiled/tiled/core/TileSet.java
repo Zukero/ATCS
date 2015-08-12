@@ -74,6 +74,7 @@ public class TileSet implements Iterable<Tile>
     private Color transparentColor;
     private Image tileSetImage;
     public Spritesheet sheet = null;
+    public Rectangle sheetDimensions;
 
     /**
      * Default constructor
@@ -120,8 +121,10 @@ public class TileSet implements Iterable<Tile>
         importTileBitmap(buffered, cutter);
     }
     
-    public void loadFromProject(String name, TMXMap tmxMap) {
+    public void loadFromProject(String name, TMXMap tmxMap, int tileWidth, int tileHeight) {
     	sheet = tmxMap.getProject().getSpritesheet(name);
+    	tileDimensions.width = tileWidth;
+    	tileDimensions.height = tileHeight;
     	int i = 0;
     	Image tileImage = sheet.getImage(i);
         while (tileImage != null) {

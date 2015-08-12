@@ -30,6 +30,7 @@ package tiled.io;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -382,7 +383,10 @@ public class TMXMapReader
                         // case.
                     	
                     	if (tmxMap.getProject().getSpritesheet(name) != null) {
-                    		set.loadFromProject(name, tmxMap);
+                    		set.loadFromProject(name, tmxMap, tileWidth, tileHeight);
+                    		set.sheetDimensions = new Rectangle();
+                    		set.sheetDimensions.width = getAttribute(child, "width", 0);
+                    		set.sheetDimensions.height = getAttribute(child, "height", 0);
                     	} else {
                     	
 
