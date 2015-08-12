@@ -1,15 +1,23 @@
 package com.gpl.rpg.atcontentstudio.model.maps;
 
 import java.awt.Image;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 
 public class ReplaceArea extends MapObject {
+	
+	public Map<String, String> replacedLayers = null;
 
 	public ReplaceArea(tiled.core.MapObject obj) {
-		// TODO Auto-generated constructor stub
+		for (Object s : obj.getProperties().keySet()) {
+			if (replacedLayers == null) replacedLayers = new LinkedHashMap<String, String>();
+			replacedLayers.put(s.toString(), obj.getProperties().getProperty(s.toString()));
+		}
+		
 	}
 
 	@Override
@@ -31,8 +39,10 @@ public class ReplaceArea extends MapObject {
 	
 	@Override
 	public void savePropertiesInTmxObject(tiled.core.MapObject tmxObject) {
-		// TODO Auto-generated method stub
-		
+		if (replacedLayers != null) {
+			for(String s : replacedLayers.keySet())
+			tmxObject.getProperties().setProperty(s, replacedLayers.get(s));
+		}
 	}
 	
 }
