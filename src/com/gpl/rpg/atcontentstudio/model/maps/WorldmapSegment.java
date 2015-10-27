@@ -2,11 +2,25 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 
 import java.awt.Image;
 import java.awt.Point;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -101,6 +115,32 @@ public class WorldmapSegment extends GameDataElement {
 	@Override
 	public void save() {
 		((Worldmap)parent).save();
+	}
+	
+	public String toXml() {
+		Document doc;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			doc.setXmlVersion("1.0");
+			Element root = doc.createElement("worldmap");
+			doc.appendChild(root);
+			root.appendChild(this.toXmlElement(doc));
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			Result output = new StreamResult(baos);
+			Source input = new DOMSource(doc);
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			transformer.transform(input, output);
+			return baos.toString();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
 	}
 	
 	public Element toXmlElement(Document doc) {

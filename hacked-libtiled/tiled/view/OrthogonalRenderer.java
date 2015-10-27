@@ -90,4 +90,5 @@ public class OrthogonalRenderer implements MapRenderer
 
         g.translate(-bounds.x * tileWidth, -bounds.y * tileHeight);
     }
+    
 }

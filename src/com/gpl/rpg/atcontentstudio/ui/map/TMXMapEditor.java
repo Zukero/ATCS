@@ -18,15 +18,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -36,6 +41,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -45,6 +52,12 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -79,6 +92,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.SpawnArea;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
 import com.gpl.rpg.atcontentstudio.ui.BooleanBasedCheckBox;
+import com.gpl.rpg.atcontentstudio.ui.CollapsiblePanel;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
@@ -139,6 +153,15 @@ public class TMXMapEditor extends Editor {
 	private JSpinner requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
+	private JList replacementsList;
+	private ReplacementsListModel replacementsListModel;
+	private ReplaceArea.Replacement selectedReplacement;
+	private JButton addReplacement;
+	private JButton deleteReplacement;
+	private JPanel replacementEditPane;
+	private JComboBox sourceLayer;
+	private JComboBox targetLayer;
+	
 	private TMXViewer tmxViewer;
 	
 	public TMXMapEditor(TMXMap map) {
@@ -156,12 +179,16 @@ public class TMXMapEditor extends Editor {
 		
 		JScrollPane tmxScroller = new JScrollPane(getTmxEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		JScrollPane xmlScroller = new JScrollPane(getXmlEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane replScroller = new JScrollPane(getReplacementSimulatorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		xmlScroller.getVerticalScrollBar().setUnitIncrement(16);
 		editorTabsHolder.add("TMX", tmxScroller);
 		editorTabsHolder.add("XML", xmlScroller);
+		editorTabsHolder.add("Replacements", replScroller);
 		
 	}
 	
+
+
 	public JPanel getTmxEditorPane() {
 		final TMXMap map = (TMXMap) target;
 		final FieldUpdateListener listener = new MapFieldUpdater();
@@ -453,7 +480,60 @@ public class TMXMapEditor extends Editor {
 			});
 			pane.add(tACPane, JideBoxLayout.FIX);
 		} else if (selected instanceof ReplaceArea) {
-			//TODO replace area edition
+			//Replace areas only use questProgress requirements ATM
+			//requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), ((ReplaceArea)selected).requirement.type, ((TMXMap)target).writable, listener);
+			requirementParamsPane = new JPanel();
+			requirementParamsPane.setLayout(new JideBoxLayout(requirementParamsPane, JideBoxLayout.PAGE_AXIS, 6));
+			pane.add(requirementParamsPane, JideBoxLayout.FIX);
+			updateRequirementParamsPane(requirementParamsPane, ((ReplaceArea)selected).requirement, listener);
+			
+			CollapsiblePanel replacementListPane = new CollapsiblePanel("Replacements");
+			replacementListPane.setLayout(new JideBoxLayout(replacementListPane, JideBoxLayout.PAGE_AXIS));
+			replacementsListModel = new ReplacementsListModel((ReplaceArea) selected);
+			replacementsList = new JList(replacementsListModel);
+			replacementsList.setCellRenderer(new ReplacementsListRenderer((ReplaceArea) selected));
+			replacementListPane.add(new JScrollPane(replacementsList), JideBoxLayout.VARY);
+			
+			JPanel replacementListButtonsPane = new JPanel();
+			replacementListButtonsPane.setLayout(new JideBoxLayout(replacementListButtonsPane, JideBoxLayout.LINE_AXIS));
+			addReplacement = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
+			replacementListButtonsPane.add(addReplacement, JideBoxLayout.FIX);
+			addReplacement.setEnabled(((TMXMap)target).writable);
+			addReplacement.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					replacementsListModel.addObject(null, null);
+				}
+			});
+			deleteReplacement = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+			replacementListButtonsPane.add(deleteReplacement, JideBoxLayout.FIX);
+			deleteReplacement.setEnabled(false);
+			deleteReplacement.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					replacementsListModel.removeObject(selectedReplacement);
+				}
+			});
+			replacementListButtonsPane.add(new JPanel(), JideBoxLayout.VARY);
+			replacementListPane.add(replacementListButtonsPane, JideBoxLayout.FIX);
+			
+			replacementEditPane = new JPanel();
+			replacementListPane.add(replacementEditPane, JideBoxLayout.FIX);
+			
+			pane.add(new JScrollPane(replacementListPane), JideBoxLayout.VARY);
+			
+			
+			replacementsList.addListSelectionListener(new ListSelectionListener() {
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					selectedReplacement = (ReplaceArea.Replacement)replacementsList.getSelectedValue();
+					updateReplacementsEditPane(replacementEditPane, (ReplaceArea)selected, selectedReplacement, listener);
+					deleteReplacement.setEnabled(((TMXMap)target).writable);
+				}
+			});
+			
+			
+			
 		} else if (selected instanceof RestArea) {
 			pane.add(new JLabel("Rest areas have no parameters"), JideBoxLayout.FIX);
 		} else if (selected instanceof ScriptArea) {
@@ -553,6 +633,37 @@ public class TMXMapEditor extends Editor {
 		pane.repaint();
 	}
 
+	public void updateReplacementsEditPane(JPanel pane, ReplaceArea area, ReplaceArea.Replacement replacement, final FieldUpdateListener listener) {
+		boolean writable = ((TMXMap)target).writable;
+		pane.removeAll();
+		
+		sourceLayer = new JComboBox<String>(new ReplacementsLayersComboModel(area, true, replacement.sourceLayer));
+		targetLayer = new JComboBox<String>(new ReplacementsLayersComboModel(area, false, replacement.targetLayer));
+		
+		sourceLayer.setEnabled(writable);
+		targetLayer.setEnabled(writable);
+		
+		sourceLayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceLayer, sourceLayer.getModel().getSelectedItem());
+			}
+		});
+		targetLayer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetLayer, targetLayer.getModel().getSelectedItem());
+			}
+		});
+		
+		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.LINE_AXIS));
+		pane.add(new JLabel("Replace "), JideBoxLayout.FIX);
+		pane.add(sourceLayer, JideBoxLayout.FIX);
+		pane.add(new JLabel(" by "), JideBoxLayout.FIX);
+		pane.add(targetLayer, JideBoxLayout.FIX);
+		pane.add(new JPanel(), JideBoxLayout.VARY);
+	}
+	
 	public JPanel getXmlEditorPane() {
 		JPanel pane = new JPanel();
 		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS, 6));
@@ -567,6 +678,214 @@ public class TMXMapEditor extends Editor {
 	
 	public void updateXmlViewText(String text) {
 		editorPane.setText(text);
+	}
+	
+	
+	
+	public JPanel getReplacementSimulatorPane() {
+		JPanel replacementSimulator = new JPanel();
+		replacementSimulator.setLayout(new JideBoxLayout(replacementSimulator, JideBoxLayout.PAGE_AXIS));
+		final JCheckBox walkableVisibleBox = new JCheckBox("Show \""+TMXMap.WALKABLE_LAYER_NAME+"\" layer.");
+		JPanel areasActivationPane = new JPanel();
+		areasActivationPane.setLayout(new JideBoxLayout(areasActivationPane, JideBoxLayout.LINE_AXIS));
+		TreeModel areasTreeModel = new ReplaceAreasActivationTreeModel();
+		final JTree areasTree = new JTree(areasTreeModel);
+		areasTree.setEditable(false);
+		areasTree.setRootVisible(false);
+		areasTree.setCellRenderer(new ReplaceAreasActivationTreeCellRenderer());
+		areasActivationPane.add(new JScrollPane(areasTree), JideBoxLayout.FIX);
+		final JToggleButton activate = new JToggleButton("Activate ReplaceArea(s)");
+		areasActivationPane.add(activate, JideBoxLayout.VARY);
+		final TMXReplacementViewer viewer = new TMXReplacementViewer((TMXMap)target);  
+		
+		replacementSimulator.add(walkableVisibleBox, JideBoxLayout.FIX);
+		replacementSimulator.add(areasActivationPane, JideBoxLayout.FIX);
+		replacementSimulator.add(viewer, JideBoxLayout.VARY);
+		
+		walkableVisibleBox.setSelected(true);
+		walkableVisibleBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.showWalkable = walkableVisibleBox.isSelected();
+				viewer.revalidate();
+				viewer.repaint();
+			}
+		});
+		activate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (areasTree.getSelectionPaths() == null) return;
+				for (TreePath paths : areasTree.getSelectionPaths()) {
+					Object target = paths.getLastPathComponent();
+					if (target instanceof ReplaceArea) {
+						viewer.activeReplacements.put((ReplaceArea) target, activate.isSelected());
+						viewer.updateLayers();
+						viewer.revalidate();
+						viewer.repaint();
+					} else if (target instanceof MapObjectGroup) {
+						for (MapObject obj : ((MapObjectGroup)target).mapObjects) {
+							if (obj instanceof ReplaceArea) {
+								viewer.activeReplacements.put((ReplaceArea) obj, activate.isSelected());
+							}
+							viewer.updateLayers();
+							viewer.revalidate();
+							viewer.repaint();
+						}
+					}
+					
+				}
+			}
+		});
+		areasTree.addTreeSelectionListener(new TreeSelectionListener() {
+			@Override
+			public void valueChanged(TreeSelectionEvent e) {
+				if (areasTree.getSelectionPaths() == null) return;
+				for (TreePath paths : areasTree.getSelectionPaths()) {
+					Object target = paths.getLastPathComponent();
+					if (target instanceof ReplaceArea) {
+						activate.setSelected(viewer.activeReplacements.get((ReplaceArea) target));
+					} else if (target instanceof MapObjectGroup) {
+						for (MapObject obj : ((MapObjectGroup)target).mapObjects) {
+							activate.setSelected(true);
+							if (obj instanceof ReplaceArea) {
+								if (!viewer.activeReplacements.get((ReplaceArea) obj)) {
+									activate.setSelected(false);
+								}
+							}
+						}
+					}
+					
+				}
+			}
+		});
+		
+		return replacementSimulator;
+	}
+	
+	public class ReplaceAreasActivationTreeModel implements TreeModel {
+
+		@Override
+		public Object getRoot() {
+			return target;
+		}
+
+		@Override
+		public Object getChild(Object parent, int index) {
+			int i = index;
+			if (parent instanceof TMXMap) {
+				for (MapObjectGroup group : ((TMXMap)parent).groups) {
+					for (MapObject obj : group.mapObjects) {
+						if (obj instanceof ReplaceArea) {
+							if (i == 0) return group;
+							i--;
+							break;
+						}
+					}
+				}
+			} else if (parent instanceof MapObjectGroup) {
+				for (MapObject obj : ((MapObjectGroup)parent).mapObjects) {
+					if (obj instanceof ReplaceArea) {
+						if (i == 0) return obj;
+						i--;
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public int getChildCount(Object parent) {
+			int count = 0;
+			if (parent instanceof TMXMap) {
+				for (MapObjectGroup group : ((TMXMap)parent).groups) {
+					for (MapObject obj : group.mapObjects) {
+						if (obj instanceof ReplaceArea) {
+							count++;
+							break;
+						}
+					}
+				}
+			} else if (parent instanceof MapObjectGroup) {
+				for (MapObject obj : ((MapObjectGroup)parent).mapObjects) {
+					if (obj instanceof ReplaceArea) {
+						count++;
+					}
+				}
+			}
+			return count;
+		}
+
+		@Override
+		public boolean isLeaf(Object node) {
+			return node instanceof ReplaceArea;
+		}
+
+		@Override
+		public void valueForPathChanged(TreePath path, Object newValue) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public int getIndexOfChild(Object parent, Object child) {
+			int index = 0;
+			if (parent instanceof TMXMap) {
+				for (MapObjectGroup group : ((TMXMap)parent).groups) {
+					if (group == child) return index;
+					for (MapObject obj : group.mapObjects) {
+						if (obj instanceof ReplaceArea) {
+							index++;
+							break;
+						}
+					}
+				}
+			} else if (parent instanceof MapObjectGroup) {
+				for (MapObject obj : ((MapObjectGroup)parent).mapObjects) {
+					if (obj == child) return index;
+					if (obj instanceof ReplaceArea) {
+						index++;
+					}
+				}
+			}
+			return index;
+		}
+		
+		List<TreeModelListener> listeners = new LinkedList<TreeModelListener>();
+
+		@Override
+		public void addTreeModelListener(TreeModelListener l) {
+			listeners.add(l);
+		}
+
+		@Override
+		public void removeTreeModelListener(TreeModelListener l) {
+			listeners.remove(l);
+		}
+		
+	}
+	
+	public class ReplaceAreasActivationTreeCellRenderer extends DefaultTreeCellRenderer {
+
+		private static final long serialVersionUID = 3988638353699460533L;
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+			Component c = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+			if (c instanceof JLabel) {
+				JLabel label = (JLabel)c;
+				
+				if (value instanceof MapObjectGroup) {
+					label.setText(((MapObjectGroup)value).name);
+					label.setIcon(new ImageIcon(DefaultIcons.getObjectLayerIcon()));
+				} else if (value instanceof ReplaceArea) {
+					label.setText(((ReplaceArea)value).name);
+					label.setIcon(new ImageIcon(DefaultIcons.getReplaceIcon()));
+				}
+			}
+
+			return c;
+		}
 	}
 	
 	public static JList addTMXMapSpritesheetsList(JPanel pane, TMXMap tmxMap) {
@@ -669,6 +988,139 @@ public class TMXMapEditor extends Editor {
 				}
 			}
 			return c;
+		}
+	}
+	
+	public class ReplacementsListModel implements ListModel {
+		
+		public ReplaceArea area;
+		
+		public ReplacementsListModel(ReplaceArea area) {
+			this.area = area;
+		}
+		
+		@Override
+		public int getSize() {
+			if (area.replacements == null) return 0;
+			return area.replacements.size();
+		}
+
+		@Override
+		public Object getElementAt(int index) {
+			if (index < 0 || index > getSize()) return null;
+			if (area.replacements == null) return null;
+			return area.replacements.get(index);
+		}
+
+
+		public void objectChanged(ReplaceArea.Replacement repl) {
+			int index = area.replacements.indexOf(repl);
+			for (ListDataListener l : listeners) {
+				l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index));
+			}
+		}
+		
+		public void addObject(String source, String target) {
+			ReplaceArea.Replacement repl = area.addReplacement(source, target);
+			int index = area.replacements.indexOf(repl);
+			for (ListDataListener l : listeners) {
+				l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, index));
+			}
+		}
+		
+		public void removeObject(ReplaceArea.Replacement repl) {
+			int index = area.replacements.indexOf(repl);
+			area.removeReplacement(repl);
+			for (ListDataListener l : listeners) {
+				l.intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index, index));
+			}
+		}
+		
+		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		
+		@Override
+		public void addListDataListener(ListDataListener l) {
+			listeners.add(l);
+		}
+
+		@Override
+		public void removeListDataListener(ListDataListener l) {
+			listeners.remove(l);
+		}
+	}
+	
+	public class ReplacementsListRenderer extends DefaultListCellRenderer {
+		private static final long serialVersionUID = -6182599528961565957L;
+		public ReplaceArea area;
+		public ReplacementsListRenderer(ReplaceArea area) {
+			super();
+			this.area = area;
+		}
+		@Override
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			if (c instanceof JLabel) {
+				JLabel label = (JLabel)c;
+				ReplaceArea.Replacement repl = (ReplaceArea.Replacement)value;
+				label.setText(repl.sourceLayer+" -> "+repl.targetLayer);
+			}
+			return c;
+		}
+	}
+	
+	public class ReplacementsLayersComboModel implements ComboBoxModel<String> {
+		ReplaceArea area;
+		boolean modelForSource = false;
+		
+		public List<String> availableLayers = new LinkedList<String>();
+		
+		public String selected;
+
+		public ReplacementsLayersComboModel(ReplaceArea area, boolean modelForSource, String selected) {
+			this.area = area;
+			this.modelForSource = modelForSource;
+			this.selected = selected;
+			
+			availableLayers.add(null);
+			for (tiled.core.MapLayer layer : ((TMXMap)target).tmxMap.getLayers()) {
+				if (layer instanceof tiled.core.TileLayer) {
+					if (modelForSource && !TMXMap.isPaintedLayerName(layer.getName())) {
+						continue;
+					}
+					if (modelForSource && area.hasReplacementFor(layer.getName()) && !layer.getName().equals(selected)) {
+						continue;
+					}
+					availableLayers.add(layer.getName());
+				}
+			}
+			
+		}
+		@Override
+		public String getElementAt(int index) {
+			return availableLayers.get(index);
+		}
+		@Override
+		public Object getSelectedItem() {
+			return selected;
+		}
+		@Override
+		public int getSize() {
+			return availableLayers.size();
+		}
+		
+		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		@Override
+		public void addListDataListener(ListDataListener l) {
+			listeners.add(l);
+		}
+
+		@Override
+		public void removeListDataListener(ListDataListener l) {
+			listeners.remove(l);
+		}
+		@Override
+		public void setSelectedItem(Object anItem) {
+			selected = (String)anItem;
 		}
 	}
 	
@@ -1373,6 +1825,7 @@ public class TMXMapEditor extends Editor {
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.changeType((Requirement.RequirementType)requirementTypeCombo.getSelectedItem());
 					updateRequirementParamsPane(requirementParamsPane, area.requirement, this);
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				}
 			} else if (source == requirementObj) {
 				if (selectedMapObject instanceof KeyArea) {
@@ -1383,10 +1836,24 @@ public class TMXMapEditor extends Editor {
 					} else {
 						area.requirement.required_obj_id = null;
 					}
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+				} else if (selectedMapObject instanceof ReplaceArea) {
+					ReplaceArea area = (ReplaceArea) selectedMapObject;
+					area.requirement.required_obj = (GameDataElement) value;
+					if (area.requirement.required_obj != null) {
+						area.requirement.required_obj_id = area.requirement.required_obj.id; 
+					} else {
+						area.requirement.required_obj_id = null;
+					}
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				}
 			} else if (source == requirementObjId) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
+					area.requirement.required_obj_id = (String) value;
+					area.requirement.required_obj = null;
+				} else if (selectedMapObject instanceof ReplaceArea) {
+					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.required_obj_id = (String) value;
 					area.requirement.required_obj = null;
 				}
@@ -1394,13 +1861,31 @@ public class TMXMapEditor extends Editor {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.required_value = (Integer) value;
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+				} else if (selectedMapObject instanceof ReplaceArea) {
+					ReplaceArea area = (ReplaceArea) selectedMapObject;
+					area.requirement.required_value = (Integer) value;
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				}
 			} else if (source == requirementNegated) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.negated = (Boolean) value;
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+				} else if (selectedMapObject instanceof ReplaceArea) {
+					ReplaceArea area = (ReplaceArea) selectedMapObject;
+					area.requirement.negated = (Boolean) value;
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				}
-			} 
+			}  else if (source == sourceLayer) {
+				selectedReplacement.sourceLayer = (String)value;
+				replacementsListModel.objectChanged(selectedReplacement);
+				groupObjectsListModel.objectChanged(selectedMapObject);
+			} else if (source == targetLayer) {
+				selectedReplacement.targetLayer = (String)value;
+				replacementsListModel.objectChanged(selectedReplacement);
+				groupObjectsListModel.objectChanged(selectedMapObject);
+			}
 			if (modified) {
 				if (map.state != GameDataElement.State.modified) {
 					map.state = GameDataElement.State.modified;
@@ -1432,6 +1917,205 @@ public class TMXMapEditor extends Editor {
 		message.revalidate();
 		message.repaint();
 	}
+	
+	public class TMXReplacementViewer extends JPanel implements Scrollable {
+		
+		private static final long serialVersionUID = 2845032142029325865L;
+		private TMXMap map;
+		public ReplaceArea highlighted = null;
+		public boolean showWalkable = true;
+	    private OrthogonalRenderer renderer;
+	    
+	    private String groundName, objectsName, aboveName, walkableName;
+	    private Map<String, tiled.core.TileLayer> layersByName = new LinkedHashMap<String, tiled.core.TileLayer>();
+	    private tiled.core.TileLayer ground, objects, above, walkable;
+	    
+	    private Map<String, List<ReplaceArea>> replacementsForLayer = new LinkedHashMap<String, List<ReplaceArea>>();
+	    public Map<ReplaceArea, Boolean> activeReplacements = new LinkedHashMap<ReplaceArea, Boolean>();
+
+	    public TMXReplacementViewer(final TMXMap map) {
+	    	this.map = map;
+	        renderer = createRenderer(map.tmxMap);
+	        
+	        init();
+
+	        setPreferredSize(renderer.getMapSize());
+	        setOpaque(true);
+	       
+	    }
+	    
+	    public void init() {
+	    	groundName = objectsName = aboveName = walkableName = null;
+	    	layersByName.clear();
+	    	ground = objects = above = walkable = null;
+	    	replacementsForLayer.clear();
+	    	
+	    	for (tiled.core.MapLayer layer : map.tmxMap.getLayers()) {
+	        	if (layer instanceof tiled.core.TileLayer) {
+	        		layersByName.put(layer.getName(), (tiled.core.TileLayer)layer);
+	        		if (TMXMap.GROUND_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
+	        			groundName = layer.getName();
+	        		} else if (TMXMap.OBJECTS_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
+	        			objectsName = layer.getName();
+	        		} else if (TMXMap.ABOVE_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
+	        			aboveName = layer.getName();
+	        		} else if (TMXMap.WALKABLE_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
+	        			walkableName = layer.getName();
+	        		}
+	        	}
+	        }
+	        
+	        for (MapObjectGroup group : map.groups) {
+	        	for (MapObject object : group.mapObjects) {
+	        		if (object instanceof ReplaceArea) {
+	        			ReplaceArea area = (ReplaceArea)object;
+	        			if (!activeReplacements.containsKey(area)) {
+	        				activeReplacements.put(area, true);
+	        			}
+	        			for (ReplaceArea.Replacement repl : area.replacements) {
+	        				if (replacementsForLayer.get(repl.sourceLayer) == null) {
+	        					replacementsForLayer.put(repl.sourceLayer, new LinkedList<ReplaceArea>());
+	        				}
+	        				replacementsForLayer.get(repl.sourceLayer).add(area);
+	        			}
+	        		}
+	        	}
+	        }
+	        updateLayers();
+	    }
+	    
+	    public void updateLayers() {
+	    	ground = mergeReplacements(groundName);
+	    	objects = mergeReplacements(objectsName);
+	    	above = mergeReplacements(aboveName);
+	    	walkable = mergeReplacements(walkableName);
+	    }
+	    
+	    private tiled.core.TileLayer mergeReplacements(String layerName) {
+	    	tiled.core.TileLayer merged = null;
+	    	if (layerName != null && layersByName.get(layerName) != null) {
+	        	tiled.core.TileLayer original = layersByName.get(layerName);
+	        	merged = new tiled.core.TileLayer(original.getBounds());
+	        	merged.copyFrom(original);
+	        	if (replacementsForLayer.containsKey(layerName)) {
+	        		for (ReplaceArea area : replacementsForLayer.get(layerName)) {
+	        			if (activeReplacements.get(area)) {
+	        				String targetName = null;
+	        				for (ReplaceArea.Replacement repl : area.replacements) {
+	        					if (layerName.equals(repl.sourceLayer)) {
+	        						targetName = repl.targetLayer;
+	        					}
+	        				}
+	        				if (targetName != null) {
+	        					for (int x = area.x / 32; x < (area.x + area.w) / 32; x++) {
+	        						for (int y = area.y / 32; y < (area.y + area.h) / 32; y++) {
+	        							merged.setTileAt(x, y, layersByName.get(targetName).getTileAt(x, y));
+	        						}	
+	        					}
+	        				}
+	        			}
+	        		}
+	        	}
+	        }
+	    	return merged;
+	    }
+
+	    public void setHighlight(ReplaceArea selected) {
+			highlighted = selected;
+			invalidate();
+		}
+
+		public void paintComponent(Graphics g) {
+	        final Graphics2D g2d = (Graphics2D) g.create();
+	        final Rectangle clip = g2d.getClipBounds();
+
+	        // Draw a gray background
+	        g2d.setPaint(new Color(100, 100, 100));
+	        g2d.fill(clip);
+
+	        // Draw each tile map layer
+	        
+	        if (ground != null) {
+	        	renderer.paintTileLayer(g2d, ground);
+	        }
+	        
+	        if (objects != null) {
+	        	renderer.paintTileLayer(g2d, objects);
+	        }
+	        
+	        if (above != null) {
+	        	renderer.paintTileLayer(g2d, above);
+	        }
+	        
+	        if (walkable != null && showWalkable) {
+	        	renderer.paintTileLayer(g2d, walkable);
+	        }
+	        
+	        if (highlighted != null) {
+	        	drawObject(highlighted, g2d, new Color(190, 20, 20));
+	        }
+	        
+	        g2d.dispose();
+	    }
+
+		
+	    private void drawObject(MapObject object, Graphics2D g2d, Color color) {
+	    	g2d.setPaint(color);
+			g2d.drawRect(object.x+1, object.y+1, object.w-3, object.h-3);
+			g2d.drawRect(object.x+2, object.y+2, object.w-5, object.h-5);
+			g2d.setPaint(color.darker().darker());
+			g2d.drawLine(object.x, object.y + object.h - 1, object.x + object.w - 1, object.y + object.h - 1);
+			g2d.drawLine(object.x + object.w - 1, object.y, object.x + object.w - 1, object.y + object.h - 1);
+			g2d.drawLine(object.x + 3, object.y + 3, object.x + object.w - 4, object.y + 3);
+			g2d.drawLine(object.x + 3, object.y + 3, object.x + 3, object.y + object.h - 4);
+			g2d.setPaint(color.brighter().brighter().brighter());
+			g2d.drawLine(object.x, object.y, object.x + object.w - 1, object.y);
+			g2d.drawLine(object.x, object.y, object.x, object.y + object.h - 1);
+			g2d.drawLine(object.x + 3, object.y + object.h - 4, object.x + object.w - 4, object.y + object.h - 4);
+			g2d.drawLine(object.x + object.w - 4, object.y + 3, object.x + object.w - 4, object.y + object.h - 4);
+			Image img = object.getIcon();
+			g2d.setColor(new Color(255, 255, 255, 120));
+			g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
+			g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
+	    }
+
+		private OrthogonalRenderer createRenderer(tiled.core.Map map) {
+			return new OrthogonalRenderer(map);
+	    }
+
+	    public Dimension getPreferredScrollableViewportSize() {
+	        return getPreferredSize();
+	    }
+
+	    public int getScrollableUnitIncrement(Rectangle visibleRect,
+	                                          int orientation, int direction) {
+	        if (orientation == SwingConstants.HORIZONTAL)
+	            return ((TMXMap)target).tmxMap.getTileWidth();
+	        else
+	            return ((TMXMap)target).tmxMap.getTileHeight();
+	    }
+
+	    public int getScrollableBlockIncrement(Rectangle visibleRect,
+	                                           int orientation, int direction) {
+	        if (orientation == SwingConstants.HORIZONTAL) {
+	            final int tileWidth = ((TMXMap)target).tmxMap.getTileWidth();
+	            return (visibleRect.width / tileWidth - 1) * tileWidth;
+	        } else {
+	            final int tileHeight = ((TMXMap)target).tmxMap.getTileHeight();
+	            return (visibleRect.height / tileHeight - 1) * tileHeight;
+	        }
+	    }
+
+	    public boolean getScrollableTracksViewportWidth() {
+	        return false;
+	    }
+
+	    public boolean getScrollableTracksViewportHeight() {
+	        return false;
+	    }
+		
+	}
+	
 	
 	
 }

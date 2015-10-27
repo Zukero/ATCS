@@ -25,6 +25,9 @@ import javax.swing.JViewport;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
@@ -45,6 +48,9 @@ import com.jidesoft.swing.JideTabbedPane;
 public class WorldMapEditor extends Editor {
 
 	private static final long serialVersionUID = -8358238912588729094L;
+	
+
+	private RSyntaxTextArea editorPane;
 	
 	public EditMode editMode = EditMode.moveViewSelect;
 	
@@ -72,6 +78,10 @@ public class WorldMapEditor extends Editor {
 		add(editorTabsHolder, BorderLayout.CENTER);
 
 		editorTabsHolder.add("Map", buildSegmentTab(worldmap));
+		
+		JScrollPane xmlScroller = new JScrollPane(getXmlEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		xmlScroller.getVerticalScrollBar().setUnitIncrement(16);
+		editorTabsHolder.add("XML", xmlScroller);
 	}
 	
 	@Override
@@ -80,6 +90,18 @@ public class WorldMapEditor extends Editor {
 
 	}
 
+	public JPanel getXmlEditorPane() {
+		JPanel pane = new JPanel();
+		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS, 6));
+		editorPane = new RSyntaxTextArea();
+		editorPane.setText(((WorldmapSegment)target).toXml());
+		editorPane.setEditable(false);
+		editorPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
+		pane.add(editorPane, JideBoxLayout.VARY);
+
+		return pane;
+	}
+	
 	
 	private JPanel buildSegmentTab(final WorldmapSegment worldmap) {
 		JPanel pane = new JPanel();

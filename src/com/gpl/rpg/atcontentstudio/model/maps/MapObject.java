@@ -94,6 +94,7 @@ public abstract class MapObject {
 	public abstract void savePropertiesInTmxObject(tiled.core.MapObject tmxObject);
 	
 	public static MapObject newMapchange(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Mapchange");
 		MapObject result = new MapChange(obj);
 		result.type = Types.mapchange;
 		initObj(result, obj, parentMap);
@@ -101,6 +102,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newSpawnArea(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Spawnarea");
 		MapObject result = new SpawnArea(obj);
 		result.type = Types.spawn;
 		initObj(result, obj, parentMap);
@@ -108,6 +110,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newRest(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Rest");
 		MapObject result = new RestArea(obj);
 		result.type = Types.rest;
 		initObj(result, obj, parentMap);
@@ -115,6 +118,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newKey(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Key");
 		MapObject result = new KeyArea(obj);
 		result.type = Types.key;
 		initObj(result, obj, parentMap);
@@ -122,6 +126,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newReplace(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Replace");
 		MapObject result = new ReplaceArea(obj);
 		result.type = Types.replace;
 		initObj(result, obj, parentMap);
@@ -129,6 +134,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newScript(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Script");
 		MapObject result = new ScriptArea(obj);
 		result.type = Types.script;
 		initObj(result, obj, parentMap);
@@ -136,6 +142,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newContainer(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Container");
 		MapObject result = new ContainerArea(obj);
 		result.type = Types.container;
 		initObj(result, obj, parentMap);
@@ -143,6 +150,7 @@ public abstract class MapObject {
 	}
 
 	public static MapObject newSign(tiled.core.MapObject obj, TMXMap parentMap) {
+		if (obj.getName() == null) obj.setName("Sign");
 		MapObject result = new SignArea(obj);
 		result.type = Types.sign;
 		initObj(result, obj, parentMap);

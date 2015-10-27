@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class Worldmap extends ArrayList<WorldmapSegment> implements ProjectTreeN
 	public File worldmapFile;
 	public GameSource parent;
 	
-	public Map<String, Map<String, Point>> segments = new HashMap<String, Map<String,Point>>();
+	public Map<String, Map<String, Point>> segments = new LinkedHashMap<String, Map<String,Point>>();
 
 	public Worldmap(GameSource gameSource) {
 		this.parent = gameSource;
@@ -261,6 +262,7 @@ public class Worldmap extends ArrayList<WorldmapSegment> implements ProjectTreeN
 			Source input = new DOMSource(doc);
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
 			transformer.transform(input, output);
 		} catch (TransformerConfigurationException e) {
 			// TODO Auto-generated catch block

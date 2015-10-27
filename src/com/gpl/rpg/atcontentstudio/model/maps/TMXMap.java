@@ -33,6 +33,12 @@ public class TMXMap extends GameDataElement {
 
 	private static final long serialVersionUID = 1609502879500898837L;
 	
+	public static final String GROUND_LAYER_NAME = "Ground";
+	public static final String OBJECTS_LAYER_NAME = "Objects";
+	public static final String ABOVE_LAYER_NAME = "Above";
+	public static final String WALKABLE_LAYER_NAME = "Walkable";
+	
+	
 	public File tmxFile = null;
 	public tiled.core.Map tmxMap = null;
 	public Set<Spritesheet> usedSpritesheets = null;
@@ -333,6 +339,26 @@ public class TMXMap extends GameDataElement {
 			}
 		}
 		return result;
+	}
+	
+	public MapObject getMapObject(String name) {
+		MapObject result = null;
+		for (MapObjectGroup group : groups) {
+			for (MapObject obj : group.mapObjects) {
+				if (obj.name.equals(name)) {
+					result = obj;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public static boolean isPaintedLayerName(String name) {
+		return GROUND_LAYER_NAME.equalsIgnoreCase(name) ||
+				OBJECTS_LAYER_NAME.equalsIgnoreCase(name) ||
+				ABOVE_LAYER_NAME.equalsIgnoreCase(name) ||
+				WALKABLE_LAYER_NAME.equalsIgnoreCase(name);
 	}
 	
 }

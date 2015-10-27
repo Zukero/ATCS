@@ -12,6 +12,7 @@ public class KeyArea extends MapObject {
 	public String dialogue_id = null;
 	public Dialogue dialogue = null;
 	public Requirement requirement = null;
+	public boolean oldSchoolRequirement = true;
 	
 	public KeyArea(tiled.core.MapObject obj) {
 		dialogue_id = obj.getProperties().getProperty("phrase");
@@ -29,6 +30,9 @@ public class KeyArea extends MapObject {
 				requireType = fields[0];
 				requireId = fields[1];
 			}
+			oldSchoolRequirement = true;
+		} else {
+			oldSchoolRequirement = false;
 		}
 		requirement = new Requirement();
 		requirement.type = Requirement.RequirementType.valueOf(requireType);
@@ -59,6 +63,7 @@ public class KeyArea extends MapObject {
 			dialogue = (Dialogue) newOne;
 			newOne.addBacklink(parentMap);
 		}
+		requirement.elementChanged(oldOne, newOne);
 	}
 	
 	@Override
@@ -69,15 +74,33 @@ public class KeyArea extends MapObject {
 			tmxObject.getProperties().setProperty("phrase", dialogue_id);
 		}
 		if (requirement != null) {
-			tmxObject.getProperties().setProperty("requireType", requirement.type.toString());
-			if (requirement.required_obj != null) {
-				tmxObject.getProperties().setProperty("requireId", requirement.required_obj.id);
-			} else if (requirement.required_obj_id != null) {
-				tmxObject.getProperties().setProperty("requireId", requirement.required_obj_id);
+			if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
+				tmxObject.setName(requirement.required_obj_id+":"+Integer.toString(requirement.required_value));
+			} else {
+				tmxObject.getProperties().setProperty("requireType", requirement.type.toString());
+				if (requirement.required_obj != null) {
+					tmxObject.getProperties().setProperty("requireId", requirement.required_obj.id);
+				} else if (requirement.required_obj_id != null) {
+					tmxObject.getProperties().setProperty("requireId", requirement.required_obj_id);
+				}
+				if (requirement.required_value != null) {
+					tmxObject.getProperties().setProperty("requireValue", requirement.required_value.toString());
+				}
 			}
-			if (requirement.required_value != null) {
-				tmxObject.getProperties().setProperty("requireValue", requirement.required_value.toString());
+		}
+	}
+
+	public void updateNameFromRequirementChange() {
+		if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
+			name = requirement.required_obj_id+":"+Integer.toString(requirement.required_value);
+		} else if (oldSchoolRequirement) {
+			int i = 0;
+			String futureName = requirement.type.toString() + "#" + Integer.toString(i);
+			while (parentMap.getMapObject(futureName) != null) {
+				i++;
+				futureName = requirement.type.toString() + "#" + Integer.toString(i);
 			}
+			this.name = futureName;
 		}
 	}
 
