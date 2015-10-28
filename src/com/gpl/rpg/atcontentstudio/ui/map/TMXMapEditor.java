@@ -16,6 +16,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,12 +43,14 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JToolTip;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
+import javax.swing.ToolTipManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
@@ -687,7 +690,7 @@ public class TMXMapEditor extends Editor {
 		replacementSimulator.setLayout(new JideBoxLayout(replacementSimulator, JideBoxLayout.PAGE_AXIS));
 		final JCheckBox walkableVisibleBox = new JCheckBox("Show \""+TMXMap.WALKABLE_LAYER_NAME+"\" layer.");
 		JPanel areasActivationPane = new JPanel();
-		areasActivationPane.setLayout(new JideBoxLayout(areasActivationPane, JideBoxLayout.LINE_AXIS));
+		areasActivationPane.setLayout(new JideBoxLayout(areasActivationPane, JideBoxLayout.PAGE_AXIS));
 		TreeModel areasTreeModel = new ReplaceAreasActivationTreeModel();
 		final JTree areasTree = new JTree(areasTreeModel);
 		areasTree.setEditable(false);
@@ -697,10 +700,14 @@ public class TMXMapEditor extends Editor {
 		final JToggleButton activate = new JToggleButton("Activate ReplaceArea(s)");
 		areasActivationPane.add(activate, JideBoxLayout.VARY);
 		final TMXReplacementViewer viewer = new TMXReplacementViewer((TMXMap)target);  
+		JPanel activateAndViewPane = new JPanel();
+		activateAndViewPane.setLayout(new JideBoxLayout(activateAndViewPane, JideBoxLayout.LINE_AXIS));
 		
+		activateAndViewPane.add(areasActivationPane, JideBoxLayout.FIX);
+		activateAndViewPane.add(viewer, JideBoxLayout.VARY);
+
 		replacementSimulator.add(walkableVisibleBox, JideBoxLayout.FIX);
-		replacementSimulator.add(areasActivationPane, JideBoxLayout.FIX);
-		replacementSimulator.add(viewer, JideBoxLayout.VARY);
+		replacementSimulator.add(activateAndViewPane, JideBoxLayout.VARY);
 		
 		walkableVisibleBox.setSelected(true);
 		walkableVisibleBox.addActionListener(new ActionListener() {
@@ -739,11 +746,14 @@ public class TMXMapEditor extends Editor {
 		areasTree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
+				ReplaceArea oldHighlight = viewer.highlighted;
+				viewer.highlighted = null;
 				if (areasTree.getSelectionPaths() == null) return;
 				for (TreePath paths : areasTree.getSelectionPaths()) {
 					Object target = paths.getLastPathComponent();
 					if (target instanceof ReplaceArea) {
 						activate.setSelected(viewer.activeReplacements.get((ReplaceArea) target));
+						viewer.highlighted = (ReplaceArea)target;
 					} else if (target instanceof MapObjectGroup) {
 						for (MapObject obj : ((MapObjectGroup)target).mapObjects) {
 							activate.setSelected(true);
@@ -754,7 +764,10 @@ public class TMXMapEditor extends Editor {
 							}
 						}
 					}
-					
+				}
+				if (oldHighlight != viewer.highlighted) {
+					viewer.revalidate();
+					viewer.repaint();
 				}
 			}
 		});
@@ -1248,19 +1261,6 @@ public class TMXMapEditor extends Editor {
 	    	return new Rectangle(obj.x, obj.y, 16, 16);
 	    }
 	    
-	    public Point getClosestTileCorner(Point p) {
-	    	return new Point(getClosestMultiple(p.x, 32), getClosestMultiple(p.y, 32));
-	    }
-	    
-	    public int getClosestMultiple(int num, int ref) {
-	    	int rest = num % ref;
-	    	int result = num - rest;
-	    	if (rest >= ref / 2) {
-	    		result += ref;
-	    	}
-	    	return result;
-	    }
-	    
 	    public TMXViewer(final TMXMap map, FieldUpdateListener listener) {
 	    	this.listener = listener;
 	        renderer = createRenderer(map.tmxMap);
@@ -1420,27 +1420,7 @@ public class TMXMapEditor extends Editor {
 	    	return paintSelected;
 		}
 	    
-	    private void drawObject(MapObject object, Graphics2D g2d, Color color) {
-	    	g2d.setPaint(color);
-			g2d.drawRect(object.x+1, object.y+1, object.w-3, object.h-3);
-			g2d.drawRect(object.x+2, object.y+2, object.w-5, object.h-5);
-			g2d.setPaint(color.darker().darker());
-			g2d.drawLine(object.x, object.y + object.h - 1, object.x + object.w - 1, object.y + object.h - 1);
-			g2d.drawLine(object.x + object.w - 1, object.y, object.x + object.w - 1, object.y + object.h - 1);
-			g2d.drawLine(object.x + 3, object.y + 3, object.x + object.w - 4, object.y + 3);
-			g2d.drawLine(object.x + 3, object.y + 3, object.x + 3, object.y + object.h - 4);
-			g2d.setPaint(color.brighter().brighter().brighter());
-			g2d.drawLine(object.x, object.y, object.x + object.w - 1, object.y);
-			g2d.drawLine(object.x, object.y, object.x, object.y + object.h - 1);
-			g2d.drawLine(object.x + 3, object.y + object.h - 4, object.x + object.w - 4, object.y + object.h - 4);
-			g2d.drawLine(object.x + object.w - 4, object.y + 3, object.x + object.w - 4, object.y + object.h - 4);
-			Image img = object.getIcon();
-			g2d.setColor(new Color(255, 255, 255, 120));
-			g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
-			g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
-	    }
-
-		private MapRenderer createRenderer(tiled.core.Map map) {
+	    private MapRenderer createRenderer(tiled.core.Map map) {
 	        switch (map.getOrientation()) {
 	            case tiled.core.Map.ORIENTATION_ORTHOGONAL:
 	                return new OrthogonalRenderer(map);
@@ -1933,6 +1913,8 @@ public class TMXMapEditor extends Editor {
 	    private Map<String, List<ReplaceArea>> replacementsForLayer = new LinkedHashMap<String, List<ReplaceArea>>();
 	    public Map<ReplaceArea, Boolean> activeReplacements = new LinkedHashMap<ReplaceArea, Boolean>();
 
+	    private boolean tooltipActivated = true;
+	    
 	    public TMXReplacementViewer(final TMXMap map) {
 	    	this.map = map;
 	        renderer = createRenderer(map.tmxMap);
@@ -1941,6 +1923,30 @@ public class TMXMapEditor extends Editor {
 
 	        setPreferredSize(renderer.getMapSize());
 	        setOpaque(true);
+	        
+	        addMouseMotionListener(new MouseMotionAdapter() {
+	        	@Override
+	        	public void mouseMoved(MouseEvent e) {
+	        		tooltippedTile.setLocation(e.getX() / 32, e.getY() / 32);
+	        		if (!((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
+	        			if (tooltipActivated) {
+	        				//Hides the tooltip...
+	        				ToolTipManager.sharedInstance().setEnabled(false);
+	        				ToolTipManager.sharedInstance().unregisterComponent(TMXReplacementViewer.this);
+	        				tooltipActivated = false;
+	        			}
+	        		} else {
+	        			if (!tooltipActivated) {
+	        				ToolTipManager.sharedInstance().registerComponent(TMXReplacementViewer.this);
+	        				ToolTipManager.sharedInstance().setEnabled(true);
+	        				tooltipActivated = true;
+	        			}
+	        		}
+	        	}
+			});
+	        
+	        ToolTipManager.sharedInstance().registerComponent(this);
+	        setToolTipText("");
 	       
 	    }
 	    
@@ -2058,26 +2064,7 @@ public class TMXMapEditor extends Editor {
 	        g2d.dispose();
 	    }
 
-		
-	    private void drawObject(MapObject object, Graphics2D g2d, Color color) {
-	    	g2d.setPaint(color);
-			g2d.drawRect(object.x+1, object.y+1, object.w-3, object.h-3);
-			g2d.drawRect(object.x+2, object.y+2, object.w-5, object.h-5);
-			g2d.setPaint(color.darker().darker());
-			g2d.drawLine(object.x, object.y + object.h - 1, object.x + object.w - 1, object.y + object.h - 1);
-			g2d.drawLine(object.x + object.w - 1, object.y, object.x + object.w - 1, object.y + object.h - 1);
-			g2d.drawLine(object.x + 3, object.y + 3, object.x + object.w - 4, object.y + 3);
-			g2d.drawLine(object.x + 3, object.y + 3, object.x + 3, object.y + object.h - 4);
-			g2d.setPaint(color.brighter().brighter().brighter());
-			g2d.drawLine(object.x, object.y, object.x + object.w - 1, object.y);
-			g2d.drawLine(object.x, object.y, object.x, object.y + object.h - 1);
-			g2d.drawLine(object.x + 3, object.y + object.h - 4, object.x + object.w - 4, object.y + object.h - 4);
-			g2d.drawLine(object.x + object.w - 4, object.y + 3, object.x + object.w - 4, object.y + object.h - 4);
-			Image img = object.getIcon();
-			g2d.setColor(new Color(255, 255, 255, 120));
-			g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
-			g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
-	    }
+	
 
 		private OrthogonalRenderer createRenderer(tiled.core.Map map) {
 			return new OrthogonalRenderer(map);
@@ -2113,9 +2100,124 @@ public class TMXMapEditor extends Editor {
 	    public boolean getScrollableTracksViewportHeight() {
 	        return false;
 	    }
+	    
+	    JLabel noTileGround = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
+	    JLabel noTileObjects = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
+	    JLabel noTileAbove = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
+	    {
+	    	noTileGround.setPreferredSize(new Dimension(32, 32));
+	    	noTileObjects.setPreferredSize(new Dimension(32, 32));
+	    	noTileAbove.setPreferredSize(new Dimension(32, 32));
+	    }
+	    Point tooltippedTile = new Point();
+	    JToolTip tt = null;
+	    Point lastTTTile = null;
+	    
+	    @Override
+	    public JToolTip createToolTip() {
+	    	if (tooltippedTile.equals(lastTTTile)) {
+	    		return tt;
+	    	}
+	    	if (!((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
+	    		return super.createToolTip();
+	    	}
+	    	tt = super.createToolTip();
+	    	lastTTTile = new Point(tooltippedTile);
+	    	tt.setLayout(new BorderLayout());
+	    	JPanel content = new JPanel();
+	    	content.setLayout(new JideBoxLayout(content, JideBoxLayout.PAGE_AXIS));
+	    	if (tooltippedTile != null) {
+	    		Image tile;
+	    		JLabel label;
+	    		
+	    		if (above != null && above.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
+	    			tile = above.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    		} else {
+	    			tile = null;
+	    		}
+	    		if (tile != null) {
+	    			label = new JLabel(new ImageIcon(tile));
+	    			label.setPreferredSize(new Dimension(32,32));
+	    			content.add(label, JideBoxLayout.FIX);
+	    		} else {
+	    			content.add(noTileAbove, JideBoxLayout.FIX);
+	    		}
+	    		
+	    		if (objects != null && objects.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
+	    			tile = objects.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    		} else {
+	    			tile = null;
+	    		}
+	    		if (tile != null) {
+	    			label = new JLabel(new ImageIcon(tile));
+	    			label.setPreferredSize(new Dimension(32,32));
+	    			content.add(label, JideBoxLayout.FIX);
+	    		} else {
+	    			content.add(noTileObjects, JideBoxLayout.FIX);
+	    		}
+	    		
+	    		if (ground != null && ground.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
+	    			tile = ground.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    		} else {
+	    			tile = null;
+	    		}
+	    		if (tile != null) {
+	    			label = new JLabel(new ImageIcon(tile));
+	    			label.setPreferredSize(new Dimension(32,32));
+	    			content.add(label, JideBoxLayout.FIX);
+	    		} else {
+	    			content.add(noTileGround, JideBoxLayout.FIX);
+	    		}
+	    		
+	    		content.add(new JLabel(tooltippedTile.x+", "+tooltippedTile.y), JideBoxLayout.FIX);
+	    		
+	    	}
+	    	
+	    	tt.add(content, BorderLayout.CENTER);
+	    	tt.setPreferredSize(tt.getLayout().preferredLayoutSize(tt));
+	    	return tt;
+	    }
+	    
+	    @Override
+	    public Point getToolTipLocation(MouseEvent event) {
+	    	return event.getPoint();//new Point(event.getX() - (event.getX() % 32), event.getY() - (event.getY() % 32));
+	    }
 		
 	}
 	
 	
+	public Point getClosestTileCorner(Point p) {
+    	return new Point(getClosestMultiple(p.x, 32), getClosestMultiple(p.y, 32));
+    }
+    
+    public int getClosestMultiple(int num, int ref) {
+    	int rest = num % ref;
+    	int result = num - rest;
+    	if (rest >= ref / 2) {
+    		result += ref;
+    	}
+    	return result;
+    }
+	
+	
+    private void drawObject(MapObject object, Graphics2D g2d, Color color) {
+    	g2d.setPaint(color);
+		g2d.drawRect(object.x+1, object.y+1, object.w-3, object.h-3);
+		g2d.drawRect(object.x+2, object.y+2, object.w-5, object.h-5);
+		g2d.setPaint(color.darker().darker());
+		g2d.drawLine(object.x, object.y + object.h - 1, object.x + object.w - 1, object.y + object.h - 1);
+		g2d.drawLine(object.x + object.w - 1, object.y, object.x + object.w - 1, object.y + object.h - 1);
+		g2d.drawLine(object.x + 3, object.y + 3, object.x + object.w - 4, object.y + 3);
+		g2d.drawLine(object.x + 3, object.y + 3, object.x + 3, object.y + object.h - 4);
+		g2d.setPaint(color.brighter().brighter().brighter());
+		g2d.drawLine(object.x, object.y, object.x + object.w - 1, object.y);
+		g2d.drawLine(object.x, object.y, object.x, object.y + object.h - 1);
+		g2d.drawLine(object.x + 3, object.y + object.h - 4, object.x + object.w - 4, object.y + object.h - 4);
+		g2d.drawLine(object.x + object.w - 4, object.y + 3, object.x + object.w - 4, object.y + object.h - 4);
+		Image img = object.getIcon();
+		g2d.setColor(new Color(255, 255, 255, 120));
+		g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
+		g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
+    }
 	
 }
