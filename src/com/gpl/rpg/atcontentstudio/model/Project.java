@@ -522,6 +522,13 @@ public class Project implements ProjectTreeNode, Serializable {
 		return gde;
 	}
 
+	public NPC getNPCIgnoreCase(String id) {
+		NPC gde = createdContent.gameData.getNPCIgnoreCase(id);
+		if (gde == null) gde = alteredContent.gameData.getNPCIgnoreCase(id);
+		if (gde == null) gde = baseContent.gameData.getNPCIgnoreCase(id);
+		return gde;
+	}
+
 	public int getNPCCount() {
 		return createdContent.gameData.npcs.size() + baseContent.gameData.npcs.size();
 	}
@@ -833,7 +840,7 @@ public class Project implements ProjectTreeNode, Serializable {
 		int index = -1;
 		while (--i >= 0) {
 			NPC npc = getNPC(i);
-			if (spawngroup_id.equals(npc.spawngroup_id)) {
+			if (spawngroup_id.equalsIgnoreCase(npc.spawngroup_id)) {
 				for (NPC present : result) {
 					if (present.id.equals(npc.id)) {
 						alreadyAdded = true;
@@ -851,7 +858,7 @@ public class Project implements ProjectTreeNode, Serializable {
 		}
 		if (result.isEmpty()) {
 			//Fallback case. A single NPC does not declare a spawn group, but is referred by its ID in maps' spawn areas.
-			NPC npc = getNPC(spawngroup_id);
+			NPC npc = getNPCIgnoreCase(spawngroup_id);
 			if (npc != null) result.add(npc);
 		}
 		return result;

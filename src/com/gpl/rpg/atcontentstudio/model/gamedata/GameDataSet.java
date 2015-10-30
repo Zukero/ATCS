@@ -212,6 +212,16 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 		return null;
 	}
 	
+	public NPC getNPCIgnoreCase(String id) {
+		if (npcs == null) return null;
+		for (NPC gde : npcs) {
+			if (id.equalsIgnoreCase(gde.id)){
+				return gde;
+			}
+		}
+		return null;
+	}
+	
 	public Quest getQuest(String id) {
 		if (quests == null) return null;
 		for (Quest gde : quests) {

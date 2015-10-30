@@ -102,6 +102,10 @@ public class WorldMapEditor extends Editor {
 		return pane;
 	}
 	
+	public void updateXmlViewText(String text) {
+		editorPane.setText(text);
+	}
+	
 	
 	private JPanel buildSegmentTab(final WorldmapSegment worldmap) {
 		JPanel pane = new JPanel();

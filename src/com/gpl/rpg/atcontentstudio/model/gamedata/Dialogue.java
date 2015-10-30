@@ -171,7 +171,7 @@ public class Dialogue extends JSONElement {
 						requirement.parent = this;
 						if (requirementJson.get("requireType") != null) requirement.type = RequirementType.valueOf((String) requirementJson.get("requireType"));
 						requirement.required_obj_id = (String) requirementJson.get("requireID");
-						requirement.required_value = JSONElement.getInteger(Integer.parseInt(requirementJson.get("value").toString()));
+						if (requirementJson.get("value") != null) requirement.required_value = JSONElement.getInteger(Integer.parseInt(requirementJson.get("value").toString()));
 						if (requirementJson.get("negate") != null) requirement.negated = (Boolean) requirementJson.get("negate");
 						requirement.state = State.parsed;
 						reply.requirements.add(requirement);
