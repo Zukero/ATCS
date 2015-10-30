@@ -12,6 +12,7 @@ public class SpawnArea extends MapObject {
 
 	public int quantity = 1;
 	public int spawnchance = 10;
+	public boolean active = true;
 	public List<NPC> spawnGroup = new ArrayList<NPC>();
 	
 	public SpawnArea(tiled.core.MapObject obj) {
@@ -20,6 +21,9 @@ public class SpawnArea extends MapObject {
 		}
 		if (obj.getProperties().getProperty("spawnchance") != null) {
 			this.spawnchance = Integer.parseInt(obj.getProperties().getProperty("spawnchance"));
+		}
+		if (obj.getProperties().getProperty("active") != null) {
+			this.active = Boolean.parseBoolean(obj.getProperties().getProperty("active"));
 		}
 	}
 
@@ -66,6 +70,9 @@ public class SpawnArea extends MapObject {
 		}
 		if (spawnchance != 10) {
 			tmxObject.getProperties().setProperty("spawnchance", Integer.toString(spawnchance));
+		}
+		if (!this.active) {
+			tmxObject.getProperties().setProperty("active", Boolean.toString(active));
 		}
 	}
 	

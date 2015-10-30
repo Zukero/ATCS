@@ -1,13 +1,23 @@
 package com.gpl.rpg.atcontentstudio.ui.gamedataeditors.dialoguetree;
 
 import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToolTip;
+import javax.swing.ToolTipManager;
 
 import prefuse.Display;
 import prefuse.Visualization;
@@ -42,7 +52,11 @@ import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
+import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
+import com.gpl.rpg.atcontentstudio.ui.map.TMXMapEditor.TMXReplacementViewer;
+import com.jidesoft.swing.JideBoxLayout;
 
 public class DialogueGraphView extends Display {
 
@@ -147,6 +161,7 @@ public class DialogueGraphView extends Display {
         setSize(500,500);
         pan(250, 250);
         setHighQuality(true);
+        addControlListener(new TooltipControl());
         addControlListener(new DoubleClickControl());
         addControlListener(new WheelZoomControl());
         addControlListener(new ZoomControl());
@@ -433,6 +448,90 @@ public class DialogueGraphView extends Display {
 				}
 			}
 		}
+	}
+	
+	class TooltipControl extends ControlAdapter {
+		
+		@Override
+		public void itemEntered(VisualItem item, MouseEvent e) {
+			if (item.get(TARGET) != null) {
+				tooltippedItem = item;
+				if (!tooltipActivated) {
+					setToolTipText("");
+					ToolTipManager.sharedInstance().registerComponent(DialogueGraphView.this);
+					ToolTipManager.sharedInstance().setEnabled(true);
+					tooltipActivated = true;
+				}
+			}
+		}
+		@Override
+		public void itemExited(VisualItem item, MouseEvent e) {
+			//Hides the tooltip...
+			ToolTipManager.sharedInstance().setEnabled(false);
+			ToolTipManager.sharedInstance().unregisterComponent(DialogueGraphView.this);
+			tooltipActivated = false;
+		}
+	}
+	
+	JToolTip tt = null;
+	private VisualItem tooltippedItem = null;
+	private VisualItem lastTTItem = null;
+    private boolean tooltipActivated = false;
+	
+	@Override
+	public Point getToolTipLocation(MouseEvent event) {
+		return new Point(event.getX() + 5, event.getY() + 5);
+	}
+	
+	@Override
+	public JToolTip createToolTip() {
+		if (tt == null) tt = super.createToolTip();
+		if (tooltippedItem == lastTTItem) {
+			return tt;
+		}
+		tt = super.createToolTip();
+		lastTTItem = tooltippedItem;
+    	tt.setLayout(new BorderLayout());
+    	JPanel content = new JPanel();
+    	content.setLayout(new JideBoxLayout(content, JideBoxLayout.PAGE_AXIS));
+    	JLabel label;
+    	if (tooltippedItem != null) {
+    		Object target = tooltippedItem.get(TARGET);
+    		if (target != null) {
+    			if (target instanceof Dialogue) {
+    				Dialogue d = (Dialogue) target;
+    				label = new JLabel(new ImageIcon(DefaultIcons.getDialogueIcon()));
+    				label.setText(d.id);
+    				content.add(label, JideBoxLayout.FIX);
+    				if (tooltippedItem.get(REPLY) == null) {
+    					if (d.rewards != null && !d.rewards.isEmpty()) {
+    						for (Dialogue.Reward r : d.rewards) {
+    							label = new JLabel();
+    							DialogueEditor.decorateRewardJLabel(label, r);
+    							content.add(label, JideBoxLayout.FIX);
+    						}
+    					}
+    				} else { 
+    					Object replObj = tooltippedItem.get(REPLY);
+    					if (replObj instanceof Dialogue.Reply) {
+    						Dialogue.Reply r = (Dialogue.Reply) replObj;
+    						if (r.requirements != null && !r.requirements.isEmpty()) {
+    							for (Requirement req : r.requirements) {
+    								label = new JLabel();
+    								DialogueEditor.decorateRequirementJLabel(label, req);
+        							content.add(label, JideBoxLayout.FIX);
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
+    		
+    	}
+    	
+    	tt.add(content, BorderLayout.CENTER);
+    	tt.setPreferredSize(tt.getLayout().preferredLayoutSize(tt));
+    	return tt;
 	}
 
 }

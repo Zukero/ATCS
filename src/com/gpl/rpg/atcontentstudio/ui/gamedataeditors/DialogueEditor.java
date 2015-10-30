@@ -717,60 +717,64 @@ public class DialogueEditor extends JSONElementEditor {
 				JLabel label = ((JLabel)c);
 				Dialogue.Reward reward = (Dialogue.Reward)value;
 				
-				if (reward.type != null) {
-					String rewardObjDesc = null;
-					if( reward.reward_obj != null) {
-						rewardObjDesc = reward.reward_obj.getDesc();
-					} else if (reward.reward_obj_id != null) {
-						rewardObjDesc = reward.reward_obj_id;
-					}
-					switch (reward.type) {
-					case activateMapChangeArea:
-						label.setText("Activate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
-						break;
-					case actorCondition:
-						label.setText("Give actor condition "+rewardObjDesc+" for "+reward.reward_value+" turns");
-						if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
-						break;
-					case alignmentChange:
-						label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
-						break;
-					case createTimer:
-						label.setText("Create timer "+rewardObjDesc);
-						break;
-					case deactivateMapChangeArea:
-						label.setText("Deactivate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
-						break;
-					case deactivateSpawnArea:
-						label.setText("Deactivate spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
-						break;
-					case dropList:
-						label.setText("Give contents of droplist "+rewardObjDesc);
-						if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
-						break;
-					case giveItem:
-						label.setText("Give "+reward.reward_value+" "+rewardObjDesc);
-						if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
-						break;
-					case questProgress:
-						label.setText("Give quest progress "+rewardObjDesc+":"+reward.reward_value);
-						if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
-						break;
-					case removeSpawnArea:
-						label.setText("Remove all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
-						break;
-					case skillIncrease:
-						label.setText("Increase skill "+rewardObjDesc+" level");
-						break;
-					case spawnAll:
-						label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
-						break;
-					}
-				} else {
-					label.setText("New, undefined reward");
-				}
+				decorateRewardJLabel(label, reward);
 			}
 			return c;
+		}
+	}
+	
+	public static void decorateRewardJLabel(JLabel label, Dialogue.Reward reward) {
+		if (reward.type != null) {
+			String rewardObjDesc = null;
+			if( reward.reward_obj != null) {
+				rewardObjDesc = reward.reward_obj.getDesc();
+			} else if (reward.reward_obj_id != null) {
+				rewardObjDesc = reward.reward_obj_id;
+			}
+			switch (reward.type) {
+			case activateMapChangeArea:
+				label.setText("Activate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
+				break;
+			case actorCondition:
+				label.setText("Give actor condition "+rewardObjDesc+" for "+reward.reward_value+" turns");
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case alignmentChange:
+				label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
+				break;
+			case createTimer:
+				label.setText("Create timer "+rewardObjDesc);
+				break;
+			case deactivateMapChangeArea:
+				label.setText("Deactivate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
+				break;
+			case deactivateSpawnArea:
+				label.setText("Deactivate spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				break;
+			case dropList:
+				label.setText("Give contents of droplist "+rewardObjDesc);
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case giveItem:
+				label.setText("Give "+reward.reward_value+" "+rewardObjDesc);
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case questProgress:
+				label.setText("Give quest progress "+rewardObjDesc+":"+reward.reward_value);
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case removeSpawnArea:
+				label.setText("Remove all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				break;
+			case skillIncrease:
+				label.setText("Increase skill "+rewardObjDesc+" level");
+				break;
+			case spawnAll:
+				label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				break;
+			}
+		} else {
+			label.setText("New, undefined reward");
 		}
 	}
 	
@@ -981,16 +985,20 @@ public class DialogueEditor extends JSONElementEditor {
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
-				((JLabel)c).setText(((Requirement)value).getDesc());
-				if (((Requirement)value).required_obj != null) {
-					if (((Requirement)value).required_obj.getIcon() != null) {
-						((JLabel)c).setIcon(new ImageIcon(((Requirement)value).required_obj.getIcon()));
-					}
-				} if (((Requirement)value).type == null) {
-					((JLabel)c).setText("New, undefined requirement.");
-				}
+				decorateRequirementJLabel((JLabel)c, (Requirement)value);
 			}
 			return c;
+		}
+	}
+	
+	public static void decorateRequirementJLabel(JLabel label, Requirement req) {
+		label.setText(req.getDesc());
+		if (req.required_obj != null) {
+			if (req.required_obj.getIcon() != null) {
+				label.setIcon(new ImageIcon(req.required_obj.getIcon()));
+			}
+		} if (req.type == null) {
+			label.setText("New, undefined requirement.");
 		}
 	}
 	

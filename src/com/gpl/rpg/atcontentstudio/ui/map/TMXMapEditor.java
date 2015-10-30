@@ -146,6 +146,7 @@ public class TMXMapEditor extends Editor {
 	private JComboBox targetAreaCombo;
 	private JComboBox evaluateTriggerBox;
 	private JSpinner quantityField;
+	private JCheckBox activeForNewGame;
 	private JList npcList;
 	private SpawnGroupNpcListModel npcListModel;
 
@@ -547,6 +548,7 @@ public class TMXMapEditor extends Editor {
 		} else if (selected instanceof SpawnArea) {
 			areaField = addTextField(pane, "Spawn group ID: ", ((SpawnArea)selected).name, ((TMXMap)target).writable, listener);
 			quantityField = addIntegerField(pane, "Number of spawned NPCs: ", ((SpawnArea)selected).quantity, false, ((TMXMap)target).writable, listener);
+			activeForNewGame = addBooleanBasedCheckBox(pane, "Active in a new game: ", ((SpawnArea)selected).active, ((TMXMap)target).writable, listener);
 			npcListModel = new SpawnGroupNpcListModel((SpawnArea) selected);
 			npcList = new JList(npcListModel);
 			npcList.setCellRenderer(new GDERenderer(true, ((TMXMap)target).writable));
@@ -1799,6 +1801,11 @@ public class TMXMapEditor extends Editor {
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea) selectedMapObject;
 					area.quantity = (Integer) value;
+				}
+			} else if (source == activeForNewGame) {
+				if (selectedMapObject instanceof SpawnArea) {
+					SpawnArea area = (SpawnArea) selectedMapObject;
+					area.active = (Boolean) value;
 				}
 			} else if (source == requirementTypeCombo) {
 				if (selectedMapObject instanceof KeyArea) {
