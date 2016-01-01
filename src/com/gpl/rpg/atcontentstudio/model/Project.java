@@ -754,13 +754,13 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 			existingNode.getBacklinks().clear();
 			node.writable = true;
-			node.state = GameDataElement.State.created;
 			alteredContent.gameData.addElement(node);
 			node.link();
+			node.state = GameDataElement.State.created;
 		} else {
 			createdContent.gameData.addElement(node);
-			node.state =  GameDataElement.State.created;
 			node.link();
+			node.state =  GameDataElement.State.created;
 		}
 		fireElementAdded(node, getNodeIndex(node));
 	}
