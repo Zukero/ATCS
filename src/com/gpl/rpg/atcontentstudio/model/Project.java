@@ -73,10 +73,19 @@ public class Project implements ProjectTreeNode, Serializable {
 	public transient Workspace parent;
 	
 	public Properties knownSpritesheetsProperties = null;
+	
+	public static enum ResourceSet {
+		gameData,
+		debugData,
+		allFiles
+	} 
+	
+	public ResourceSet sourceSetToUse = ResourceSet.allFiles;
 
-	public Project(Workspace w, String name, File source) {
+	public Project(Workspace w, String name, File source, ResourceSet sourceSet) {
 		this.parent = w;
 		this.name = name;
+		this.sourceSetToUse = sourceSet;
 		
 		//CREATE PROJECT
 		baseFolder = new File(w.baseFolder, name+File.separator);
@@ -218,6 +227,10 @@ public class Project implements ProjectTreeNode, Serializable {
 				Notification.addWarn("Unable to load default spritesheets properties.");
 				e.printStackTrace();
 			}
+		}
+		
+		if (sourceSetToUse == null) {
+			sourceSetToUse = ResourceSet.allFiles;
 		}
 		
 //		long l = new Date().getTime();
@@ -477,6 +490,21 @@ public class Project implements ProjectTreeNode, Serializable {
 		return null;
 	}
 	
+	public int getItemCountIncludingAltered() {
+		return createdContent.gameData.items.size() + alteredContent.gameData.items.size() + baseContent.gameData.items.size();
+	}
+
+	public Item getItemIncludingAltered(int index) {
+		if (index < createdContent.gameData.items.size()) {
+			return createdContent.gameData.items.get(index);
+		} else if (index < createdContent.gameData.items.size() + alteredContent.gameData.items.size()){
+			return alteredContent.gameData.items.get(index - createdContent.gameData.items.size());
+		} else if (index < getItemCountIncludingAltered()) {
+			return baseContent.gameData.items.get(index - (createdContent.gameData.items.size() + alteredContent.gameData.items.size()));
+		}
+		return null;
+	}
+	
 	public int getItemIndex(Item item) {
 		if (item.getDataType() == GameSource.Type.created) {
 			return createdContent.gameData.items.getIndex(item);
@@ -538,6 +566,21 @@ public class Project implements ProjectTreeNode, Serializable {
 			return createdContent.gameData.npcs.get(index);
 		} else if (index < getNPCCount()){
 			return getNPC(baseContent.gameData.npcs.get(index - createdContent.gameData.npcs.size()).id);
+		}
+		return null;
+	}
+	
+	public int getNPCCountIncludingAltered() {
+		return createdContent.gameData.npcs.size() + alteredContent.gameData.npcs.size() + baseContent.gameData.npcs.size();
+	}
+
+	public NPC getNPCIncludingAltered(int index) {
+		if (index < createdContent.gameData.npcs.size()) {
+			return createdContent.gameData.npcs.get(index);
+		} else if (index < createdContent.gameData.npcs.size() + alteredContent.gameData.npcs.size()){
+			return alteredContent.gameData.npcs.get(index - createdContent.gameData.npcs.size());
+		} else if (index < getNPCCountIncludingAltered()) {
+			return baseContent.gameData.npcs.get(index - (createdContent.gameData.npcs.size() + alteredContent.gameData.npcs.size()));
 		}
 		return null;
 	}

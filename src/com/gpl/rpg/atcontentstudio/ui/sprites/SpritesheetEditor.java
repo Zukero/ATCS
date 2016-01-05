@@ -151,10 +151,10 @@ public class SpritesheetEditor extends Editor {
 			TableColumn col;
 			while (columns.hasMoreElements()) {
 				col = columns.nextElement();
-				col.setMinWidth(sheet.spriteWidth + 1);
-				col.setMaxWidth(sheet.spriteWidth + 1);
+				col.setMinWidth(sheet.spriteWidth + 4);
+				col.setMaxWidth(sheet.spriteWidth + 4);
 			}
-			spritesTable.setRowHeight(sheet.spriteHeight + 1);
+			spritesTable.setRowHeight(sheet.spriteHeight + 4);
 			pane.add(new JScrollPane(spritesTable), BorderLayout.CENTER);
 		}
 	}

@@ -146,7 +146,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	}
 
 
-	public static void createProject(final String projectName, final File gameSourceFolder) {
+	public static void createProject(final String projectName, final File gameSourceFolder, final Project.ResourceSet sourceSet) {
 		WorkerDialog.showTaskMessage("Creating project "+projectName+"...", ATContentStudio.frame, new Runnable() {
 			@Override
 			public void run() {
@@ -154,7 +154,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 					Notification.addError("A project named "+projectName+" already exists in this workspace.");
 					return;
 				}
-				Project p = new Project(activeWorkspace, projectName, gameSourceFolder);
+				Project p = new Project(activeWorkspace, projectName, gameSourceFolder, sourceSet);
 				activeWorkspace.projects.add(p);
 				activeWorkspace.projectsName.add(projectName);
 				activeWorkspace.projectsOpenByName.put(projectName, p.open);

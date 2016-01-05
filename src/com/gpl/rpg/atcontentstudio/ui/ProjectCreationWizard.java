@@ -1,5 +1,6 @@
 package com.gpl.rpg.atcontentstudio.ui;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,18 +9,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataListener;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
+import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
@@ -30,7 +39,8 @@ public class ProjectCreationWizard extends JDialog {
 	private static final long serialVersionUID = -2854969975146867119L;
 
 	final JTextField projectNameField;
-	final JComboBox atSourceSelectionCombo;
+	final JComboBox<String> atSourceSelectionCombo;
+	final JComboBox<Project.ResourceSet> resourceSetToUse;
 
 	final JButton browse;
 	final JButton okButton;
@@ -42,7 +52,62 @@ public class ProjectCreationWizard extends JDialog {
 		super(ATContentStudio.frame);
 		setTitle("Create project");
 		projectNameField = new JTextField();
-		atSourceSelectionCombo = new JComboBox();
+		atSourceSelectionCombo = new JComboBox<String>();
+		resourceSetToUse = new JComboBox<Project.ResourceSet>(new ComboBoxModel<Project.ResourceSet>() {
+
+			Project.ResourceSet selected = Project.ResourceSet.allFiles;
+			
+			@Override
+			public int getSize() {
+				return Project.ResourceSet.values().length;
+			}
+
+			@Override
+			public ResourceSet getElementAt(int index) {
+				return Project.ResourceSet.values()[index];
+			}
+
+			List<ListDataListener> listeners = new LinkedList<ListDataListener>();
+			
+			@Override
+			public void addListDataListener(ListDataListener l) {
+				listeners.add(l);
+			}
+
+			@Override
+			public void removeListDataListener(ListDataListener l) {
+				listeners.remove(l);
+			}
+
+			@Override
+			public void setSelectedItem(Object anItem) {
+				selected = (ResourceSet) anItem;
+			}
+
+			@Override
+			public Object getSelectedItem() {
+				return selected;
+			}
+			
+		});
+		resourceSetToUse.setRenderer(new ListCellRenderer<Project.ResourceSet>() {
+			@Override
+			public Component getListCellRendererComponent(
+					JList<? extends ResourceSet> list, ResourceSet value,
+					int index, boolean isSelected, boolean cellHasFocus) {
+				switch (value) {
+				case allFiles:
+					return new JLabel("All available files");
+				case debugData:
+					return new JLabel("Debug data");
+				case gameData:
+					return new JLabel("Real game data");
+				default:
+					return new JLabel();
+				}
+					
+			}
+		});
 		browse = new JButton("Browse...");
 		okButton = new JButton("Ok");
 		cancelButton = new JButton("Cancel");
@@ -103,7 +168,7 @@ public class ProjectCreationWizard extends JDialog {
 				if (!Workspace.activeWorkspace.knownMapSourcesFolders.contains(atSourceFolder)) {
 					Workspace.activeWorkspace.knownMapSourcesFolders.add(atSourceFolder);
 				}
-				Workspace.createProject(projectNameField.getText(), atSourceFolder);
+				Workspace.createProject(projectNameField.getText(), atSourceFolder, (Project.ResourceSet)resourceSetToUse.getSelectedItem());
 				ProjectCreationWizard.this.dispose();
 			}
 		});
@@ -153,6 +218,17 @@ public class ProjectCreationWizard extends JDialog {
 		c.gridx++;
 		c.weightx = 20;
 		panel.add(browse, c);
+		
+		c.gridy++;
+		c.gridx = 1;
+		c.gridwidth = 1;
+		c.weightx = 20;
+		panel.add(new JLabel("Resource set: "), c);
+
+		c.gridx++;
+		c.weightx = 80;
+		c.gridwidth = 2;
+		panel.add(resourceSetToUse, c);
 		
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new GridBagLayout());

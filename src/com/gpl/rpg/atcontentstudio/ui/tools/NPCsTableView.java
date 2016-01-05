@@ -17,7 +17,7 @@ public class NPCsTableView extends ElementTableView {
 	private static final long serialVersionUID = -4196852140899079621L;
 
 	public NPCsTableView(Project proj) {
-		super(new NPCsTableModel(proj), "Compare "+proj.getNPCCount()+" NPCs.", new ImageIcon(DefaultIcons.getNPCIcon()));
+		super(new NPCsTableModel(proj), "Compare "+proj.getNPCCountIncludingAltered()+" NPCs.", new ImageIcon(DefaultIcons.getNPCIcon()));
 	}
 	
 	private static class NPCsTableModel implements TableModel {
@@ -30,7 +30,7 @@ public class NPCsTableView extends ElementTableView {
 		
 		@Override
 		public int getRowCount() {
-			return proj.getNPCCount();
+			return proj.getNPCCountIncludingAltered();
 		}
 
 		@Override
@@ -109,7 +109,7 @@ public class NPCsTableView extends ElementTableView {
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			NPC npc = proj.getNPC(rowIndex);
+			NPC npc = proj.getNPCIncludingAltered(rowIndex);
 			switch (columnIndex) {
 			case 0: return new ImageIcon(npc.getIcon()); // Icon
 			case 1: return npc.id; //ID

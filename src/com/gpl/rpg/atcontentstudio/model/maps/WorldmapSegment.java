@@ -90,7 +90,9 @@ public class WorldmapSegment extends GameDataElement {
 			return;
 		}
 		for (String mapName : mapLocations.keySet()) {
-			getProject().getMap(mapName).addBacklink(this);
+			if (getProject().getMap(mapName) != null) {
+				getProject().getMap(mapName).addBacklink(this);
+			}
 		}
 	}
 

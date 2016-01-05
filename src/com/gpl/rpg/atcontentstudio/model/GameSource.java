@@ -2,13 +2,29 @@ package com.gpl.rpg.atcontentstudio.model;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.tree.TreeNode;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
@@ -20,6 +36,9 @@ import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 public class GameSource implements ProjectTreeNode, Serializable {
 
 	private static final long serialVersionUID = -1512979360971918158L;
+	
+	public static final String DEFAULT_REL_PATH_FOR_GAME_RESOURCE = "res"+File.separator+"values"+File.separator+"loadresources.xml";
+	public static final String DEFAULT_REL_PATH_FOR_DEBUG_RESOURCE = "res"+File.separator+"values"+File.separator+"loadresources_debug.xml";
 	
 	public transient GameDataSet gameData;
 	public transient TMXMapSet gameMaps;
@@ -38,6 +57,8 @@ public class GameSource implements ProjectTreeNode, Serializable {
 	public Type type;
 	
 	public transient Project parent = null;
+	
+	public transient Map<String, List<String>> referencedSourceFiles = null;
 	
 	public GameSource(File folder, Project parent) {
 		this.parent = parent;
@@ -59,6 +80,12 @@ public class GameSource implements ProjectTreeNode, Serializable {
 	}
 
 	public void initData() {
+		if (type == Type.source) {
+			if (parent.sourceSetToUse == ResourceSet.gameData || parent.sourceSetToUse == ResourceSet.debugData) {
+				referencedSourceFiles = new LinkedHashMap<String, List<String>>();
+				readResourceList();
+			}
+		}
 		this.gameData = new GameDataSet(this);
 		this.gameMaps = new TMXMapSet(this);
 		this.gameSprites = new SpriteSheetSet(this);
@@ -68,6 +95,58 @@ public class GameSource implements ProjectTreeNode, Serializable {
 		v.add(gameMaps);
 		v.add(gameSprites);
 		v.add(worldmap);
+	}
+	
+	public void readResourceList() {
+		File xmlFile = null;
+		if (parent.sourceSetToUse == ResourceSet.gameData) {
+			xmlFile = new File(baseFolder, DEFAULT_REL_PATH_FOR_GAME_RESOURCE);
+		} else if (parent.sourceSetToUse == ResourceSet.debugData) {
+			xmlFile = new File(baseFolder, DEFAULT_REL_PATH_FOR_DEBUG_RESOURCE);
+		} else {
+			return;
+		}
+		
+		if (!xmlFile.exists()) return;
+		 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	        Document doc;
+	        try {
+	            factory.setIgnoringComments(true);
+	            factory.setIgnoringElementContentWhitespace(true);
+	            factory.setExpandEntityReferences(false);
+	            DocumentBuilder builder = factory.newDocumentBuilder();
+	            InputSource insrc = new InputSource(new FileInputStream(xmlFile));
+//	            insrc.setSystemId("http://worldmap/");
+	            insrc.setEncoding("UTF-8");
+	            doc = builder.parse(insrc);
+	            
+	            Element root = (Element) doc.getElementsByTagName("resources").item(0);
+	            if (root != null) {
+	            	NodeList arraysList = root.getElementsByTagName("array");
+	            	if (arraysList != null) {
+	            		for (int i = 0; i < arraysList.getLength(); i++) {
+	            			Element arrayNode = (Element) arraysList.item(i);
+	            			String name = arrayNode.getAttribute("name");
+	            			List<String> arrayContents = new LinkedList<String>();
+	            			NodeList arrayItems = arrayNode.getElementsByTagName("item");
+	            			if (arrayItems != null) {
+	            				for (int j = 0; j < arrayItems.getLength(); j++) {
+	            					arrayContents.add(((Element)arrayItems.item(j)).getTextContent());
+	            				}
+	            				referencedSourceFiles.put(name, arrayContents);
+	            			}
+	            		}
+	            	}
+	            }
+	        } catch (SAXException e) {
+	            e.printStackTrace();
+	        } catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 	
 	@Override

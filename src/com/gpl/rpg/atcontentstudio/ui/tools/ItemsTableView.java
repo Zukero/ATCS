@@ -18,7 +18,7 @@ public class ItemsTableView extends ElementTableView {
 	private static final long serialVersionUID = 1474255176349837609L;
 
 	public ItemsTableView(Project proj) {
-		super(new ItemsTableModel(proj), "Compare "+proj.getItemCount()+" items.", new ImageIcon(DefaultIcons.getItemIcon()));
+		super(new ItemsTableModel(proj), "Compare "+proj.getItemCountIncludingAltered()+" items.", new ImageIcon(DefaultIcons.getItemIcon()));
 	}
 	
 	private static class ItemsTableModel implements TableModel {
@@ -32,7 +32,7 @@ public class ItemsTableView extends ElementTableView {
 		@Override
 		public int getRowCount() {
 //			return proj.getItemCount() + 1;
-			return proj.getItemCount();
+			return proj.getItemCountIncludingAltered();
 		}
 
 		@Override
@@ -130,7 +130,7 @@ public class ItemsTableView extends ElementTableView {
 //				return getColumnName(columnIndex);
 //			}
 //			Item item = proj.getItem(rowIndex - 1);
-			Item item = proj.getItem(rowIndex);
+			Item item = proj.getItemIncludingAltered(rowIndex);
 			boolean canUse = item.category != null && item.category.action_type == ItemCategory.ActionType.use;
 			boolean canEquip = item.category != null && item.category.action_type == ItemCategory.ActionType.equip;
 			switch (columnIndex) {

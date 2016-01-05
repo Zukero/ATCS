@@ -13,6 +13,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
 import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SavedSlotCollection;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
@@ -24,6 +25,17 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 	
 	public static final String DEFAULT_REL_PATH_IN_SOURCE = "res"+File.separator+"raw"+File.separator;
 	public static final String DEFAULT_REL_PATH_IN_PROJECT = "json"+File.separator;
+	
+	public static final String GAME_AC_ARRAY_NAME = "loadresource_actorconditions";
+	public static final String GAME_DIALOGUES_ARRAY_NAME = "loadresource_conversationlists";
+	public static final String GAME_DROPLISTS_ARRAY_NAME = "loadresource_droplists";
+	public static final String GAME_ITEMS_ARRAY_NAME = "loadresource_items";
+	public static final String GAME_ITEMCAT_ARRAY_NAME = "loadresource_itemcategories";
+	public static final String GAME_NPC_ARRAY_NAME = "loadresource_monsters";
+	public static final String GAME_QUESTS_ARRAY_NAME = "loadresource_quests";
+	public static final String DEBUG_SUFFIX = "_debug";
+	public static final String RESOURCE_PREFIX = "@raw/";
+	public static final String FILENAME_SUFFIX = ".json";
 	
 	public File baseFolder;
 	
@@ -67,7 +79,87 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 		v.add(quests);
 		
 		//Start parsing to populate categories' content.
-		if (parent.type != GameSource.Type.referenced) {
+		if (parent.type == GameSource.Type.source && (parent.parent.sourceSetToUse == ResourceSet.debugData || parent.parent.sourceSetToUse == ResourceSet.gameData)) {
+			String suffix = (parent.parent.sourceSetToUse == ResourceSet.debugData) ? DEBUG_SUFFIX : "";
+			
+			if (parent.referencedSourceFiles.get(GAME_AC_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_AC_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						ActorCondition.fromJson(f, actorConditions);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_DIALOGUES_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_DIALOGUES_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						Dialogue.fromJson(f, dialogues);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_DROPLISTS_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_DROPLISTS_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						Droplist.fromJson(f, droplists);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_ITEMS_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_ITEMS_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						Item.fromJson(f, items);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_ITEMCAT_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_ITEMCAT_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						ItemCategory.fromJson(f, itemCategories);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_NPC_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_NPC_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						NPC.fromJson(f, npcs);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+			if (parent.referencedSourceFiles.get(GAME_QUESTS_ARRAY_NAME+suffix) != null) {
+				for (String resource : parent.referencedSourceFiles.get(GAME_QUESTS_ARRAY_NAME+suffix)) {
+					File f = new File(baseFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						Quest.fromJson(f, quests);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+			
+		} else if (parent.type != GameSource.Type.referenced) {
 			for (File f : baseFolder.listFiles()) {
 				if (f.getName().startsWith("actorconditions_")) {
 					ActorCondition.fromJson(f, actorConditions);

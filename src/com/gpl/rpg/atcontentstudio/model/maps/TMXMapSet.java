@@ -10,11 +10,14 @@ import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
+import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
+import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Item;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 public class TMXMapSet implements ProjectTreeNode {
@@ -22,6 +25,11 @@ public class TMXMapSet implements ProjectTreeNode {
 	public static final String DEFAULT_REL_PATH_IN_SOURCE = "res/xml/";
 	public static final String DEFAULT_REL_PATH_IN_PROJECT = "maps/";
 
+	public static final String GAME_MAPS_ARRAY_NAME = "loadresource_maps";
+	public static final String DEBUG_SUFFIX = "_debug";
+	public static final String RESOURCE_PREFIX = "@xml/";
+	public static final String FILENAME_SUFFIX = ".tmx";
+	
 	public File mapFolder = null;
 	public List<TMXMap> tmxMaps;
 	
@@ -29,7 +37,9 @@ public class TMXMapSet implements ProjectTreeNode {
 	
 	public TMXMapSet(GameSource source) {
 		this.parent = source;
-		if (source.type == GameSource.Type.source) this.mapFolder = new File(source.baseFolder, DEFAULT_REL_PATH_IN_SOURCE);
+		if (source.type == GameSource.Type.source) {
+			this.mapFolder = new File(source.baseFolder, DEFAULT_REL_PATH_IN_SOURCE);
+		}
 		else if (source.type == GameSource.Type.created | source.type == GameSource.Type.altered) {
 			this.mapFolder = new File(source.baseFolder, DEFAULT_REL_PATH_IN_PROJECT);
 			if (!this.mapFolder.exists()) {
@@ -38,7 +48,22 @@ public class TMXMapSet implements ProjectTreeNode {
 		}
 		this.tmxMaps = new ArrayList<TMXMap>();
 		
-		if (this.mapFolder != null) {
+		if (source.type == GameSource.Type.source && (source.parent.sourceSetToUse == ResourceSet.debugData || source.parent.sourceSetToUse == ResourceSet.gameData)) {
+			String suffix = (source.parent.sourceSetToUse == ResourceSet.debugData) ? DEBUG_SUFFIX : "";
+			
+			if (source.referencedSourceFiles.get(GAME_MAPS_ARRAY_NAME+suffix) != null) {
+				for (String resource : source.referencedSourceFiles.get(GAME_MAPS_ARRAY_NAME+suffix)) {
+					File f = new File(mapFolder, resource.replaceAll(RESOURCE_PREFIX, "")+FILENAME_SUFFIX);
+					if (f.exists()) {
+						TMXMap map = new TMXMap(this, f);
+						tmxMaps.add(map);
+					} else {
+						Notification.addWarn("Unable to locate resource "+resource+" in the game source for project "+getProject().name);
+					}
+				}
+			}
+		
+		} else if (this.mapFolder != null) {
 			for (File f : this.mapFolder.listFiles()) {
 				if (f.getName().endsWith(".tmx") || f.getName().endsWith(".TMX")) {
 					TMXMap map = new TMXMap(this, f);
