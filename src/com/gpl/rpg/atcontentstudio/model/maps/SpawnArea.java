@@ -13,6 +13,7 @@ public class SpawnArea extends MapObject {
 	public int quantity = 1;
 	public int spawnchance = 10;
 	public boolean active = true;
+	public String spawngroup_id;
 	public List<NPC> spawnGroup = new ArrayList<NPC>();
 	
 	public SpawnArea(tiled.core.MapObject obj) {
@@ -25,12 +26,17 @@ public class SpawnArea extends MapObject {
 		if (obj.getProperties().getProperty("active") != null) {
 			this.active = Boolean.parseBoolean(obj.getProperties().getProperty("active"));
 		}
+		if (obj.getProperties().getProperty("spawngroup") != null) {
+			this.spawngroup_id = obj.getProperties().getProperty("spawngroup");
+		} else if (obj.getName() != null ){
+			this.spawngroup_id = obj.getName();
+		}
 	}
 
 	@Override
 	public void link() {
-		if (name != null) {
-			spawnGroup = parentMap.getProject().getSpawnGroup(name);
+		if (spawngroup_id != null) {
+			spawnGroup = parentMap.getProject().getSpawnGroup(spawngroup_id);
 		} else {
 			spawnGroup = new ArrayList<NPC>();
 		}
@@ -65,6 +71,9 @@ public class SpawnArea extends MapObject {
 	
 	@Override
 	public void savePropertiesInTmxObject(tiled.core.MapObject tmxObject) {
+		if (spawngroup_id != null) {
+			tmxObject.getProperties().setProperty("spawngroup", spawngroup_id);
+		}
 		if (quantity != 1) {
 			tmxObject.getProperties().setProperty("quantity", Integer.toString(quantity));
 		}

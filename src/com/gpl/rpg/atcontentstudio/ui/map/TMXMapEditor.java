@@ -147,6 +147,7 @@ public class TMXMapEditor extends Editor {
 	private JComboBox evaluateTriggerBox;
 	private JSpinner quantityField;
 	private JCheckBox activeForNewGame;
+	private JTextField spawngroupField;
 	private JList npcList;
 	private SpawnGroupNpcListModel npcListModel;
 
@@ -546,7 +547,8 @@ public class TMXMapEditor extends Editor {
 		} else if (selected instanceof SignArea) {
 			dialogueBox = addDialogueBox(pane, ((TMXMap)target).getProject(), "Message: ", ((SignArea)selected).dialogue, ((TMXMap)target).writable, listener);
 		} else if (selected instanceof SpawnArea) {
-			areaField = addTextField(pane, "Spawn group ID: ", ((SpawnArea)selected).name, ((TMXMap)target).writable, listener);
+			areaField = addTextField(pane, "Spawn area ID: ", ((SpawnArea)selected).name, ((TMXMap)target).writable, listener);
+			spawngroupField = addTextField(pane, "Spawn group ID: ", ((SpawnArea)selected).spawngroup_id, ((TMXMap)target).writable, listener);
 			quantityField = addIntegerField(pane, "Number of spawned NPCs: ", ((SpawnArea)selected).quantity, false, ((TMXMap)target).writable, listener);
 			activeForNewGame = addBooleanBasedCheckBox(pane, "Active in a new game: ", ((SpawnArea)selected).active, ((TMXMap)target).writable, listener);
 			npcListModel = new SpawnGroupNpcListModel((SpawnArea) selected);
@@ -1690,6 +1692,16 @@ public class TMXMapEditor extends Editor {
 				tmxViewer.revalidate();
 				tmxViewer.repaint();
 			} else if (source == areaField) {
+				if (selectedMapObject instanceof SpawnArea) {
+					SpawnArea area = (SpawnArea)selectedMapObject;
+					area.name = (String) value;
+					groupObjectsListModel.objectChanged(area);
+				} else if (selectedMapObject instanceof MapChange) {
+					MapChange area = (MapChange) selectedMapObject;
+					area.name = (String) value;
+					groupObjectsListModel.objectChanged(area);
+				}
+			} else if (source == spawngroupField) {
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea)selectedMapObject;
 					if (area.spawnGroup != null && !area.spawnGroup.isEmpty()) {

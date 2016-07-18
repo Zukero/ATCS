@@ -35,7 +35,7 @@ public class KeyArea extends MapObject {
 			oldSchoolRequirement = false;
 		}
 		requirement = new Requirement();
-		requirement.type = Requirement.RequirementType.valueOf(requireType);
+		if (requireType != null) requirement.type = Requirement.RequirementType.valueOf(requireType);
 		requirement.required_obj_id = requireId;
 		if (requireValue != null) requirement.required_value = Integer.parseInt(requireValue);
 		requirement.state = GameDataElement.State.parsed;

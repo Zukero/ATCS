@@ -36,7 +36,7 @@ public class AboutEditor extends Editor {
 			"<br/>" +
 			"Play <a href=\"https://play.google.com/store/apps/details?id=com.gpl.rpg.AndorsTrail\">Andor's Trail</a> for free on your Android device.<br/>" +
 			"Visit <a href=\"http://andorstrail.com/\">the official forum</a> to give or receive help.<br/>" +
-			"Open the project's <a href=\"https://code.google.com/p/andors-trail/\">Google Code page</a> to check out the game's source code.<br/>" +
+			"Open the project's <a href=\"https://github.com/Zukero/andors-trail/\">GitHub project page</a> to check out the game's source code.<br/>" +
 			"<br/>" +
 			"For content creation help, make sure to use the following resources:<br/>" +
 			"<a href=\"http://andorstrail.com/viewtopic.php?f=6&t=4560\">The contribution guide on the forums</a><br/>" +
