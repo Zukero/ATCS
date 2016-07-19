@@ -77,7 +77,9 @@ public class KeyArea extends MapObject {
 			if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
 				tmxObject.setName(requirement.required_obj_id+":"+Integer.toString(requirement.required_value));
 			} else {
-				tmxObject.getProperties().setProperty("requireType", requirement.type.toString());
+				if (requirement.type != null) {
+					tmxObject.getProperties().setProperty("requireType", requirement.type.toString());
+				}
 				if (requirement.required_obj != null) {
 					tmxObject.getProperties().setProperty("requireId", requirement.required_obj.id);
 				} else if (requirement.required_obj_id != null) {

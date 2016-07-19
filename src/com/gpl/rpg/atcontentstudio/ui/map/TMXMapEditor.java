@@ -542,7 +542,7 @@ public class TMXMapEditor extends Editor {
 			
 			
 		} else if (selected instanceof RestArea) {
-			pane.add(new JLabel("Rest areas have no parameters"), JideBoxLayout.FIX);
+			areaField = addTextField(pane, "Area ID: ", ((RestArea)selected).name, ((TMXMap)target).writable, listener);
 		} else if (selected instanceof ScriptArea) {
 			evaluateTriggerBox = addEnumValueBox(pane, "Evaluate on every: ", ScriptArea.EvaluationTrigger.values(), ((ScriptArea)selected).trigger_type, ((TMXMap)target).writable, listener);
 			dialogueBox = addDialogueBox(pane, ((TMXMap)target).getProject(), "Script: ", ((ScriptArea)selected).dialogue, ((TMXMap)target).writable, listener);
