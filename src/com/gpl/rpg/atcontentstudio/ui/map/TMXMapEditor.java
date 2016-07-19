@@ -124,6 +124,7 @@ public class TMXMapEditor extends Editor {
 	
 	private JPanel layerDetailsPane;
 	private BooleanBasedCheckBox layerVisibleBox;
+	private BooleanBasedCheckBox activeLayerBox;
 	private JTextField layerNameField;
 	private MapObjectsListModel groupObjectsListModel;
 	private JList groupObjectsList;
@@ -308,6 +309,7 @@ public class TMXMapEditor extends Editor {
 					break;
 				}
 			}
+			activeForNewGame = addBooleanBasedCheckBox(groupDetailPane, "Active for new game", objGroup.active, map.writable, listener);
 			groupObjectsListModel = new MapObjectsListModel(objGroup);
 			groupObjectsList = new JList(groupObjectsListModel);
 			groupObjectsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -1683,6 +1685,11 @@ public class TMXMapEditor extends Editor {
 				modified = false;
 				tmxViewer.revalidate();
 				tmxViewer.repaint();
+			}  else if (source == activeForNewGame) {
+				if (selectedLayer instanceof tiled.core.ObjectGroup) {
+					map.getGroup((tiled.core.ObjectGroup) selectedLayer).active = activeForNewGame.isSelected();
+				}
+				modified = true;
 			} else if (source == layerList) {
 				modified = false;
 				tmxViewer.revalidate();
@@ -1692,15 +1699,8 @@ public class TMXMapEditor extends Editor {
 				tmxViewer.revalidate();
 				tmxViewer.repaint();
 			} else if (source == areaField) {
-				if (selectedMapObject instanceof SpawnArea) {
-					SpawnArea area = (SpawnArea)selectedMapObject;
-					area.name = (String) value;
-					groupObjectsListModel.objectChanged(area);
-				} else if (selectedMapObject instanceof MapChange) {
-					MapChange area = (MapChange) selectedMapObject;
-					area.name = (String) value;
-					groupObjectsListModel.objectChanged(area);
-				}
+				selectedMapObject.name = (String) value;
+				groupObjectsListModel.objectChanged(selectedMapObject);
 			} else if (source == spawngroupField) {
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea)selectedMapObject;
@@ -1709,7 +1709,7 @@ public class TMXMapEditor extends Editor {
 							npc.removeBacklink(map);
 						}
 					}
-					area.name = (String) value;
+					area.spawngroup_id = (String) value;
 					selectedMapObject.link();
 					npcList.setModel(new SpawnGroupNpcListModel(area));
 					groupObjectsListModel.objectChanged(area);
@@ -1717,10 +1717,6 @@ public class TMXMapEditor extends Editor {
 					npcList.repaint();
 					tmxViewer.revalidate();
 					tmxViewer.repaint();
-				} else if (selectedMapObject instanceof MapChange) {
-					MapChange area = (MapChange) selectedMapObject;
-					area.name = (String) value;
-					groupObjectsListModel.objectChanged(area);
 				}
 			} else if (source == targetAreaCombo) {
 				if (selectedMapObject instanceof MapChange) {

@@ -13,12 +13,18 @@ public class MapObjectGroup {
 	public String name;
 	public boolean visible;
 	public List<MapObject> mapObjects = new ArrayList<MapObject>();
+	public Boolean active;
 	
 	public MapObjectGroup(tiled.core.ObjectGroup layer, TMXMap map) {
 		this.tmxGroup = layer;
 		this.name = layer.getName();
 		this.visible = layer.isVisible();
 		this.parentMap = map;
+		if (layer.getProperties().get("active") != null) {
+			active = new Boolean(((String) layer.getProperties().get("active")));
+		} else {
+			active = true;
+		}
 		for (tiled.core.MapObject obj : layer.getObjectsList()) {
 			mapObjects.add(MapObject.buildObject(obj, map));
 		}
@@ -44,6 +50,9 @@ public class MapObjectGroup {
 		}
 		tmxGroup.setVisible(visible);
 		tmxGroup.setName(name);
+		if (!active) {
+			tmxGroup.getProperties().put("active", Boolean.toString(active));
+		}
 		for (MapObject object : mapObjects) {
 			tmxGroup.addObject(object.toTmxObject());
 		}

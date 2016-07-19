@@ -63,8 +63,8 @@ public class Dialogue extends JSONElement {
 			spawnAll,
 			removeSpawnArea,
 			deactivateSpawnArea,
-			activateMapChangeArea,
-			deactivateMapChangeArea
+			activateMapObjectGroup,
+			deactivateMapObjectGroup
 		}
 	}
 	
@@ -242,8 +242,8 @@ public class Dialogue extends JSONElement {
 			for (Reward reward : rewards) {
 				if (reward.reward_obj_id != null) {
 					switch (reward.type) {
-					case activateMapChangeArea:
-					case deactivateMapChangeArea:
+					case activateMapObjectGroup:
+					case deactivateMapObjectGroup:
 					case spawnAll:
 					case removeSpawnArea:
 					case deactivateSpawnArea:

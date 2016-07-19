@@ -320,8 +320,13 @@ public class DialogueEditor extends JSONElementEditor {
 		}
 		if (reward.type != null) {
 			switch (reward.type) {
-			case activateMapChangeArea:
-			case deactivateMapChangeArea:
+			case activateMapObjectGroup:
+			case deactivateMapObjectGroup:
+				rewardMap = addMapBox(pane, ((Dialogue)target).getProject(), "Map Name: ", reward.map, writable, listener);
+				rewardObjId = addTextField(pane, "Group ID: ", reward.reward_obj_id, writable, listener);
+				rewardObj = null;
+				rewardValue = null;
+				break;
 			case deactivateSpawnArea:
 			case removeSpawnArea:
 			case spawnAll:
@@ -732,8 +737,9 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObjDesc = reward.reward_obj_id;
 			}
 			switch (reward.type) {
-			case activateMapChangeArea:
-				label.setText("Activate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
+			case activateMapObjectGroup:
+				label.setText("Activate map object group "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getObjectLayerIcon()));
 				break;
 			case actorCondition:
 				label.setText("Give actor condition "+rewardObjDesc+" for "+reward.reward_value+" turns");
@@ -745,11 +751,13 @@ public class DialogueEditor extends JSONElementEditor {
 			case createTimer:
 				label.setText("Create timer "+rewardObjDesc);
 				break;
-			case deactivateMapChangeArea:
-				label.setText("Deactivate mapchange area "+rewardObjDesc+" on map "+reward.map_name);
+			case deactivateMapObjectGroup:
+				label.setText("Deactivate map object group "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getObjectLayerIcon()));
 				break;
 			case deactivateSpawnArea:
 				label.setText("Deactivate spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getNPCIcon()));
 				break;
 			case dropList:
 				label.setText("Give contents of droplist "+rewardObjDesc);
@@ -765,12 +773,14 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case removeSpawnArea:
 				label.setText("Remove all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getNPCIcon()));
 				break;
 			case skillIncrease:
 				label.setText("Increase skill "+rewardObjDesc+" level");
 				break;
 			case spawnAll:
 				label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getNPCIcon()));
 				break;
 			}
 		} else {
@@ -1027,6 +1037,10 @@ public class DialogueEditor extends JSONElementEditor {
 			} else if (source == rewardTypeCombo) {
 				if (selectedReward.type != value) {
 					selectedReward.type = (Dialogue.Reward.RewardType) value;
+					if (selectedReward.map != null) {
+						selectedReward.map.removeBacklink(dialogue);
+					}
+					selectedReward.map = null;
 					selectedReward.map_name = null;
 					selectedReward.reward_obj = null;
 					selectedReward.reward_obj_id = null;
