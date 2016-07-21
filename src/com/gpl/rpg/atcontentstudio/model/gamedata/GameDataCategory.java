@@ -154,7 +154,7 @@ public class GameDataCategory<E extends JSONElement> extends ArrayList<E> implem
 				dataToSave.add(element.toJson());
 			}
 		}
-		if (dataToSave.isEmpty()) {
+		if (dataToSave.isEmpty() && jsonFile.exists()) {
 			if (jsonFile.delete()) {
 				Notification.addSuccess("File "+jsonFile.getAbsolutePath()+" deleted.");
 			} else {

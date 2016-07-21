@@ -496,6 +496,8 @@ public class Item extends JSONElement {
 		itemJson.put("id", this.id);
 		if (this.icon_id != null) itemJson.put("iconID", this.icon_id);
 		if (this.name != null) itemJson.put("name", this.name);
+		if(this.display_type != null) itemJson.put("displaytype", this.display_type.toString());
+		
 		if (this.has_manual_price != null) itemJson.put("hasManualPrice", this.has_manual_price);
 		if (this.base_market_cost != null) itemJson.put("baseMarketCost", this.base_market_cost);
 		if (this.category != null) {

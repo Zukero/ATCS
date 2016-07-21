@@ -27,6 +27,7 @@ import javax.swing.event.ListDataListener;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.gamedata.ActorCondition;
@@ -293,6 +294,7 @@ public class JSONCreationWizard extends JDialog {
 				creation.id = idField.getText();
 				JSONCreationWizard.this.setVisible(false);
 				JSONCreationWizard.this.dispose();
+				creation.state = State.created;
 				proj.createElement(creation);
 				notifyCreated();
 				ATContentStudio.frame.selectInTree(creation);
