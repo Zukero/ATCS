@@ -29,6 +29,7 @@
 package tiled.core;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Properties;
 
 /**
@@ -36,7 +37,7 @@ import java.util.Properties;
  */
 public class Tile
 {
-    private Image image;
+    private BufferedImage image;
     private int id = -1;
     private Properties properties;
     private TileSet tileset;
@@ -76,7 +77,7 @@ public class Tile
      *
      * @param i the new image of the tile
      */
-    public void setImage(Image i) {
+    public void setImage(BufferedImage i) {
         image = i;
     }
 
@@ -133,7 +134,7 @@ public class Tile
      *
      * @return Image
      */
-    public Image getImage() {
+    public BufferedImage getImage() {
     	if (tileset != null && tileset.sheet != null) return tileset.sheet.getImage(getId());
         return image;
     }

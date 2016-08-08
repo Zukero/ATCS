@@ -30,6 +30,7 @@ package tiled.view;
 import tiled.core.TileLayer;
 
 import java.awt.*;
+import java.awt.image.BufferedImageOp;
 
 /**
  * An interface defining methods to render a map.
@@ -50,5 +51,5 @@ public interface MapRenderer
      * @param g     the graphics context to paint to
      * @param layer the layer to paint
      */
-    public void paintTileLayer(Graphics2D g, TileLayer layer);
+    public void paintTileLayer(Graphics2D g, TileLayer layer, BufferedImageOp filter);
 }

@@ -64,7 +64,7 @@ public class BasicTileCutter implements TileCutter
         this.image = image;
     }
 
-    public Image getNextTile() {
+    public BufferedImage getNextTile() {
         if (nextY + tileHeight + tileMargin <= image.getHeight()) {
             BufferedImage tile =
                 image.getSubimage(nextX, nextY, tileWidth, tileHeight);

@@ -161,7 +161,7 @@ public class TileSet implements Iterable<Tile>
             tilesPerRow = basicTileCutter.getTilesPerRow();
         }
 
-        Image tileImage = cutter.getNextTile();
+        BufferedImage tileImage = cutter.getNextTile();
         while (tileImage != null) {
             Tile tile = new Tile();
             tile.setImage(tileImage);
@@ -220,7 +220,7 @@ public class TileSet implements Iterable<Tile>
         tileDimensions = new Rectangle(tileCutter.getTileDimensions());
 
         int id = 0;
-        Image tileImage = tileCutter.getNextTile();
+        BufferedImage tileImage = tileCutter.getNextTile();
         while (tileImage != null) {
             Tile tile = getTile(id);
             tile.setImage(tileImage);

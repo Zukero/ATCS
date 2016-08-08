@@ -1,23 +1,31 @@
 package com.gpl.rpg.atcontentstudio.ui.gamedataeditors;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
+import org.fife.ui.rtextarea.ColorBackgroundPainterStrategy;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
@@ -79,6 +87,7 @@ public class QuestEditor extends JSONElementEditor {
 		stagesTable.getColumnModel().getColumn(3).setMinWidth(130);
 		stagesTable.getColumnModel().getColumn(3).setMaxWidth(130);
 		stagesTable.setCellSelectionEnabled(true);
+		stagesTable.getColumnModel().getColumn(1).setCellRenderer(new MultilineCellRenderer());
 		stagesPane.add(new JScrollPane(stagesTable), BorderLayout.CENTER);
 		if (quest.writable) {
 			JPanel buttonPane = new JPanel();
@@ -330,6 +339,48 @@ public class QuestEditor extends JSONElementEditor {
 			updateJsonViewText(quest.toJsonString());
 		}
 		
+		
+	}
+
+	public class MultilineCellRenderer extends JTextArea implements TableCellRenderer {
+		private static final long serialVersionUID = 6539816623608859506L;
+		
+		public MultilineCellRenderer() {
+			setLineWrap(true);
+			setWrapStyleWord(true);
+			//setOpaque(true);
+		}
+		
+		@Override
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			if (isSelected) {
+				setForeground(stagesTable.getSelectionForeground());
+				setBackground(stagesTable.getSelectionBackground());
+			} else {
+				setForeground(stagesTable.getForeground());
+				setBackground(stagesTable.getBackground());
+			}
+			setFont(stagesTable.getFont());
+			if (hasFocus) {
+				setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
+				if (stagesTable.isCellEditable(row, column)) {
+					setForeground(UIManager.getColor("Table.focusCellForeground"));
+					setBackground(UIManager.getColor("Table.focusCellBackground"));
+				}
+			} else {
+				setBorder(BorderFactory.createLineBorder(getBackground(), 1)); 
+			}
+			setText((value == null ? "" : value.toString()));
+			
+			int fh = getFontMetrics(getFont()).getHeight();
+//			int tl = getText().length();
+			setSize(stagesTable.getWidth(), fh);
+			stagesTable.setRowHeight(row, getPreferredSize().height);
+			
+			return this;
+		}
 	}
 	
 

@@ -23,6 +23,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
@@ -79,7 +80,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private static final int SHOP_INDEX = 5;
 	
 	private JTextField idField;
-	private JTextField messageField;
+	private JTextArea messageField;
 	private MyComboBox switchToNpcBox;
 	
 	private RewardsListModel rewardsListModel;
@@ -127,7 +128,7 @@ public class DialogueEditor extends JSONElementEditor {
 		createButtonPane(pane, dialogue.getProject(), dialogue, Dialogue.class, dialogue.getImage(), null, listener);
 		
 		idField = addTextField(pane, "Internal ID: ", dialogue.id, dialogue.writable, listener);
-		messageField = addTextField(pane, "Message: ", dialogue.message, dialogue.writable, listener);
+		messageField = addTextArea(pane, "Message: ", dialogue.message, dialogue.writable, listener);
 		switchToNpcBox = addNPCBox(pane, dialogue.getProject(), "Switch active NPC to: ", dialogue.switch_to_npc, dialogue.writable, listener);
 		
 		CollapsiblePanel rewards = new CollapsiblePanel("Reaching this phrase gives the following rewards: ");

@@ -48,7 +48,7 @@ public interface TileCutter
      * @return the next tile image, or <code>null</code> when no more tile
      *         images are available
      */
-    public Image getNextTile();
+    public BufferedImage getNextTile();
 
     /**
      * Resets the tile cutter so that the next call to <code>getNextTile</code>

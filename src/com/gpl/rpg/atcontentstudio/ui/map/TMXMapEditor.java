@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -18,8 +19,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BandCombineOp;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ByteLookupTable;
+import java.awt.image.ColorConvertOp;
+import java.awt.image.LookupOp;
+import java.awt.image.LookupTable;
+import java.awt.image.ShortLookupTable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -115,6 +122,7 @@ public class TMXMapEditor extends Editor {
 	private RSyntaxTextArea editorPane;
 	
 	private IntegerBasedCheckBox outsideBox;
+	private JComboBox colorFilterBox;
 	private LayerListModel layerListModel;
 	private JList layerList;
 	private tiled.core.MapLayer selectedLayer;
@@ -206,6 +214,7 @@ public class TMXMapEditor extends Editor {
 		addLabelField(pane, "TMX File: ", ((TMXMap)target).tmxFile.getAbsolutePath());
 		createButtonPane(pane, map.getProject(), map, listener);
 		outsideBox = addIntegerBasedCheckBox(pane, "Map is outdoors", map.outside, map.writable, listener);
+		colorFilterBox = addEnumValueBox(pane, "Color Filter", TMXMap.ColorFilter.values(), map.colorFilter, map.writable, listener);
 		
 		JSplitPane layersViewSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		layerListModel = new LayerListModel(map); 
@@ -1242,12 +1251,51 @@ public class TMXMapEditor extends Editor {
 	
 	}
 	
+	private static final BufferedImageOp colorFilterBlack20 = null;
+	private static final BufferedImageOp colorFilterBlack40 = null;
+	private static final BufferedImageOp colorFilterBlack60 = null;
+	private static final BufferedImageOp colorFilterBlack80 = null;
+	private static final BufferedImageOp colorFilterInvert = null;
+	private static final BufferedImageOp colorFilterBW = null;
+
+	
+//	private static final BufferedImageOp colorFilterBlack20 = createGrayScaleColorFilter(0.8f);
+//	private static final BufferedImageOp colorFilterBlack40 = createGrayScaleColorFilter(0.6f);
+//	private static final BufferedImageOp colorFilterBlack60 = createGrayScaleColorFilter(0.4f);
+//	private static final BufferedImageOp colorFilterBlack80 = createGrayScaleColorFilter(0.2f);
+//	private static final BufferedImageOp colorFilterInvert = createInvertColorFilter();
+//	private static final BufferedImageOp colorFilterBW = createBWColorFilter();
+//
+//    private static BufferedImageOp createGrayScaleColorFilter(float f) {
+//		byte[] gs = new byte[256];
+//		for (int i=0; i < 256; i++) {
+//			gs[i] = (byte)( i * f);
+//		}
+//    	return new LookupOp(new ByteLookupTable(0, gs), null);
+//	}
+//    
+//    private static BufferedImageOp createInvertColorFilter() {
+//    	byte[] invert = new byte[256];
+//		for (int i=0; i < 256; i++) {
+//			invert[i] =  (byte) (255 - i);
+//		}
+//    	return new LookupOp(new ByteLookupTable(0, invert), null);
+//	}
+//    
+//    
+//    private static BufferedImageOp createBWColorFilter() {
+//		return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+//	}
+	
 	public class TMXViewer extends JPanel implements Scrollable {
 		
 		private static final long serialVersionUID = 2845032142029325865L;
+
+		
 		public tiled.core.MapObject highlighted = null;
 	    private MapRenderer renderer;
 	    private FieldUpdateListener listener;
+	    private TMXMap map;
 	    
 	    public boolean resizing = false;
 	    public boolean moving = false;
@@ -1257,7 +1305,8 @@ public class TMXMapEditor extends Editor {
 	    	return new Rectangle(selectedMapObject.x + selectedMapObject.w - 16, selectedMapObject.y + selectedMapObject.h - 16, 16, 16);
 	    }
 	    
-	    public Rectangle getMoveHitArea() {
+
+		public Rectangle getMoveHitArea() {
 	    	//16x16 px square in the upper left corner of area
 	    	return new Rectangle(selectedMapObject.x, selectedMapObject.y, 16, 16);
 	    }
@@ -1270,6 +1319,7 @@ public class TMXMapEditor extends Editor {
 	    public TMXViewer(final TMXMap map, FieldUpdateListener listener) {
 	    	this.listener = listener;
 	        renderer = createRenderer(map.tmxMap);
+	        this.map = map;
 
 	        setPreferredSize(renderer.getMapSize());
 	        setOpaque(true);
@@ -1383,20 +1433,86 @@ public class TMXMapEditor extends Editor {
 		public void paintComponent(Graphics g) {
 	        final Graphics2D g2d = (Graphics2D) g.create();
 	        final Rectangle clip = g2d.getClipBounds();
+	        
+	        BufferedImageOp filter = null;
+	        
+	        if (map.colorFilter != null) {
+	        	switch(map.colorFilter) {
+				case black20:
+					filter=colorFilterBlack20;
+					break;
+				case black40:
+					filter=colorFilterBlack40;
+					break;
+				case black60:
+					filter=colorFilterBlack60;
+					break;
+				case black80:
+					filter=colorFilterBlack80;
+					break;
+				case bw:
+					filter=colorFilterBW;
+					break;
+				case invert:
+					filter=colorFilterInvert;
+					break;
+				default:
+					break;
+	        
+	        	}
+	        }
 
 	        // Draw a gray background
 	        g2d.setPaint(new Color(100, 100, 100));
 	        g2d.fill(clip);
 
 	        // Draw each tile map layer
-	        boolean paintSelected = false;
 	        for (tiled.core.MapLayer layer : ((TMXMap)target).tmxMap) {
 	            if (layer instanceof tiled.core.TileLayer && layer.isVisible()) {
-	                renderer.paintTileLayer(g2d, (tiled.core.TileLayer) layer);
-	            } else if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
+	                renderer.paintTileLayer(g2d, (tiled.core.TileLayer) layer, filter);
+	            } 
+	        }
+	        
+	        
+	        if (map.colorFilter != null) {
+	        	switch(map.colorFilter) {
+				case black20:
+			        g2d.setPaint(new Color(0f, 0f, 0f, 0.2f));
+			        g2d.fill(clip);
+					break;
+				case black40:
+			        g2d.setPaint(new Color(0f, 0f, 0f, 0.4f));
+			        g2d.fill(clip);
+					break;
+				case black60:
+			        g2d.setPaint(new Color(0f, 0f, 0f, 0.6f));
+			        g2d.fill(clip);
+					break;
+				case black80:
+			        g2d.setPaint(new Color(0f, 0f, 0f, 0.8f));
+			        g2d.fill(clip);
+					break;
+				case bw:
+					break;
+				case invert:
+					break;
+				default:
+					break;
+	        
+	        	}
+	        }
+	        
+	        
+	        // Draw each object map layer
+	        boolean paintSelected = false;
+	        for (tiled.core.MapLayer layer : ((TMXMap)target).tmxMap) {
+	            if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
 	                paintSelected |= paintObjectGroup(g2d, (tiled.core.ObjectGroup) layer);
 	            }
 	        }
+	        
+	        
+	        
 	        if (paintSelected) {
 	        	//TODO make this less ugly..... visually speaking.
 	        	g2d.setColor(new Color(190, 20, 20));
@@ -1725,6 +1841,10 @@ public class TMXMapEditor extends Editor {
 				}
 			} else if (source == outsideBox) {
 				map.outside = (Integer)value;
+			} else if (source == colorFilterBox) {
+				map.colorFilter = (TMXMap.ColorFilter) value;
+				tmxViewer.revalidate();
+				tmxViewer.repaint();
 			} else if (source == droplistBox) {
 				if (selectedMapObject instanceof ContainerArea) {
 					ContainerArea area = (ContainerArea)selectedMapObject;
@@ -2050,6 +2170,34 @@ public class TMXMapEditor extends Editor {
 	        final Graphics2D g2d = (Graphics2D) g.create();
 	        final Rectangle clip = g2d.getClipBounds();
 
+	        BufferedImageOp filter = null;
+	        
+	        if (map.colorFilter != null) {
+	        	switch(map.colorFilter) {
+				case black20:
+					filter=colorFilterBlack20;
+					break;
+				case black40:
+					filter=colorFilterBlack40;
+					break;
+				case black60:
+					filter=colorFilterBlack60;
+					break;
+				case black80:
+					filter=colorFilterBlack80;
+					break;
+				case bw:
+					filter=colorFilterBW;
+					break;
+				case invert:
+					filter=colorFilterInvert;
+					break;
+				default:
+					break;
+	        
+	        	}
+	        }
+	        
 	        // Draw a gray background
 	        g2d.setPaint(new Color(100, 100, 100));
 	        g2d.fill(clip);
@@ -2057,19 +2205,19 @@ public class TMXMapEditor extends Editor {
 	        // Draw each tile map layer
 	        
 	        if (ground != null) {
-	        	renderer.paintTileLayer(g2d, ground);
+	        	renderer.paintTileLayer(g2d, ground, filter);
 	        }
 	        
 	        if (objects != null) {
-	        	renderer.paintTileLayer(g2d, objects);
+	        	renderer.paintTileLayer(g2d, objects, filter);
 	        }
 	        
 	        if (above != null) {
-	        	renderer.paintTileLayer(g2d, above);
+	        	renderer.paintTileLayer(g2d, above, filter);
 	        }
 	        
 	        if (walkable != null && showWalkable) {
-	        	renderer.paintTileLayer(g2d, walkable);
+	        	renderer.paintTileLayer(g2d, walkable, filter);
 	        }
 	        
 	        if (highlighted != null) {

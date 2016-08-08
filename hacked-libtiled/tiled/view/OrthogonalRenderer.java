@@ -32,6 +32,8 @@ import tiled.core.Tile;
 import tiled.core.TileLayer;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 /**
  * The orthogonal map renderer. This is the most basic map renderer, dealing
@@ -51,7 +53,7 @@ public class OrthogonalRenderer implements MapRenderer
                 map.getHeight() * map.getTileHeight());
     }
 
-    public void paintTileLayer(Graphics2D g, TileLayer layer) {
+    public void paintTileLayer(Graphics2D g, TileLayer layer, BufferedImageOp filter ) {
         final Rectangle clip = g.getClipBounds();
         final int tileWidth = map.getTileWidth();
         final int tileHeight = map.getTileHeight();
@@ -74,15 +76,17 @@ public class OrthogonalRenderer implements MapRenderer
                 final Tile tile = layer.getTileAt(x, y);
                 if (tile == null)
                     continue;
-                final Image image = tile.getImage();
+                final BufferedImage image = tile.getImage();
                 if (image == null)
                     continue;
 
+                
+                
                 g.drawImage(
                         image,
+                        filter,
                         x * tileWidth,
-                        (y + 1) * tileHeight - image.getHeight(null),
-                        null);
+                        (y + 1) * tileHeight - image.getHeight(null));
             }
         }
 

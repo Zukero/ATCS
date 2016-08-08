@@ -81,7 +81,7 @@ public class WorldMapView extends JComponent implements Scrollable {
         	for (tiled.core.MapLayer layer : ((TMXMap)map).tmxMap) {
         		if (layer instanceof tiled.core.TileLayer && layer.isVisible()) {
         			if (layer.getName().equalsIgnoreCase("walkable")) continue;
-        			renderer.paintTileLayer(g2, (tiled.core.TileLayer) layer);
+        			renderer.paintTileLayer(g2, (tiled.core.TileLayer) layer, null);
         		} else if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
 //        			paintObjectGroup(g2, map, (tiled.core.ObjectGroup) layer);
         		}

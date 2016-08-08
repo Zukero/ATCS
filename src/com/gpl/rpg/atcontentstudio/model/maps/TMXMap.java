@@ -38,6 +38,14 @@ public class TMXMap extends GameDataElement {
 	public static final String ABOVE_LAYER_NAME = "Above";
 	public static final String WALKABLE_LAYER_NAME = "Walkable";
 	
+	public enum ColorFilter {
+		black20,
+		black40,
+		black60,
+		black80,
+		invert,
+		bw
+	}
 	
 	public File tmxFile = null;
 	public tiled.core.Map tmxMap = null;
@@ -46,6 +54,7 @@ public class TMXMap extends GameDataElement {
 	
 	public ProjectTreeNode parent;
 	public Integer outside = null;
+	public ColorFilter colorFilter = null;
 
 	public boolean writable = false;
 
@@ -62,8 +71,11 @@ public class TMXMap extends GameDataElement {
 			usedSpritesheets = new HashSet<Spritesheet>();
 			try {
 				tmxMap = new TMXMapReader().readMap(tmxFile.getAbsolutePath(), this);
-				if (tmxMap.getProperties().get("outside") != null) {
-					outside = new Integer(((String) tmxMap.getProperties().get("outside")));
+				if (tmxMap.getProperties().get("outdoors") != null) {
+					outside = new Integer(((String) tmxMap.getProperties().get("outdoors")));
+				}
+				if (tmxMap.getProperties().get("colorfilter") != null) {
+					colorFilter = ColorFilter.valueOf(((String) tmxMap.getProperties().get("colorfilter")));
 				}
 			} catch (FileNotFoundException e) {
 				Notification.addError("Impossible to load TMX map file "+tmxFile.getAbsolutePath());
@@ -97,8 +109,11 @@ public class TMXMap extends GameDataElement {
 		try {
 			clone.usedSpritesheets = new HashSet<Spritesheet>();
 			clone.tmxMap = new TMXMapReader().readMap(new StringReader(this.toXml()), clone);
-			if (clone.tmxMap.getProperties().get("outside") != null) {
-				clone.outside = new Integer(((String) clone.tmxMap.getProperties().get("outside")));
+			if (clone.tmxMap.getProperties().get("outdoors") != null) {
+				clone.outside = new Integer(((String) clone.tmxMap.getProperties().get("outdoors")));
+			}
+			if (clone.tmxMap.getProperties().get("colorfilter") != null) {
+				clone.colorFilter = ColorFilter.valueOf(((String) tmxMap.getProperties().get("colorfilter")));
 			}
 			for (tiled.core.MapLayer layer : clone.tmxMap.getLayers()) {
 				if (layer instanceof tiled.core.ObjectGroup) {
@@ -210,6 +225,17 @@ public class TMXMap extends GameDataElement {
 	}
 
 	public String toXml() {
+		if (outside != null && outside == 1) {
+			tmxMap.getProperties().put("outdoors", Integer.toString(outside));
+		} else {
+			tmxMap.getProperties().remove("outdoors");
+		}
+		if (colorFilter != null) {
+			tmxMap.getProperties().put("colorfilter", colorFilter.toString());
+		} else {
+			tmxMap.getProperties().remove("colorfilter");
+		}
+		
 		for (MapObjectGroup group : groups) {
 			group.pushBackToTiledProperties();
 			if (!tmxMap.containsLayer(group.tmxGroup)) {

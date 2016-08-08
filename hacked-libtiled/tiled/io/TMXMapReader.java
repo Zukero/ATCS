@@ -31,6 +31,7 @@ package tiled.io;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -223,9 +224,9 @@ public class TMXMapReader
         return o;
     }
 
-    private Image unmarshalImage(Node t, String baseDir) throws IOException
+    private BufferedImage unmarshalImage(Node t, String baseDir) throws IOException
     {
-        Image img = null;
+    	BufferedImage img = null;
 
         String source = getAttributeValue(t, "source");
 
@@ -253,7 +254,7 @@ public class TMXMapReader
                         // size, somehow makes drawing of the tiles a lot
                         // faster on various systems (seen on Linux, Windows
                         // and MacOS X).
-                        img = img.getScaledInstance(
+                        img = (BufferedImage) img.getScaledInstance(
                                 img.getWidth(null), img.getHeight(null),
                                 Image.SCALE_FAST);
                     }
@@ -534,7 +535,7 @@ public class TMXMapReader
             Node child = children.item(i);
             if ("image".equalsIgnoreCase(child.getNodeName())) {
                 int id = getAttribute(child, "id", -1);
-                Image img = unmarshalImage(child, baseDir);
+                BufferedImage img = unmarshalImage(child, baseDir);
                 tile.setImage(img);
             } else if ("animation".equalsIgnoreCase(child.getNodeName())) {
                 // TODO: fill this in once TMXMapWriter is complete

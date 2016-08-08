@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
@@ -29,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.NumberEditor;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.SpinnerNumberModel;
@@ -146,6 +148,51 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 			}
 		});
 		return tfField;
+	}
+	
+	public static JTextArea addTextArea(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
+		String text= initialValue == null ? "" : initialValue.replaceAll("\\n", "\n");
+		
+		JPanel tfPane = new JPanel();
+		tfPane.setLayout(new JideBoxLayout(tfPane, JideBoxLayout.LINE_AXIS, 6));
+		JLabel tfLabel = new JLabel(label);
+		tfPane.add(tfLabel, JideBoxLayout.FIX);
+		final JTextArea tfArea = new JTextArea(text);
+		tfArea.setEditable(editable);
+		tfPane.add(new JScrollPane(tfArea), JideBoxLayout.VARY);
+		JButton nullify = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		tfPane.add(nullify, JideBoxLayout.FIX);
+		nullify.setEnabled(editable);
+		pane.add(tfPane, JideBoxLayout.FIX);
+		
+		nullify.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				tfArea.setText("");
+				listener.valueChanged(tfArea, null);
+			}
+		});
+		tfArea.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				listener.valueChanged(tfArea, tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n")));
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				listener.valueChanged(tfArea, tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n")));
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				listener.valueChanged(tfArea, tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n")));
+			}
+		});
+//		tfArea.addActionListener(new ActionListener() {
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				listener.valueChanged(tfArea, tfArea.getText().replaceAll("\n", "\\n"));
+//			}
+//		});
+		return tfArea;
 	}
 
 //	public static JSpinner addIntegerField(JPanel pane, String label, Integer initialValue, boolean allowNegatives, boolean editable) {
