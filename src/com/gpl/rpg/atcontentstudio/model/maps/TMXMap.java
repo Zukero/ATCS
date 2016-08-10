@@ -44,7 +44,10 @@ public class TMXMap extends GameDataElement {
 		black60,
 		black80,
 		invert,
-		bw
+		bw,
+		redtint,
+		greentint,
+		bluetint
 	}
 	
 	public File tmxFile = null;

@@ -3,6 +3,7 @@ package com.gpl.rpg.atcontentstudio.ui.map;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -19,13 +19,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BandCombineOp;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ByteLookupTable;
-import java.awt.image.ColorConvertOp;
-import java.awt.image.LookupOp;
-import java.awt.image.LookupTable;
-import java.awt.image.ShortLookupTable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -108,6 +102,7 @@ import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
 import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
+import com.gpl.rpg.atcontentstudio.ui.tools.MatrixComposite;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
@@ -1473,37 +1468,101 @@ public class TMXMapEditor extends Editor {
 	            } 
 	        }
 	        
-	        
 	        if (map.colorFilter != null) {
+	        	Composite oldComp = g2d.getComposite();
+	        	MatrixComposite newComp = null;
+				float f=0.0f;
 	        	switch(map.colorFilter) {
 				case black20:
-			        g2d.setPaint(new Color(0f, 0f, 0f, 0.2f));
-			        g2d.fill(clip);
+					f=0.8f;
+					newComp = new MatrixComposite(new float[]{
+							f,     0.00f, 0.00f, 0.0f, 0.0f,
+							0.00f, f,     0.00f, 0.0f, 0.0f,
+							0.00f, 0.00f, f,     0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				case black40:
-			        g2d.setPaint(new Color(0f, 0f, 0f, 0.4f));
-			        g2d.fill(clip);
+					f=0.6f;
+					newComp = new MatrixComposite(new float[]{
+							f,     0.00f, 0.00f, 0.0f, 0.0f,
+							0.00f, f,     0.00f, 0.0f, 0.0f,
+							0.00f, 0.00f, f,     0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				case black60:
-			        g2d.setPaint(new Color(0f, 0f, 0f, 0.6f));
-			        g2d.fill(clip);
+					f=0.4f;
+					newComp = new MatrixComposite(new float[]{
+							f,     0.00f, 0.00f, 0.0f, 0.0f,
+							0.00f, f,     0.00f, 0.0f, 0.0f,
+							0.00f, 0.00f, f,     0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				case black80:
-			        g2d.setPaint(new Color(0f, 0f, 0f, 0.8f));
-			        g2d.fill(clip);
+					f=0.2f;
+					newComp = new MatrixComposite(new float[]{
+							f,     0.00f, 0.00f, 0.0f, 0.0f,
+							0.00f, f,     0.00f, 0.0f, 0.0f,
+							0.00f, 0.00f, f,     0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				case bw:
+					newComp = new MatrixComposite(new float[]{
+							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
+							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
+							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				case invert:
+					newComp = new MatrixComposite(new float[]{
+							-1.00f, 0.00f, 0.00f, 0.0f, 255.0f,
+							0.00f, -1.00f, 0.00f, 0.0f, 255.0f,
+							0.00f, 0.00f, -1.00f, 0.0f, 255.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
+					break;
+				case redtint:
+					newComp = new MatrixComposite(new float[]{
+							1.20f, 0.20f, 0.20f, 0.0f, 25.0f,
+							0.00f, 0.80f, 0.00f, 0.0f, 0.0f,
+							0.00f, 0.00f, 0.80f, 0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
+					break;
+				case greentint:
+					newComp = new MatrixComposite(new float[]{
+							0.85f, 0.00f, 0.00f, 0.0f, 0.0f,
+							0.15f, 1.15f, 0.15f, 0.0f, 15.0f,
+							0.00f, 0.00f, 0.85f, 0.0f, 0.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
+					break;
+				case bluetint:
+					newComp = new MatrixComposite(new float[]{
+							0.70f, 0.00f, 0.00f, 0.0f, 0.0f,
+							0.00f, 0.70f, 0.00f, 0.0f, 0.0f,
+							0.30f, 0.30f, 1.30f, 0.0f, 40.0f,
+							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+					});
 					break;
 				default:
 					break;
 	        
 	        	}
+	        	if (newComp != null) {
+	        		g2d.setComposite(newComp);
+					g2d.setPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
+					g2d.fill(clip);
+					g2d.setComposite(oldComp);
+	        	}
 	        }
 	        
 	        
-	        // Draw each object map layer
+	        // Draw each map object layer
 	        boolean paintSelected = false;
 	        for (tiled.core.MapLayer layer : ((TMXMap)target).tmxMap) {
 	            if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
