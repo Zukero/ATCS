@@ -53,7 +53,7 @@ public class OrthogonalRenderer implements MapRenderer
                 map.getHeight() * map.getTileHeight());
     }
 
-    public void paintTileLayer(Graphics2D g, TileLayer layer, BufferedImageOp filter ) {
+    public void paintTileLayer(Graphics2D g, TileLayer layer) {
         final Rectangle clip = g.getClipBounds();
         final int tileWidth = map.getTileWidth();
         final int tileHeight = map.getTileHeight();
@@ -84,9 +84,9 @@ public class OrthogonalRenderer implements MapRenderer
                 
                 g.drawImage(
                         image,
-                        filter,
                         x * tileWidth,
-                        (y + 1) * tileHeight - image.getHeight(null));
+                        (y + 1) * tileHeight - image.getHeight(null),
+                        null);
             }
         }
 

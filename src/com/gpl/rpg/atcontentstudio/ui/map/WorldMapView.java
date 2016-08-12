@@ -10,6 +10,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
@@ -81,10 +82,16 @@ public class WorldMapView extends JComponent implements Scrollable {
         	for (tiled.core.MapLayer layer : ((TMXMap)map).tmxMap) {
         		if (layer instanceof tiled.core.TileLayer && layer.isVisible()) {
         			if (layer.getName().equalsIgnoreCase("walkable")) continue;
-        			renderer.paintTileLayer(g2, (tiled.core.TileLayer) layer, null);
+        			renderer.paintTileLayer(g2, (tiled.core.TileLayer) layer);
         		} else if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
 //        			paintObjectGroup(g2, map, (tiled.core.ObjectGroup) layer);
         		}
+        	}
+        	if (map.colorFilter != null) {
+        		Shape oldClip = g2.getClip();
+        		g2.setClip(0, 0, map.tmxMap.getWidth() * TILE_SIZE, map.tmxMap.getHeight() * TILE_SIZE);
+        		MapColorFilters.applyColorfilter(map.colorFilter, g2);
+        		g2.setClip(oldClip);
         	}
         	if (selected.contains(s)) {
         		g2.drawRect(0, 0, map.tmxMap.getWidth() * TILE_SIZE, map.tmxMap.getHeight() * TILE_SIZE);

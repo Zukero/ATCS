@@ -37,7 +37,7 @@ public class ItemsTableView extends ElementTableView {
 
 		@Override
 		public int getColumnCount() {
-			return 32;
+			return 33;
 		}
 
 		@Override
@@ -49,32 +49,33 @@ public class ItemsTableView extends ElementTableView {
 			case 3: return "Folder type"; //Source type (created, altered, source)
 			case 4: return "Use type"; //Use type ("none", "use", or equip slot name).
 			case 5: return "Category"; //Category id.
-			case 6: return "Manually set price ?"; //Has manual price
-			case 7: return "Price"; //Price
-			case 8: return "On use/hit - HP min";
-			case 9: return "On use/hit - HP max";
-			case 10: return "On use/hit - AP min";
-			case 11: return "On use/hit - AP max";
-			case 12: return "On use/hit - # conditions";
-			case 13: return "On kill - HP min";
-			case 14: return "On kill - HP max";
-			case 15: return "On kill - AP min";
-			case 16: return "On kill - AP max";
-			case 17: return "On kill - # conditions";
-			case 18: return "AD min";
-			case 19: return "AD max";
-			case 20: return "Max HP";
-			case 21: return "Max AP";
-			case 22: return "Attack cost";
-			case 23: return "AC";
-			case 24: return "BC";
-			case 25: return "DR";
-			case 26: return "CS";
-			case 27: return "CM";
-			case 28: return "Move cost";
-			case 29: return "Use cost";
-			case 30: return "Reequip cost";
-			case 31: return "# conditions";
+			case 6: return "DisplayType"; //Display type (ordinary, rare, extraordinary...)
+			case 7: return "Manually set price ?"; //Has manual price
+			case 8: return "Price"; //Price
+			case 9: return "On use/hit - HP min";
+			case 10: return "On use/hit - HP max";
+			case 11: return "On use/hit - AP min";
+			case 12: return "On use/hit - AP max";
+			case 13: return "On use/hit - # conditions";
+			case 14: return "On kill - HP min";
+			case 15: return "On kill - HP max";
+			case 16: return "On kill - AP min";
+			case 17: return "On kill - AP max";
+			case 18: return "On kill - # conditions";
+			case 19: return "AD min";
+			case 20: return "AD max";
+			case 21: return "Max HP";
+			case 22: return "Max AP";
+			case 23: return "Attack cost";
+			case 24: return "AC";
+			case 25: return "BC";
+			case 26: return "DR";
+			case 27: return "CS";
+			case 28: return "CM";
+			case 29: return "Move cost";
+			case 30: return "Use cost";
+			case 31: return "Reequip cost";
+			case 32: return "# conditions";
 			}
 			return null;
 		}
@@ -89,32 +90,33 @@ public class ItemsTableView extends ElementTableView {
 			case 3: return String.class; //Source type (created, altered, source)
 			case 4: return String.class; //Use type ("none", "use", or equip slot name).
 			case 5: return String.class; //Category id.
-			case 6: return Boolean.class; //Has manual price
-			case 7: return Integer.class; //Price
-			case 8: return Integer.class;//"On use/hit - HP min";
-			case 9: return Integer.class;//"On use/hit - HP max";
-			case 10: return Integer.class;//"On use/hit - AP min";
-			case 11: return Integer.class;//"On use/hit - AP max";
-			case 12: return Integer.class;//"On use/hit - # conditions";
-			case 13: return Integer.class;//"On kill - HP min";
-			case 14: return Integer.class;//"On kill - HP max";
-			case 15: return Integer.class;//"On kill - AP min";
-			case 16: return Integer.class;//"On kill - AP max";
-			case 17: return Integer.class;//"On kill - # conditions";
-			case 18: return Integer.class;//"AD min";
-			case 19: return Integer.class;//"AD max";
-			case 20: return Integer.class;//"Max HP";
-			case 21: return Integer.class;//"Max AP";
-			case 22: return Integer.class;//"Attack cost";
-			case 23: return Integer.class;//"AC";
-			case 24: return Integer.class;//"BC";
-			case 25: return Integer.class;//"DR";
-			case 26: return Integer.class;//"CS";
-			case 27: return Double.class;//"CM";
-			case 28: return Integer.class;//"Move cost";
-			case 29: return Integer.class;//"Use cost";
-			case 30: return Integer.class;//"Reequip cost";
-			case 31: return Integer.class;//"# conditions";
+			case 6: return String.class; //Display type (ordinary, rare, extraordinary...)
+			case 7: return Boolean.class; //Has manual price
+			case 8: return Integer.class; //Price
+			case 9: return Integer.class;//"On use/hit - HP min";
+			case 10: return Integer.class;//"On use/hit - HP max";
+			case 11: return Integer.class;//"On use/hit - AP min";
+			case 12: return Integer.class;//"On use/hit - AP max";
+			case 13: return Integer.class;//"On use/hit - # conditions";
+			case 14: return Integer.class;//"On kill - HP min";
+			case 15: return Integer.class;//"On kill - HP max";
+			case 16: return Integer.class;//"On kill - AP min";
+			case 17: return Integer.class;//"On kill - AP max";
+			case 18: return Integer.class;//"On kill - # conditions";
+			case 19: return Integer.class;//"AD min";
+			case 20: return Integer.class;//"AD max";
+			case 21: return Integer.class;//"Max HP";
+			case 22: return Integer.class;//"Max AP";
+			case 23: return Integer.class;//"Attack cost";
+			case 24: return Integer.class;//"AC";
+			case 25: return Integer.class;//"BC";
+			case 26: return Integer.class;//"DR";
+			case 27: return Integer.class;//"CS";
+			case 28: return Double.class;//"CM";
+			case 29: return Integer.class;//"Move cost";
+			case 30: return Integer.class;//"Use cost";
+			case 31: return Integer.class;//"Reequip cost";
+			case 32: return Integer.class;//"# conditions";
 			}
 			return null;
 		}
@@ -144,15 +146,16 @@ public class ItemsTableView extends ElementTableView {
 				if (item.category.action_type != ItemCategory.ActionType.equip) return item.category.action_type.toString();
 				return item.category.slot.toString();
 			case 5: return item.category != null ? item.category.id : (item.category_id != null ? item.category_id : null ); //Category id.
-			case 6: return item.has_manual_price == null ? false : (item.has_manual_price == 1); //Has manual price
-			case 7: //Price
+			case 6: return item.display_type != null ? item.display_type.toString() : null; //Category id.
+			case 7: return item.has_manual_price == null ? false : (item.has_manual_price == 1); //Has manual price
+			case 8: //Price
 				if (item.has_manual_price == null || item.has_manual_price != 1) return item.computePrice();
 				return item.base_market_cost;
-			case 8: return canUse ? (item.kill_effect != null ? item.kill_effect.hp_boost_min : null) : (item.hit_effect != null ? item.hit_effect.hp_boost_min : null);//"On use/hit - HP min";
-			case 9: return canUse ? (item.kill_effect != null ? item.kill_effect.hp_boost_max : null) : (item.hit_effect != null ? item.hit_effect.hp_boost_max : null);//"On use/hit - HP max";
-			case 10: return canUse ? (item.kill_effect != null ? item.kill_effect.ap_boost_min : null) : (item.hit_effect != null ? item.hit_effect.ap_boost_min : null);//"On use/hit - AP min";
-			case 11: return canUse ? (item.kill_effect != null ? item.kill_effect.ap_boost_max : null) : (item.hit_effect != null ? item.hit_effect.ap_boost_max : null);//"On use/hit - AP max";
-			case 12: //"On use/hit - # conditions";
+			case 9: return canUse ? (item.kill_effect != null ? item.kill_effect.hp_boost_min : null) : (item.hit_effect != null ? item.hit_effect.hp_boost_min : null);//"On use/hit - HP min";
+			case 10: return canUse ? (item.kill_effect != null ? item.kill_effect.hp_boost_max : null) : (item.hit_effect != null ? item.hit_effect.hp_boost_max : null);//"On use/hit - HP max";
+			case 11: return canUse ? (item.kill_effect != null ? item.kill_effect.ap_boost_min : null) : (item.hit_effect != null ? item.hit_effect.ap_boost_min : null);//"On use/hit - AP min";
+			case 12: return canUse ? (item.kill_effect != null ? item.kill_effect.ap_boost_max : null) : (item.hit_effect != null ? item.hit_effect.ap_boost_max : null);//"On use/hit - AP max";
+			case 13: //"On use/hit - # conditions";
 				if (canUse) {
 					if (item.kill_effect != null && item.kill_effect.conditions_source != null) {
 						return item.kill_effect.conditions_source.size();
@@ -169,25 +172,25 @@ public class ItemsTableView extends ElementTableView {
 					return val;
 				}
 				return null;
-			case 13: return (!canUse && item.kill_effect != null) ? item.kill_effect.hp_boost_min : null;//"On kill - HP min";
-			case 14: return (!canUse && item.kill_effect != null) ? item.kill_effect.hp_boost_max : null;//"On kill - HP max";
-			case 15: return (!canUse && item.kill_effect != null) ? item.kill_effect.ap_boost_min : null;//"On kill - AP min";
-			case 16: return (!canUse && item.kill_effect != null) ? item.kill_effect.ap_boost_max : null;//"On kill - AP max";
-			case 17: return (!canUse && item.kill_effect != null && item.kill_effect.conditions_source != null) ? item.kill_effect.conditions_source.size() : null;//"On kill - # conditions";
-			case 18: return (canEquip && item.equip_effect != null) ? item.equip_effect.damage_boost_min : null;//"AD min";
-			case 19: return (canEquip && item.equip_effect != null) ? item.equip_effect.damage_boost_max : null;//"AD max";
-			case 20: return (canEquip && item.equip_effect != null) ? item.equip_effect.max_hp_boost : null;//"Max HP";
-			case 21: return (canEquip && item.equip_effect != null) ? item.equip_effect.max_ap_boost : null;//"Max AP";
-			case 22: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_attack_cost : null;//"Attack cost";
-			case 23: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_attack_chance : null;//"AC";
-			case 24: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_block_chance : null;//"BC";
-			case 25: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_damage_resistance : null;//"DR";
-			case 26: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_critical_skill : null;//"CS";
-			case 27: return (canEquip && item.equip_effect != null) ? item.equip_effect.critical_multiplier : null;//"CM";
-			case 28: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_move_cost : null;//"Move cost";
-			case 29: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_use_item_cost : null;//"Use cost";
-			case 30: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_reequip_cost : null;//"Reequip cost";
-			case 31: return (canEquip && item.equip_effect != null && item.equip_effect.conditions != null) ? item.equip_effect.conditions.size() : null;//"# conditions";
+			case 14: return (!canUse && item.kill_effect != null) ? item.kill_effect.hp_boost_min : null;//"On kill - HP min";
+			case 15: return (!canUse && item.kill_effect != null) ? item.kill_effect.hp_boost_max : null;//"On kill - HP max";
+			case 16: return (!canUse && item.kill_effect != null) ? item.kill_effect.ap_boost_min : null;//"On kill - AP min";
+			case 17: return (!canUse && item.kill_effect != null) ? item.kill_effect.ap_boost_max : null;//"On kill - AP max";
+			case 18: return (!canUse && item.kill_effect != null && item.kill_effect.conditions_source != null) ? item.kill_effect.conditions_source.size() : null;//"On kill - # conditions";
+			case 19: return (canEquip && item.equip_effect != null) ? item.equip_effect.damage_boost_min : null;//"AD min";
+			case 20: return (canEquip && item.equip_effect != null) ? item.equip_effect.damage_boost_max : null;//"AD max";
+			case 21: return (canEquip && item.equip_effect != null) ? item.equip_effect.max_hp_boost : null;//"Max HP";
+			case 22: return (canEquip && item.equip_effect != null) ? item.equip_effect.max_ap_boost : null;//"Max AP";
+			case 23: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_attack_cost : null;//"Attack cost";
+			case 24: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_attack_chance : null;//"AC";
+			case 25: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_block_chance : null;//"BC";
+			case 26: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_damage_resistance : null;//"DR";
+			case 27: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_critical_skill : null;//"CS";
+			case 28: return (canEquip && item.equip_effect != null) ? item.equip_effect.critical_multiplier : null;//"CM";
+			case 29: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_move_cost : null;//"Move cost";
+			case 30: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_use_item_cost : null;//"Use cost";
+			case 31: return (canEquip && item.equip_effect != null) ? item.equip_effect.increase_reequip_cost : null;//"Reequip cost";
+			case 32: return (canEquip && item.equip_effect != null && item.equip_effect.conditions != null) ? item.equip_effect.conditions.size() : null;//"# conditions";
 			}
 			return null;
 		}

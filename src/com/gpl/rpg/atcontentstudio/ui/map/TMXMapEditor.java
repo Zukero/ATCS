@@ -3,7 +3,6 @@ package com.gpl.rpg.atcontentstudio.ui.map;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Composite;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -102,7 +101,6 @@ import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
 import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
-import com.gpl.rpg.atcontentstudio.ui.tools.MatrixComposite;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
@@ -1282,6 +1280,7 @@ public class TMXMapEditor extends Editor {
 //		return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
 //	}
 	
+	
 	public class TMXViewer extends JPanel implements Scrollable {
 		
 		private static final long serialVersionUID = 2845032142029325865L;
@@ -1429,33 +1428,6 @@ public class TMXMapEditor extends Editor {
 	        final Graphics2D g2d = (Graphics2D) g.create();
 	        final Rectangle clip = g2d.getClipBounds();
 	        
-	        BufferedImageOp filter = null;
-	        
-	        if (map.colorFilter != null) {
-	        	switch(map.colorFilter) {
-				case black20:
-					filter=colorFilterBlack20;
-					break;
-				case black40:
-					filter=colorFilterBlack40;
-					break;
-				case black60:
-					filter=colorFilterBlack60;
-					break;
-				case black80:
-					filter=colorFilterBlack80;
-					break;
-				case bw:
-					filter=colorFilterBW;
-					break;
-				case invert:
-					filter=colorFilterInvert;
-					break;
-				default:
-					break;
-	        
-	        	}
-	        }
 
 	        // Draw a gray background
 	        g2d.setPaint(new Color(100, 100, 100));
@@ -1464,101 +1436,12 @@ public class TMXMapEditor extends Editor {
 	        // Draw each tile map layer
 	        for (tiled.core.MapLayer layer : ((TMXMap)target).tmxMap) {
 	            if (layer instanceof tiled.core.TileLayer && layer.isVisible()) {
-	                renderer.paintTileLayer(g2d, (tiled.core.TileLayer) layer, filter);
+	                renderer.paintTileLayer(g2d, (tiled.core.TileLayer) layer);
 	            } 
 	        }
 	        
 	        if (map.colorFilter != null) {
-	        	Composite oldComp = g2d.getComposite();
-	        	MatrixComposite newComp = null;
-				float f=0.0f;
-	        	switch(map.colorFilter) {
-				case black20:
-					f=0.8f;
-					newComp = new MatrixComposite(new float[]{
-							f,     0.00f, 0.00f, 0.0f, 0.0f,
-							0.00f, f,     0.00f, 0.0f, 0.0f,
-							0.00f, 0.00f, f,     0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case black40:
-					f=0.6f;
-					newComp = new MatrixComposite(new float[]{
-							f,     0.00f, 0.00f, 0.0f, 0.0f,
-							0.00f, f,     0.00f, 0.0f, 0.0f,
-							0.00f, 0.00f, f,     0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case black60:
-					f=0.4f;
-					newComp = new MatrixComposite(new float[]{
-							f,     0.00f, 0.00f, 0.0f, 0.0f,
-							0.00f, f,     0.00f, 0.0f, 0.0f,
-							0.00f, 0.00f, f,     0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case black80:
-					f=0.2f;
-					newComp = new MatrixComposite(new float[]{
-							f,     0.00f, 0.00f, 0.0f, 0.0f,
-							0.00f, f,     0.00f, 0.0f, 0.0f,
-							0.00f, 0.00f, f,     0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case bw:
-					newComp = new MatrixComposite(new float[]{
-							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
-							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
-							0.33f, 0.59f, 0.11f, 0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case invert:
-					newComp = new MatrixComposite(new float[]{
-							-1.00f, 0.00f, 0.00f, 0.0f, 255.0f,
-							0.00f, -1.00f, 0.00f, 0.0f, 255.0f,
-							0.00f, 0.00f, -1.00f, 0.0f, 255.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case redtint:
-					newComp = new MatrixComposite(new float[]{
-							1.20f, 0.20f, 0.20f, 0.0f, 25.0f,
-							0.00f, 0.80f, 0.00f, 0.0f, 0.0f,
-							0.00f, 0.00f, 0.80f, 0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case greentint:
-					newComp = new MatrixComposite(new float[]{
-							0.85f, 0.00f, 0.00f, 0.0f, 0.0f,
-							0.15f, 1.15f, 0.15f, 0.0f, 15.0f,
-							0.00f, 0.00f, 0.85f, 0.0f, 0.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				case bluetint:
-					newComp = new MatrixComposite(new float[]{
-							0.70f, 0.00f, 0.00f, 0.0f, 0.0f,
-							0.00f, 0.70f, 0.00f, 0.0f, 0.0f,
-							0.30f, 0.30f, 1.30f, 0.0f, 40.0f,
-							0.00f, 0.00f, 0.00f, 1.0f, 0.0f
-					});
-					break;
-				default:
-					break;
-	        
-	        	}
-	        	if (newComp != null) {
-	        		g2d.setComposite(newComp);
-					g2d.setPaint(new Color(1.0f, 1.0f, 1.0f, 1.0f));
-					g2d.fill(clip);
-					g2d.setComposite(oldComp);
-	        	}
+	        	MapColorFilters.applyColorfilter(map.colorFilter, g2d);
 	        }
 	        
 	        
@@ -2228,34 +2111,6 @@ public class TMXMapEditor extends Editor {
 		public void paintComponent(Graphics g) {
 	        final Graphics2D g2d = (Graphics2D) g.create();
 	        final Rectangle clip = g2d.getClipBounds();
-
-	        BufferedImageOp filter = null;
-	        
-	        if (map.colorFilter != null) {
-	        	switch(map.colorFilter) {
-				case black20:
-					filter=colorFilterBlack20;
-					break;
-				case black40:
-					filter=colorFilterBlack40;
-					break;
-				case black60:
-					filter=colorFilterBlack60;
-					break;
-				case black80:
-					filter=colorFilterBlack80;
-					break;
-				case bw:
-					filter=colorFilterBW;
-					break;
-				case invert:
-					filter=colorFilterInvert;
-					break;
-				default:
-					break;
-	        
-	        	}
-	        }
 	        
 	        // Draw a gray background
 	        g2d.setPaint(new Color(100, 100, 100));
@@ -2264,20 +2119,25 @@ public class TMXMapEditor extends Editor {
 	        // Draw each tile map layer
 	        
 	        if (ground != null) {
-	        	renderer.paintTileLayer(g2d, ground, filter);
+	        	renderer.paintTileLayer(g2d, ground);
 	        }
 	        
 	        if (objects != null) {
-	        	renderer.paintTileLayer(g2d, objects, filter);
+	        	renderer.paintTileLayer(g2d, objects);
 	        }
 	        
 	        if (above != null) {
-	        	renderer.paintTileLayer(g2d, above, filter);
+	        	renderer.paintTileLayer(g2d, above);
 	        }
 	        
 	        if (walkable != null && showWalkable) {
-	        	renderer.paintTileLayer(g2d, walkable, filter);
+	        	renderer.paintTileLayer(g2d, walkable);
 	        }
+	        
+	        if (map.colorFilter != null) {
+	        	MapColorFilters.applyColorfilter(map.colorFilter, g2d);
+	        }
+	        
 	        
 	        if (highlighted != null) {
 	        	drawObject(highlighted, g2d, new Color(190, 20, 20));

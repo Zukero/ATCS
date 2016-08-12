@@ -1,6 +1,6 @@
 !include MUI2.nsh
 
-!define VERSION "0.4.7"
+!define VERSION "0.4.8"
 !define JAVA_BIN "java"
 
 Name "Andor's Trail Content Studio v${VERSION}"

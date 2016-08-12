@@ -219,14 +219,12 @@ public class Project implements ProjectTreeNode, Serializable {
 	public void refreshTransients(Workspace w) {
 		this.parent = w;
 
-		if (knownSpritesheetsProperties == null) {
-			try {
-				knownSpritesheetsProperties = new Properties();
-				knownSpritesheetsProperties.load(Project.class.getResourceAsStream("/spritesheets.properties"));
-			} catch (IOException e) {
-				Notification.addWarn("Unable to load default spritesheets properties.");
-				e.printStackTrace();
-			}
+		try {
+			knownSpritesheetsProperties = new Properties();
+			knownSpritesheetsProperties.load(Project.class.getResourceAsStream("/spritesheets.properties"));
+		} catch (IOException e) {
+			Notification.addWarn("Unable to load default spritesheets properties.");
+			e.printStackTrace();
 		}
 		
 		if (sourceSetToUse == null) {
