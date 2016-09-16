@@ -31,6 +31,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.sprites.SpriteSheetSet;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeDataSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 public class GameSource implements ProjectTreeNode, Serializable {
@@ -44,6 +45,7 @@ public class GameSource implements ProjectTreeNode, Serializable {
 	public transient TMXMapSet gameMaps;
 	public transient SpriteSheetSet gameSprites;
 	public transient Worldmap worldmap;
+	public transient WriterModeDataSet writerModeDataSet;
 	private transient SavedSlotCollection v;
 	
 	public static enum Type {
@@ -86,6 +88,9 @@ public class GameSource implements ProjectTreeNode, Serializable {
 				readResourceList();
 			}
 		}
+		if (type == Type.created) {
+			this.writerModeDataSet = new WriterModeDataSet(this);
+		}
 		this.gameData = new GameDataSet(this);
 		this.gameMaps = new TMXMapSet(this);
 		this.gameSprites = new SpriteSheetSet(this);
@@ -95,6 +100,9 @@ public class GameSource implements ProjectTreeNode, Serializable {
 		v.add(gameMaps);
 		v.add(gameSprites);
 		v.add(worldmap);
+		if (type == Type.created) {
+			v.add(writerModeDataSet);
+		}
 	}
 	
 	public void readResourceList() {

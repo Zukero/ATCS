@@ -17,15 +17,12 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-
-import org.fife.ui.rtextarea.ColorBackgroundPainterStrategy;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
@@ -70,8 +67,8 @@ public class QuestEditor extends JSONElementEditor {
 		createButtonPane(pane, quest.getProject(), quest, Quest.class, quest.getImage(), null, listener);
 		
 
-		addTextField(pane, "Internal ID: ", quest.id, quest.writable, listener);
-		addTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
+		idField = addTextField(pane, "Internal ID: ", quest.id, quest.writable, listener);
+		nameField = addTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
 		visibleBox = addIntegerBasedCheckBox(pane, "Visible in quest log", quest.visible_in_log, quest.writable, listener);
 
 		JPanel stagesPane = new JPanel();

@@ -2,8 +2,6 @@ package com.gpl.rpg.atcontentstudio.ui.gamedataeditors.dialoguetree;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -55,7 +53,6 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
-import com.gpl.rpg.atcontentstudio.ui.map.TMXMapEditor.TMXReplacementViewer;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class DialogueGraphView extends Display {
@@ -66,7 +63,6 @@ public class DialogueGraphView extends Display {
     public static final String NODES = "graph.nodes";
     public static final String EDGES = "graph.edges";
     public static final String EDGES_LABELS = "edgesLabels";
-    public static final String AGGR = "aggregates";
     
     public static final String LABEL = "label";
     public static final String ICON = "icon";

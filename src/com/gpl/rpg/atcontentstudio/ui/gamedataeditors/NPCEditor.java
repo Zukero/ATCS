@@ -47,6 +47,7 @@ public class NPCEditor extends JSONElementEditor {
 	
 	private static final String form_view_id = "Form";
 	private static final String json_view_id = "JSON";
+	private static final String dialogue_tree_id = "Dialogue Tree";
 
 	private NPC.TimedConditionEffect selectedHitEffectSourceCondition;
 	private NPC.TimedConditionEffect selectedHitEffectTargetCondition;
@@ -96,15 +97,62 @@ public class NPCEditor extends JSONElementEditor {
 	private JSpinner targetConditionDuration;
 	private JSpinner targetConditionChance;
 
+	private JPanel dialogueGraphPane;
+	private DialogueGraphView dialogueGraphView;
+	
 	public NPCEditor(NPC npc) {
 		super(npc, npc.getDesc(), npc.getIcon());
 		addEditorTab(form_view_id, getFormView());
 		addEditorTab(json_view_id, getJSONView());
 		if (npc.dialogue != null) {
-			JPanel pane = new JPanel();
-			pane.setLayout(new BorderLayout());
-			pane.add(new JScrollPane(new DialogueGraphView(npc.dialogue, npc)), BorderLayout.CENTER);
-			addEditorTab("Dialogue Tree", pane);
+			createDialogueGraphView(npc);
+			addEditorTab(dialogue_tree_id, dialogueGraphPane);
+		}
+	}
+	
+	public JPanel createDialogueGraphView(final NPC npc) {
+		dialogueGraphPane = new JPanel();
+		dialogueGraphPane.setLayout(new BorderLayout());
+		
+		dialogueGraphView = new DialogueGraphView(npc.dialogue, npc);
+		dialogueGraphPane.add(dialogueGraphView, BorderLayout.CENTER);
+		
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new JideBoxLayout(buttonPane, JideBoxLayout.LINE_AXIS));
+		JButton reloadButton = new JButton("Refresh graph");
+		buttonPane.add(reloadButton, JideBoxLayout.FIX);
+		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
+		dialogueGraphPane.add(buttonPane, BorderLayout.NORTH);
+		
+		
+		reloadButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				reloadGraphView(npc);
+			}
+		});
+		
+		return dialogueGraphPane;
+	}
+	
+	public void reloadGraphView(NPC npc) {
+		if (npc.dialogue != null) {
+			if (dialogueGraphPane != null) {
+				dialogueGraphPane.remove(dialogueGraphView);
+				dialogueGraphView = new DialogueGraphView(npc.dialogue, npc);
+				dialogueGraphPane.add(dialogueGraphView, BorderLayout.CENTER);
+				dialogueGraphPane.revalidate();
+				dialogueGraphPane.repaint();
+			} else {
+				createDialogueGraphView(npc);
+				addEditorTab(dialogue_tree_id, dialogueGraphPane);
+			}
+		} else {
+			if (dialogueGraphPane != null) {
+				removeEditorTab(dialogue_tree_id);
+				dialogueGraphPane = null;
+				dialogueGraphView = null;
+			}
 		}
 	}
 	
@@ -487,6 +535,7 @@ public class NPCEditor extends JSONElementEditor {
 				} else {
 					npc.dialogue_id = null;
 				}
+				reloadGraphView(npc);
 			} else if (source == droplistBox) {
 				if (npc.droplist != null) {
 					npc.droplist.removeBacklink(npc);

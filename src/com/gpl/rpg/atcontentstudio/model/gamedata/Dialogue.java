@@ -247,7 +247,7 @@ public class Dialogue extends JSONElement {
 					case spawnAll:
 					case removeSpawnArea:
 					case deactivateSpawnArea:
-						reward.map = proj.getMap(reward.map_name);
+						reward.map = reward.map_name != null ? proj.getMap(reward.map_name) : null;
 						break;
 					case actorCondition:
 						reward.reward_obj = proj.getActorCondition(reward.reward_obj_id);
@@ -314,6 +314,11 @@ public class Dialogue extends JSONElement {
 				rclone.reward_obj = r.reward_obj;
 				if (rclone.reward_obj != null) {
 					rclone.reward_obj.addBacklink(clone);
+				}
+				rclone.map = r.map;
+				rclone.map_name = r.map_name;
+				if (rclone.map != null) {
+					rclone.map.addBacklink(clone);
 				}
 				clone.rewards.add(rclone);
 			}

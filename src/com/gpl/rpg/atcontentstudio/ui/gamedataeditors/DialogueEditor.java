@@ -109,15 +109,43 @@ public class DialogueEditor extends JSONElementEditor {
 	private JSpinner requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
+	private DialogueGraphView dialogueGraphView;
+	
 	
 	public DialogueEditor(Dialogue dialogue) {
 		super(dialogue, dialogue.getDesc(), dialogue.getIcon());
 		addEditorTab(form_view_id, getFormView());
 		addEditorTab(json_view_id, getJSONView());
-		JPanel pane = new JPanel();
+		addEditorTab(graph_view_id, createDialogueGraphView(dialogue));
+	}
+	
+	public JPanel createDialogueGraphView(final Dialogue dialogue) {
+		final JPanel pane = new JPanel();
 		pane.setLayout(new BorderLayout());
-		pane.add(new JScrollPane(new DialogueGraphView(dialogue, null)), BorderLayout.CENTER);
-		addEditorTab(graph_view_id, pane);
+		
+		dialogueGraphView = new DialogueGraphView(dialogue, null);
+		pane.add(dialogueGraphView, BorderLayout.CENTER);
+		
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new JideBoxLayout(buttonPane, JideBoxLayout.LINE_AXIS));
+		JButton reloadButton = new JButton("Refresh graph");
+		buttonPane.add(reloadButton, JideBoxLayout.FIX);
+		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
+		pane.add(buttonPane, BorderLayout.NORTH);
+		
+		
+		reloadButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pane.remove(dialogueGraphView);
+				dialogueGraphView = new DialogueGraphView(dialogue, null);
+				pane.add(dialogueGraphView, BorderLayout.CENTER);
+				pane.revalidate();
+				pane.repaint();
+			}
+		});
+		
+		return pane;
 	}
 	
 	public void insertFormViewDataField(final JPanel pane) {

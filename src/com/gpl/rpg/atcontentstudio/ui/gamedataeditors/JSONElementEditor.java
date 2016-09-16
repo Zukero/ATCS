@@ -65,6 +65,15 @@ public abstract class JSONElementEditor extends Editor {
 		editorTabs.put(id, editor);
 	}
 
+	public void removeEditorTab(String id) {
+		if (id == null) return;
+		for (int i =0; i <editorTabsHolder.getTabCount(); i++) {
+			if (id.equals(editorTabsHolder.getTitleAt(i))) {
+				editorTabsHolder.removeTabAt(i);
+				editorTabs.remove(id);
+			}
+		}
+	}
 	public JPanel getJSONView() {
 		jsonEditorPane = new RSyntaxTextArea();
 		jsonEditorPane.setText(((JSONElement)target).toJsonString());

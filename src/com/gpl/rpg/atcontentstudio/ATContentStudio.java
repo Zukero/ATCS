@@ -5,9 +5,13 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
+import prefuse.data.expression.parser.ExpressionParser;
 
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
@@ -29,6 +33,8 @@ public class ATContentStudio {
 	public static void main(String[] args) {
 		
 		ConfigCache.init();
+		
+		Logger.getLogger(ExpressionParser.class.getName()).setLevel(Level.OFF);
 		
 		try {
 			String laf = ConfigCache.getFavoriteLaFClassName();

@@ -236,6 +236,15 @@ public class ProjectsTree extends JPanel {
 			addNextSeparator = false;
 		}
 		
+		if (actions.testWriter.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.testWriter));
+		}
+		if (addNextSeparator) {
+			popupMenu.add(new JSeparator());
+			addNextSeparator = false;
+		}
+		
 		if (konamiCodeEntered) {
 			JMenuItem openTrainer = new JMenuItem("Start Andor's Trainer...");
 			popupMenu.add(openTrainer);
