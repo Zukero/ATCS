@@ -44,6 +44,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.gpl.rpg.atcontentstudio.utils.FileUtils;
@@ -692,6 +693,20 @@ public class Project implements ProjectTreeNode, Serializable {
 		}
 	}
 	
+	public int getWriterSketchCount() {
+		return createdContent.writerModeDataSet.getChildCount();
+	}
+	
+	public WriterModeData getWriterSketch(String id) {
+		return createdContent.writerModeDataSet.getWriterSketch(id);
+	}
+	
+	public WriterModeData getWriterSketch(int index) {
+		if (index < createdContent.writerModeDataSet.getChildCount()) {
+			return createdContent.writerModeDataSet.get(index);
+		} 
+		return null;
+	}
 
 	@Override
 	public Project getProject() {
@@ -842,6 +857,16 @@ public class Project implements ProjectTreeNode, Serializable {
 		fireElementAdded(node, getNodeIndex(node));
 	}
 
+
+
+	public void createWriterSketch(WriterModeData node) {
+		node.writable = true;
+		createdContent.writerModeDataSet.add(node);
+		node.state =  GameDataElement.State.created;
+		node.link();
+		fireElementAdded(node, getNodeIndex(node));
+	}
+	
 	
 	@Override
 	public GameDataSet getDataSet() {
@@ -1028,6 +1053,7 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 		}
 	}
+
 
 
 	

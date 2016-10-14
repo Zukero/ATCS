@@ -52,17 +52,21 @@ import prefuse.render.LabelRenderer;
 import prefuse.render.NullRenderer;
 import prefuse.util.ColorLib;
 import prefuse.util.PrefuseLib;
+import prefuse.visual.DecoratorItem;
+import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 
 import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
 import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.EmptyReply;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.SpecialDialogue;
 import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterDialogue;
 import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterNode;
 import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterReply;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
+import com.gpl.rpg.atcontentstudio.ui.Editor;
 
-public class WriterModeEditor extends JPanel {
+public class WriterModeEditor extends Editor {
 
 	private static final long serialVersionUID = -6591631891278528494L;
 
@@ -157,10 +161,10 @@ public class WriterModeEditor extends JPanel {
             nFill.setDefaultColor(ColorLib.gray(255));
 //            ColorAction nFill = new NPCPhraseColorAction(NODES, VisualItem.FILLCOLOR);
 //            
-            ColorAction eEdges = new ColorAction(EDGES, VisualItem.STROKECOLOR);
-            eEdges.setDefaultColor(ColorLib.gray(100));
-            ColorAction eArrows = new ColorAction(EDGES, VisualItem.FILLCOLOR);
-            eArrows.setDefaultColor(ColorLib.gray(100));
+            ColorAction eEdges = new ConnectedEdgeColorAction(EDGES, VisualItem.STROKECOLOR);
+//            eEdges.setDefaultColor(ColorLib.gray(100));
+            ColorAction eArrows = new ConnectedEdgeColorAction(EDGES, VisualItem.FILLCOLOR);
+//            eArrows.setDefaultColor(ColorLib.gray(100));
 //            ColorAction eEdgesLabels = new ConnectedEdgeColorAction(EDGES_LABELS, VisualItem.TEXTCOLOR);
             
 //            StrokeAction eStroke = new EdgesStrokeAction(EDGES);
@@ -291,8 +295,8 @@ public class WriterModeEditor extends JPanel {
 
     				if (reply.next_dialogue != null) {
     					if (cells.get(reply.next_dialogue) == null) {
-    					Node dNode = addDialogueNode(reply.next_dialogue);
-    					Edge e = graph.addEdge(rNode, dNode);
+    						Node dNode = addDialogueNode(reply.next_dialogue);
+    						Edge e = graph.addEdge(rNode, dNode);
     					} else {
     						Node dNode = cells.get(reply.next_dialogue);
     						Edge e = graph.addEdge(rNode, dNode);
@@ -302,6 +306,15 @@ public class WriterModeEditor extends JPanel {
     			}
     		}
     		return cells.get(reply);
+    	}
+    	
+    	public void addEdge(WriterNode source, WriterNode target) {
+    		if (graph.getEdge(cells.get(source), cells.get(target)) != null) return;
+    		Edge e = graph.addEdge(cells.get(source), cells.get(target));
+    		e.setBoolean(IS_TREE_EDGE, false);
+    		m_vis.run("colors");
+            m_vis.run("layout");
+           
     	}
     	
     	
@@ -359,14 +372,44 @@ public class WriterModeEditor extends JPanel {
     		}
     	}
     	
+    	class ConnectedEdgeColorAction extends ColorAction {
+
+    		final int outgoing = ColorLib.rgb(255, 100, 100);
+    		final int incoming = ColorLib.rgb(100, 255, 100);
+    		final int none = ColorLib.gray(100);
+    		
+    		public ConnectedEdgeColorAction(String group, String field) {
+    			super(group, field);
+    		}
+    		
+    		@Override
+    		public int getColor(VisualItem item) {
+    			if (item instanceof DecoratorItem) {
+    				item = ((DecoratorItem) item).getDecoratedItem();
+    			}
+    			if (item instanceof EdgeItem) {
+    				if (((EdgeItem) item).getSourceItem() != null && ((EdgeItem) item).getSourceItem().isHover()) {
+    					return outgoing;
+    				} else if (((EdgeItem) item).getTargetItem().isHover()) {
+    					return incoming;
+    				}
+    			}
+
+    			return none;
+    		}
+    	}
+    	
     	class GraphInputControl extends ControlAdapter {
     		@Override
     		public void itemClicked(VisualItem item, MouseEvent e) {
-    			if (!edgePending) {
+    			if (edgePending) {
+    				WriterNode target = (WriterNode) item.get(TARGET);
+    				lockPendingEdge(target);
+    			} else {
     				if (e.getClickCount() == 1) {
     					if (item.get(TARGET) != null) {
     						prevSelected = selected;
-    						selected = (WriterModeData.WriterNode)item.get(TARGET);
+    						selected = (WriterNode)item.get(TARGET);
     					}
     				} else if (e.getClickCount() == 2) {
     					if (item.get(TARGET) != null) {
@@ -374,7 +417,7 @@ public class WriterModeEditor extends JPanel {
     						showEditorOnSelectedAt(e.getPoint());
     					}
     				}
-    			}
+    			} 
     		}
     		
     		@Override
@@ -402,7 +445,11 @@ public class WriterModeEditor extends JPanel {
  				} else if (event.equals(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_DOWN_MASK, true))) {
  					createNextDefaultNode.actionPerformed(null);
  				} else if (event.equals(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, true))) {
- 					createContinueTalkingNode.actionPerformed(null);
+ 					if (selected instanceof WriterDialogue) {
+ 						createContinueTalkingNode.actionPerformed(null);
+ 					} else if (selected instanceof WriterReply) {
+ 						createOtherReplyNode.actionPerformed(null);
+ 					}
  				}
     		}
     		
@@ -446,16 +493,21 @@ public class WriterModeEditor extends JPanel {
     	
 
     	public void startPendingEdge() {
-    		pendingEdge = graph.addEdge(cells.get(selected), nullNode);
-    		edgePending = true;
-    		m_vis.run("colors");
-    		m_vis.run("layout");
-			revalidate();
-			repaint();
+    		if (edgePending) return;
+    		if (selected instanceof WriterDialogue ||
+    				(selected instanceof WriterReply && ((WriterReply)selected).next_dialogue == null )) {
+    			pendingEdge = graph.addEdge(cells.get(selected), nullNode);
+    			edgePending = true;
+    			m_vis.run("colors");
+    			m_vis.run("layout");
+    			revalidate();
+    			repaint();
+    		}
     	}
     	
 
     	public void stopPendingEdge() {
+    		if (!edgePending) return;
     		graph.removeEdge(pendingEdge);
     		pendingEdge = null;
     		edgePending = false;
@@ -463,6 +515,35 @@ public class WriterModeEditor extends JPanel {
     		m_vis.run("layout");
 			revalidate();
 			repaint();
+    	}
+    	
+    	public void lockPendingEdge(WriterNode target) {
+    		if (selected instanceof WriterReply) {
+    			if (target instanceof WriterDialogue && ((WriterReply)selected).next_dialogue == null) {
+    				((WriterReply)selected).next_dialogue = (WriterDialogue) target;
+    				stopPendingEdge();
+    				addEdge(selected, target);
+    			}
+    		} else if (selected instanceof WriterDialogue) {
+    			if (target instanceof WriterReply) {
+    				WriterReply clone = data.new WriterReply((WriterDialogue)selected);
+    				clone.text = ((WriterReply)target).text;
+    				if (((WriterReply)target).next_dialogue instanceof SpecialDialogue) {
+    					clone.next_dialogue = ((SpecialDialogue)((WriterReply)target).next_dialogue).duplicate();
+    				} else {
+    					clone.next_dialogue = ((WriterReply)target).next_dialogue;
+    				}
+    				stopPendingEdge();
+    				addReplyNode(clone);
+    				addEdge(selected, clone);
+    				if (clone.next_dialogue != null) addEdge(clone, clone.next_dialogue);
+    			} else if (target instanceof WriterDialogue) {
+    				WriterReply empty = data.new EmptyReply((WriterDialogue)selected);
+    				empty.next_dialogue = (WriterDialogue)target;
+    				stopPendingEdge();
+    				addEdge(selected, target);
+    			}
+    		}
     	}
     	
         static final String disposeEditorString = "disposeEditor";
@@ -483,8 +564,7 @@ public class WriterModeEditor extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (area == null) return;
-				selected.text = area.getText();
-				cells.get(selected).set(LABEL, selected.text);
+				commitAreaText();
 				m_vis.run("colors");
 				revalidate();
 				repaint();
@@ -503,6 +583,8 @@ public class WriterModeEditor extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				stopPendingEdge();
+				if (selected == null) return;
 				WriterNode newWrNode = null;
 				Node newNode = null;
 				if (selected instanceof WriterDialogue) {
@@ -518,15 +600,17 @@ public class WriterModeEditor extends JPanel {
 						newNode = addDialogueNode(((WriterDialogue)newWrNode));
 					}
 				}
-				Edge edge = graph.addEdge(cells.get(selected), newNode);
-				setSelected(newWrNode);
+				if (newNode!= null) {
+					Edge edge = graph.addEdge(cells.get(selected), newNode);
+					setSelected(newWrNode);
 
-				m_vis.run("colors");
-				m_vis.run("layout");
-	            m_vis.run("scrollToSelectedAndEdit");
-	            
-	            revalidate();
-	            repaint();
+					m_vis.run("colors");
+					m_vis.run("layout");
+					m_vis.run("scrollToSelectedAndEdit");
+
+					revalidate();
+					repaint();
+				}
 			}
 		};
 		
@@ -537,6 +621,7 @@ public class WriterModeEditor extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					commitAreaText();
+					stopPendingEdge();
 					createNextDefaultNode.actionPerformed(e);
 				}
 			};
@@ -549,6 +634,7 @@ public class WriterModeEditor extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				commitAreaText();
+				stopPendingEdge();
 				WriterDialogue newWrNode = null;
 				Node newNode = null;
 				if (selected instanceof WriterDialogue) {
@@ -559,14 +645,40 @@ public class WriterModeEditor extends JPanel {
 					newNode = addDialogueNode(newWrNode);
 					Edge edge = graph.addEdge(cells.get(selected), newNode);
 					setSelected(newWrNode);
-				} 
 
-				m_vis.run("colors");
-				m_vis.run("layout");
-	            m_vis.run("scrollToSelectedAndEdit");
+					m_vis.run("colors");
+					m_vis.run("layout");
+					m_vis.run("scrollToSelectedAndEdit");
+					revalidate();
+					repaint();
+				} 
 	            
-	            revalidate();
-	            repaint();
+			}
+		};
+		
+		static final String createOtherReplyNodeString = "createOtherReplyNode";
+		final AbstractAction createOtherReplyNode = new AbstractAction("Create another reply with the same parent") {
+			private static final long serialVersionUID = 1658086056088672748L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				commitAreaText();
+				stopPendingEdge();
+				WriterReply newWrNode = null;
+				Node newNode = null;
+				if (selected instanceof WriterReply) {
+					newWrNode = data.new WriterReply(((WriterReply) selected).parent);
+					newNode = addReplyNode(newWrNode);
+					Edge edge = graph.addEdge(cells.get(((WriterReply) selected).parent), newNode);
+					setSelected(newWrNode);
+
+					m_vis.run("colors");
+					m_vis.run("layout");
+					m_vis.run("scrollToSelectedAndEdit");
+					revalidate();
+					repaint();
+				} 
+	            
 			}
 		};
 		
@@ -657,8 +769,14 @@ public class WriterModeEditor extends JPanel {
         	area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_DOWN_MASK, true), commitAndCreateNextDefaultNodeString);
         	area.getActionMap().put(commitAndCreateNextDefaultNodeString, commitAndCreateNextDefaultNode);
         	
-        	area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, true), createContinueTalkingNodeString);
-        	area.getActionMap().put(createContinueTalkingNodeString, createContinueTalkingNode);
+        	
+        	if (selected instanceof WriterDialogue) {
+        		area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, true), createContinueTalkingNodeString);
+            	area.getActionMap().put(createContinueTalkingNodeString, createContinueTalkingNode);
+            } else if (selected instanceof WriterReply) {
+            	area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, true), createOtherReplyNodeString);
+            	area.getActionMap().put(createOtherReplyNodeString, createOtherReplyNode);
+            }
         	
         }
 		
@@ -917,5 +1035,11 @@ public class WriterModeEditor extends JPanel {
 //	}
         
     }
+
+	@Override
+	public void targetUpdated() {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

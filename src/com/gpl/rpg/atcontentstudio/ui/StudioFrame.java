@@ -34,6 +34,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
 
 public class StudioFrame extends JFrame {
 
@@ -209,6 +210,10 @@ public class StudioFrame extends JFrame {
 	}
 
 	public void openEditor(WorldmapSegment node) {
+		editors.openEditor(node);
+	}
+	
+	public void openEditor(WriterModeData node) {
 		editors.openEditor(node);
 	}
 	

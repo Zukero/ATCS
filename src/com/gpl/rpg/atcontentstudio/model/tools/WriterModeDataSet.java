@@ -52,7 +52,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 
 	@Override
 	public TreeNode getChildAt(int childIndex) {
-		return null;
+		return writerModeDataList.get(childIndex);
 	}
 
 	@Override
@@ -155,10 +155,12 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	
 	
 	@SuppressWarnings("rawtypes")
-	public void save() {
+	public void save(File jsonFile) {
 		List<Map> dataToSave = new LinkedList<Map>();
 		for (WriterModeData data : writerModeDataList) {
-			dataToSave.add(data.toJson());
+			if (data.jsonFile.equals(jsonFile)) {
+				dataToSave.add(data.toJson());
+			}
 		}
 		if (dataToSave.isEmpty() && writerFile.exists()) {
 			if (writerFile.delete()) {
@@ -228,6 +230,32 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 					e.printStackTrace();
 				}
 		}
+	}
+
+	public WriterModeData getWriterSketch(String id) {
+		for (WriterModeData sketch : writerModeDataList) {
+			if (id.equals(sketch.id)){
+				return sketch;
+			}
+		}
+		return null;
+	}
+
+	public WriterModeData get(int index) {
+		return writerModeDataList.get(index);
+	}
+
+	public void add(WriterModeData node) {
+		ProjectTreeNode higherEmptyParent = this;
+		while (higherEmptyParent != null) {
+			if (higherEmptyParent.getParent() != null && ((ProjectTreeNode)higherEmptyParent.getParent()).isEmpty()) higherEmptyParent = (ProjectTreeNode)higherEmptyParent.getParent();
+			else break;
+		}
+		if (higherEmptyParent == this && !this.isEmpty()) higherEmptyParent = null;
+		writerModeDataList.add(node);
+		node.parent = this;
+		if (higherEmptyParent != null) higherEmptyParent.notifyCreated();
+		else node.notifyCreated();
 	}
 
 }

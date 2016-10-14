@@ -22,6 +22,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.ActorConditionEditor;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DroplistEditor;
@@ -33,6 +34,7 @@ import com.gpl.rpg.atcontentstudio.ui.map.TMXMapEditor;
 import com.gpl.rpg.atcontentstudio.ui.map.WorldMapEditor;
 import com.gpl.rpg.atcontentstudio.ui.saves.SavedGameEditor;
 import com.gpl.rpg.atcontentstudio.ui.sprites.SpritesheetEditor;
+import com.gpl.rpg.atcontentstudio.ui.tools.writermode.WriterModeEditor;
 import com.jidesoft.swing.JideTabbedPane;
 
 public class EditorsArea extends JPanel {
@@ -153,6 +155,15 @@ public class EditorsArea extends JPanel {
 		}
 		node.link();
 		openEditor(new WorldMapEditor(node));
+	}
+	
+	public void openEditor(WriterModeData node) {
+		if (editors.containsKey(node)) {
+			tabHolder.setSelectedComponent(editors.get(node));
+			return;
+		}
+		node.link();
+		openEditor(new WriterModeEditor(node));
 	}
 	
 	public void closeEditor(ProjectTreeNode node) {

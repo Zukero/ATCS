@@ -1,47 +1,54 @@
 package com.gpl.rpg.atcontentstudio.model.tools;
 
 import java.awt.Image;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.tree.TreeNode;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
-import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
+import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.Project;
-import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterDialogue;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 public class WriterModeData extends GameDataElement {
-
-	public WriterModeDataSet parent;
+	private static final long serialVersionUID = -7062544089063979696L;
 	
+	//Available from state init.
+	public File jsonFile;
+
 	public Image npcIcon;
+	public String sketchName;
+	
+
+	public List<String> rootsId = new LinkedList<String>();
+	public List<WriterDialogue> roots = new LinkedList<WriterDialogue>();
 	public WriterDialogue begin;
+	public Map<String, WriterDialogue> nodesById = new LinkedHashMap<String, WriterDialogue>();
+
 	public Map<String, WriterDialogue> dialogueThreads = new LinkedHashMap<String, WriterDialogue>();
 	public Map<String, Integer> threadsNextIndex = new LinkedHashMap<String, Integer>();
 	
 
-	public WriterModeData(WriterModeDataSet parent, String id_prefix){
-		this.parent = parent;
-		this.begin = new WriterDialogue();
-		begin.id_prefix = id_prefix;
-		begin.index = getNextIndex(id_prefix);
-		begin.text = "";
+	public WriterModeData(String id_prefix){
+		this.id = id_prefix;
 	}
 	
-	public  WriterModeData(WriterModeDataSet parent, Map jsonObj) {
+	public  WriterModeData(WriterModeDataSet parent, @SuppressWarnings("rawtypes") Map jsonObj) {
 		this.parent = parent;
 		this.begin = new WriterDialogue(jsonObj);
+		this.id = begin.id_prefix;
 		this.state = State.parsed;
 	}
 	
@@ -60,14 +67,17 @@ public class WriterModeData extends GameDataElement {
 		public String text;
 		
 		public abstract String getTitle();
+		@SuppressWarnings("rawtypes")
 		public abstract Map toJson();
 		
 	}
 	
 	public class WriterDialogue extends WriterNode {
+		public String id;
 		public String id_prefix;
 		public int index;
 		public List<WriterReply> replies = new LinkedList<WriterReply>();
+		public List<WriterReply> parents = new LinkedList<WriterReply>();
 		
 		
 		public WriterDialogue() {}
@@ -87,9 +97,11 @@ public class WriterModeData extends GameDataElement {
 		@Override
 		public Map toJson() {
 			Map dialogueJson = new HashMap();
+			dialogueJson.put("id", id);
 			dialogueJson.put("id_prefix", id_prefix);
 			dialogueJson.put("index", index);
 			dialogueJson.put("text", text);
+			dialogueJson.put("special", isSpecial());
 			if (!replies.isEmpty()) {
 				List repliesJson = new ArrayList();
 				for (WriterReply reply : replies) {
@@ -100,26 +112,55 @@ public class WriterModeData extends GameDataElement {
 			return dialogueJson;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		public WriterDialogue(Map json) {
+			this.id = (String) json.get("id");
 			this.index = Integer.parseInt((String) json.get("index"));
 			this.id_prefix = (String) json.get("id_prefix");
 			this.text = (String) json.get("text");
 			List repliesJson = (List) json.get("replies");
 			for (Object rJson : repliesJson) {
+				if (Boolean.parseBoolean((String)((Map)rJson).get("special"))) {
+					//TODO Check different cases. But there are none currently.
+					this.replies.add(new EmptyReply(this, ((Map)rJson)));
+				}
 				this.replies.add(new WriterReply(this, (Map)rJson));
 			}
 		}
 		
+		public boolean isSpecial() {return false;}
+		
+		
 	}
 	
-	public class SpecialDialogue extends WriterDialogue {}
-	public class SelectorDialogue extends SpecialDialogue {}
-	public class ShopDialogue extends SpecialDialogue {}
-	public class FightDialogue extends SpecialDialogue {}
-	public class EndDialogue extends SpecialDialogue {}
+	public abstract class SpecialDialogue extends WriterDialogue {
+		
+		public boolean isSpecial() {return true;}
+		public abstract SpecialDialogue duplicate();
+	}
+	public class SelectorDialogue extends SpecialDialogue {
+		public SpecialDialogue duplicate() {return new SelectorDialogue();}
+	}
+	public class ShopDialogue extends SpecialDialogue {
+		public static final String id = "S";
+		public SpecialDialogue duplicate() {return new ShopDialogue();}
+	}
+	public class FightDialogue extends SpecialDialogue {
+		public static final String id = "F";
+		public SpecialDialogue duplicate() {return new FightDialogue();}
+	}
+	public class EndDialogue extends SpecialDialogue {
+		public static final String id = "X";
+		public SpecialDialogue duplicate() {return new EndDialogue();}
+	}
+	public class RemoveNPCDialogue extends SpecialDialogue {
+		public static final String id = "R";
+		public SpecialDialogue duplicate() {return new RemoveNPCDialogue();}
+	}
 	
 	public class WriterReply extends WriterNode {
 		public WriterDialogue parent;
+		public String next_dialogue_id;
 		public WriterDialogue next_dialogue;
 		
 		public WriterReply() {}
@@ -130,11 +171,12 @@ public class WriterModeData extends GameDataElement {
 			parent.replies.add(this);
 		}
 
+		@SuppressWarnings("rawtypes")
 		public WriterReply(WriterDialogue parent, Map json) {
 			this.parent = parent;
 			this.text = (String) json.get("text");
-			if (json.containsKey("next_dialogue")) {
-				next_dialogue = new WriterDialogue((Map) json.get("next_dialogue"));
+			if (json.containsKey("next_dialogue_id")) {
+				next_dialogue_id = (String) json.get("next_dialogue_id");
 			}
 		}
 		
@@ -148,25 +190,39 @@ public class WriterModeData extends GameDataElement {
 		public Map toJson() {
 			Map replyJson = new HashMap();
 			replyJson.put("text", text);
+			replyJson.put("special", isSpecial());
 			if (next_dialogue != null) {
-				replyJson.put("next_dialogue", next_dialogue.toJson());
+				replyJson.put("next_dialogue_id", next_dialogue.id);
 			}
 			return replyJson;
 		}
 
+		public boolean isSpecial() {return false;}
 
 	}
 	
 	public class SpecialReply extends WriterReply {
 
+		public boolean isSpecial() {return true;}
+		
 		public SpecialReply(WriterDialogue parent) {
 			super(parent);
+		}
+		
+		public SpecialReply(WriterDialogue parent, Map json) {
+			super(parent, json);
 		}
 	}
 	public class EmptyReply extends SpecialReply {
 
 		public EmptyReply(WriterDialogue parent) {
 			super(parent);
+			text="N";
+		}
+		
+		public EmptyReply(WriterDialogue parent, Map json) {
+			super(parent, json);
+			text="N";
 		}
 	}
 	
@@ -174,7 +230,7 @@ public class WriterModeData extends GameDataElement {
 	
 	@Override
 	public String getDesc() {
-		return (this.state == State.modified ? "*" : "")+begin.id_prefix;
+		return (this.state == State.modified ? "*" : "")+id;
 	}
 	@Override
 	public Project getProject() {
@@ -201,15 +257,7 @@ public class WriterModeData extends GameDataElement {
 	public GameDataSet getDataSet() {
 		return null;
 	}
-	@Override
-	public void parse() {
-		// TODO
-		
-	}
-	@Override
-	public void link() {
-		//Useless here.
-	}
+	
 	@Override
 	public GameDataElement clone() {
 		//TODO
@@ -227,11 +275,12 @@ public class WriterModeData extends GameDataElement {
 	
 	@Override
 	public void save() {
-		parent.save();
+		((WriterModeDataSet)this.getParent()).save(this.jsonFile);
 	}
+	
 	@Override
 	public List<SaveEvent> attemptSave() {
-		List<SaveEvent> events = parent.attemptSave();
+		List<SaveEvent> events = ((WriterModeDataSet)parent).attemptSave();
 		if (events == null || events.isEmpty()) {
 			return null;
 		}
@@ -247,5 +296,118 @@ public class WriterModeData extends GameDataElement {
 		return begin.toJson();
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public void parse() {
+		if (this.state == State.created || this.state == State.modified || this.state == State.saved) {
+			//This type of state is unrelated to parsing/linking.
+			return;
+		}
+		JSONParser parser = new JSONParser();
+		FileReader reader = null;
+		try {
+			reader = new FileReader(jsonFile);
+			List gameDataElements = (List) parser.parse(reader);
+			for (Object obj : gameDataElements) {
+				Map jsonObj = (Map)obj;
+				String id  = (String) jsonObj.get("id");
+				if (id != null && id.equals(this.id )) {
+					this.parse(jsonObj);
+					this.state = State.parsed;
+					break;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			Notification.addError("Error while parsing JSON file "+jsonFile.getAbsolutePath()+": "+e.getMessage());
+			e.printStackTrace();
+		} catch (IOException e) {
+			Notification.addError("Error while parsing JSON file "+jsonFile.getAbsolutePath()+": "+e.getMessage());
+			e.printStackTrace();
+		} catch (ParseException e) {
+			Notification.addError("Error while parsing JSON file "+jsonFile.getAbsolutePath()+": "+e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (reader != null)
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		}
+
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void parse(Map json) {
+		this.id = (String) json.get("id");
+		this.sketchName = (String) json.get("name");
+		List jsonRootsId = (List) json.get("roots_id");
+		if (jsonRootsId != null) {
+			for (Object jsonRootId : jsonRootsId) {
+				rootsId.add((String) jsonRootId);
+			}
+		}
+		List jsonDialogues = (List) json.get("dialogues");
+		if (jsonDialogues != null) {
+			for (Object jsonDialogue : jsonDialogues) {
+				WriterDialogue dialogue = new WriterDialogue((Map)jsonDialogue);
+				nodesById.put(dialogue.id, dialogue);
+			}
+		}
+		this.state = State.parsed;
+	}
+	
+	@Override
+	public void link() {
+		if (this.state == State.created) {
+			this.begin = new WriterDialogue();
+			begin.id_prefix = id;
+			begin.index = getNextIndex(id);
+			begin.text = "";
+		}
+		if (this.state == State.init) {
+			//Not parsed yet.
+			this.parse();
+		} else if (this.state == State.parsed) {
+			for (WriterDialogue dialogue : nodesById.values()) {
+				if (dialogue.replies == null) continue;
+				for (WriterReply reply : dialogue.replies) {
+					if (reply.next_dialogue_id != null) {
+						if (isSpecial(reply.next_dialogue_id)) {
+							reply.next_dialogue = getSpecial(reply.next_dialogue_id);
+						} else {
+							reply.next_dialogue = nodesById.get(reply.next_dialogue_id);
+						}
+					}
+				}
+			}
+			for (String rootId : rootsId) {
+				roots.add(nodesById.get(rootId));
+			}
+
+		} else if (this.state == State.linked) {
+			//Already linked.
+			return;
+		}
+
+		this.state = State.linked;
+	}
+	
+	public boolean isSpecial(String id) {
+		if (id == null) return false;
+		if (ShopDialogue.id.equals(id)) return true;
+		if (FightDialogue.id.equals(id)) return true;
+		if (EndDialogue.id.equals(id)) return true;
+		if (RemoveNPCDialogue.id.equals(id)) return true;
+		return false;
+	}
+	
+	public SpecialDialogue getSpecial(String id) {
+		if (id == null) return null;
+		if (ShopDialogue.id.equals(id)) return new ShopDialogue();
+		if (FightDialogue.id.equals(id)) return new FightDialogue();
+		if (EndDialogue.id.equals(id)) return new EndDialogue();
+		if (RemoveNPCDialogue.id.equals(id)) return new RemoveNPCDialogue();
+		return null;
+	}
 
 }

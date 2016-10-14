@@ -37,6 +37,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
 import com.jidesoft.swing.TreeSearchable;
 
 public class ProjectsTree extends JPanel {
@@ -579,6 +580,8 @@ public class ProjectsTree extends JPanel {
 			ATContentStudio.frame.openEditor((TMXMap)node);
 		} else if (node instanceof WorldmapSegment) {
 			ATContentStudio.frame.openEditor((WorldmapSegment)node);
+		}  else if (node instanceof WriterModeData) {
+			ATContentStudio.frame.openEditor((WriterModeData)node);
 		} else if (node instanceof SavedGame) {
 			if (konamiCodeEntered) {
 				ATContentStudio.frame.openEditor((SavedGame)node);

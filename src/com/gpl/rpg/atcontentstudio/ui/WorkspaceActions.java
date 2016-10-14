@@ -322,15 +322,22 @@ public class WorkspaceActions {
 	public ATCSAction testWriter = new ATCSAction("Create dialogue sketch", "Test the Writer Mode"){
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
-			WriterModeData data = new WriterModeData(selectedNode.getProject().createdContent.writerModeDataSet, "test_");
-			JFrame frame = new JFrame("Writer Mode tests");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			frame.getContentPane().setLayout(new BorderLayout());
-			frame.getContentPane().add(new WriterModeEditor(data), BorderLayout.CENTER);
-			frame.setMinimumSize(new Dimension(250, 200));
-			frame.pack();
-			frame.setVisible(true);
+			new WriterSketchCreationWizard(selectedNode.getProject()).setVisible(true);
+//			
+//			
+//			if (selectedNode == null || selectedNode.getProject() == null) return;
+//			WriterModeData data = new WriterModeData(selectedNode.getProject().createdContent.writerModeDataSet, "test_");
+//			JFrame frame = new JFrame("Writer Mode tests");
+//			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//			frame.getContentPane().setLayout(new BorderLayout());
+//			frame.getContentPane().add(new WriterModeEditor(data), BorderLayout.CENTER);
+//			frame.setMinimumSize(new Dimension(250, 200));
+//			frame.pack();
+//			frame.setVisible(true);
 		};
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(selectedNode != null && selectedNode.getProject() != null);
+		}
 	};
 	
 	List<ATCSAction> actions = new ArrayList<WorkspaceActions.ATCSAction>();
