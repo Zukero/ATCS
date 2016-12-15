@@ -5,7 +5,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public abstract class JSONElementEditor extends Editor {
 	private static final long serialVersionUID = -5889046987755079563L;
 	
 	
-	Map<String, JPanel> editorTabs = new HashMap<String, JPanel>();
+	Map<String, JPanel> editorTabs = new LinkedHashMap<String, JPanel>();
 	JideTabbedPane editorTabsHolder;
 	RSyntaxTextArea jsonEditorPane;
 	

@@ -2,7 +2,7 @@ package com.gpl.rpg.atcontentstudio.ui;
 
 import java.awt.Image;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -11,8 +11,8 @@ import com.gpl.rpg.atcontentstudio.Notification;
 
 public class DefaultIcons {
 
-	private static Map<String, Image> imageCache = new HashMap<String, Image>();
-	private static Map<String, Image> iconCache = new HashMap<String, Image>();
+	private static Map<String, Image> imageCache = new LinkedHashMap<String, Image>();
+	private static Map<String, Image> iconCache = new LinkedHashMap<String, Image>();
 
 	
 	private static String MAIN_ICON_RES = "/com/gpl/rpg/atcontentstudio/img/andorstrainer.png";

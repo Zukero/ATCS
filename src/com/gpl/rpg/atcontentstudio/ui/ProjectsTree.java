@@ -37,7 +37,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.jidesoft.swing.TreeSearchable;
 
 public class ProjectsTree extends JPanel {
@@ -240,6 +240,10 @@ public class ProjectsTree extends JPanel {
 		if (actions.testWriter.isEnabled()) {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.testWriter));
+		}
+		if (actions.testCommitWriter.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.testCommitWriter));
 		}
 		if (addNextSeparator) {
 			popupMenu.add(new JSeparator());

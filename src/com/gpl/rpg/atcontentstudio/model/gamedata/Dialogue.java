@@ -7,7 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -382,7 +383,7 @@ public class Dialogue extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map dialogueJson = new HashMap();
+		Map dialogueJson = new LinkedHashMap();
 		dialogueJson.put("id", this.id);
 		if (this.message != null) dialogueJson.put("message", this.message);
 		if (this.switch_to_npc != null) {
@@ -394,7 +395,7 @@ public class Dialogue extends JSONElement {
 			List repliesJson = new ArrayList();
 			dialogueJson.put("replies", repliesJson);
 			for (Reply reply : this.replies){
-				Map replyJson = new HashMap();
+				Map replyJson = new LinkedHashMap();
 				repliesJson.add(replyJson);
 				if (reply.text != null) replyJson.put("text", reply.text);
 				if (reply.next_phrase != null) {
@@ -406,7 +407,7 @@ public class Dialogue extends JSONElement {
 					List requirementsJson = new ArrayList();
 					replyJson.put("requires", requirementsJson);
 					for (Requirement requirement : reply.requirements) {
-						Map requirementJson = new HashMap();
+						Map requirementJson = new LinkedHashMap();
 						requirementsJson.add(requirementJson);
 						if (requirement.type != null) requirementJson.put("requireType", requirement.type.toString());
 						if (requirement.required_obj != null) {
@@ -426,7 +427,7 @@ public class Dialogue extends JSONElement {
 			List rewardsJson = new ArrayList();
 			dialogueJson.put("rewards", rewardsJson);
 			for (Reward reward : this.rewards) {
-				Map rewardJson = new HashMap();
+				Map rewardJson = new LinkedHashMap();
 				rewardsJson.add(rewardJson);
 				if (reward.type != null) rewardJson.put("rewardType", reward.type.toString());
 				if (reward.reward_obj != null) {

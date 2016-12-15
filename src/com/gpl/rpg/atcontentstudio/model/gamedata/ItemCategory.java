@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -310,7 +310,7 @@ public class ItemCategory extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map itemCatJson = new HashMap();
+		Map itemCatJson = new LinkedHashMap();
 		itemCatJson.put("id", this.id);
 		if (this.name != null) itemCatJson.put("name", this.name);
 		if (this.action_type != null) itemCatJson.put("actionType", this.action_type.toString());

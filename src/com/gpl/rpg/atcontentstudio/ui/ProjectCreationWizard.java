@@ -9,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ComboBoxModel;
@@ -67,7 +67,7 @@ public class ProjectCreationWizard extends JDialog {
 				return Project.ResourceSet.values()[index];
 			}
 
-			List<ListDataListener> listeners = new LinkedList<ListDataListener>();
+			List<ListDataListener> listeners = new ArrayList<ListDataListener>();
 			
 			@Override
 			public void addListDataListener(ListDataListener l) {

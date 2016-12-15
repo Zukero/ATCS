@@ -7,8 +7,8 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +34,11 @@ public class SpriteChooser extends JDialog {
 	private static final int STD_HEIGHT = 32;
 	private static final int MAX_PER_ROW = 10;
 	
-	public static Map<Project, Map<Spritesheet.Category, SpriteChooser>> cache = new HashMap<Project, Map<Spritesheet.Category,SpriteChooser>>();
+	public static Map<Project, Map<Spritesheet.Category, SpriteChooser>> cache = new LinkedHashMap<Project, Map<Spritesheet.Category,SpriteChooser>>();
 
 	public static SpriteChooser getChooser(Project proj, Spritesheet.Category category) {
 		if (cache.get(proj) == null) {
-			cache.put(proj, new HashMap<Spritesheet.Category, SpriteChooser>());
+			cache.put(proj, new LinkedHashMap<Spritesheet.Category, SpriteChooser>());
 		}
 		if (cache.get(proj).get(category) == null) {
 			cache.get(proj).put(category, new SpriteChooser(proj, category));

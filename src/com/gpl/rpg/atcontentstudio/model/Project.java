@@ -9,7 +9,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,7 +46,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.gpl.rpg.atcontentstudio.utils.FileUtils;
@@ -1018,8 +1020,8 @@ public class Project implements ProjectTreeNode, Serializable {
 	
 	@SuppressWarnings("rawtypes")
 	public void writeAltered(GameDataCategory<? extends JSONElement> altered, GameDataCategory<? extends JSONElement> source, Class<? extends JSONElement> gdeClass, File targetFolder) {
-		Set<String> alteredFileNames = new HashSet<String>();
-		Map<String, List<Map>> toWrite = new HashMap<String, List<Map>>();
+		Set<String> alteredFileNames = new LinkedHashSet<String>();
+		Map<String, List<Map>> toWrite = new LinkedHashMap<String, List<Map>>();
 		for (JSONElement gde : altered) {
 			alteredFileNames.add(gde.jsonFile.getName());
 		}

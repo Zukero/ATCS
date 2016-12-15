@@ -20,9 +20,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImageOp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +108,7 @@ public class TMXMapEditor extends Editor {
 	private static final long serialVersionUID = -3079451876618342442L;
 
 
-	Map<String, JPanel> editorTabs = new HashMap<String, JPanel>();
+	Map<String, JPanel> editorTabs = new LinkedHashMap<String, JPanel>();
 	JideTabbedPane editorTabsHolder;
 	
 	private RSyntaxTextArea editorPane;
@@ -871,7 +870,7 @@ public class TMXMapEditor extends Editor {
 			return index;
 		}
 		
-		List<TreeModelListener> listeners = new LinkedList<TreeModelListener>();
+		List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
 
 		@Override
 		public void addTreeModelListener(TreeModelListener l) {
@@ -1093,7 +1092,7 @@ public class TMXMapEditor extends Editor {
 		ReplaceArea area;
 		boolean modelForSource = false;
 		
-		public List<String> availableLayers = new LinkedList<String>();
+		public List<String> availableLayers = new ArrayList<String>();
 		
 		public String selected;
 
@@ -2057,7 +2056,7 @@ public class TMXMapEditor extends Editor {
 	        			}
 	        			for (ReplaceArea.Replacement repl : area.replacements) {
 	        				if (replacementsForLayer.get(repl.sourceLayer) == null) {
-	        					replacementsForLayer.put(repl.sourceLayer, new LinkedList<ReplaceArea>());
+	        					replacementsForLayer.put(repl.sourceLayer, new ArrayList<ReplaceArea>());
 	        				}
 	        				replacementsForLayer.get(repl.sourceLayer).add(area);
 	        			}

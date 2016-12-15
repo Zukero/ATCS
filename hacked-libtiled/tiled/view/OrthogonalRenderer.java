@@ -27,13 +27,14 @@
 
 package tiled.view;
 
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
 import tiled.core.Map;
 import tiled.core.Tile;
 import tiled.core.TileLayer;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 
 /**
  * The orthogonal map renderer. This is the most basic map renderer, dealing

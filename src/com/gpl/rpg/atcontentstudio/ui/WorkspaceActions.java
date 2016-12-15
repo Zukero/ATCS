@@ -1,28 +1,25 @@
 package com.gpl.rpg.atcontentstudio.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
-
-import bsh.util.JConsole;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.ClosedProject;
@@ -32,16 +29,16 @@ import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.Workspace;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.ui.tools.BeanShellView;
 import com.gpl.rpg.atcontentstudio.ui.tools.ItemsTableView;
 import com.gpl.rpg.atcontentstudio.ui.tools.NPCsTableView;
-import com.gpl.rpg.atcontentstudio.ui.tools.writermode.WriterModeEditor;
 
 public class WorkspaceActions {
 
@@ -340,6 +337,23 @@ public class WorkspaceActions {
 		}
 	};
 	
+	public ATCSAction testCommitWriter = new ATCSAction("Export dialogue sketch", "Exports the dialogue sketch as real JSON data dialogues") {
+		public void actionPerformed(ActionEvent e) {
+			if (selectedNode == null || selectedNode.getProject() == null || !(selectedNode instanceof WriterModeData)) return;
+			WriterModeData wData = (WriterModeData)selectedNode;
+			Collection<Dialogue> exported = wData.toDialogue();
+			for (Dialogue dialogue : exported) {
+				selectedNode.getProject().createElement(dialogue);
+			}
+			for (Dialogue dialogue : exported) {
+				dialogue.link();
+			}
+		};
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(selectedNode != null && selectedNode instanceof WriterModeData);
+		}
+	};
+	
 	List<ATCSAction> actions = new ArrayList<WorkspaceActions.ATCSAction>();
 	
 	public WorkspaceActions() {
@@ -358,6 +372,7 @@ public class WorkspaceActions {
 		actions.add(showAbout);
 		actions.add(exitATCS);
 		actions.add(testWriter);
+		actions.add(testCommitWriter);
 		selectionChanged(null, null);
 	}
 	
@@ -389,7 +404,7 @@ public class WorkspaceActions {
 		@Override
 		public void actionPerformed(ActionEvent e) {};
 
-		public Map<String, Object> values = new HashMap<String, Object>();
+		public Map<String, Object> values = new LinkedHashMap<String, Object>();
 		
 		@Override
 		public Object getValue(String key) {

@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +31,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.sprites.SpriteSheetSet;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeDataSet;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeDataSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 public class GameSource implements ProjectTreeNode, Serializable {
@@ -135,7 +135,7 @@ public class GameSource implements ProjectTreeNode, Serializable {
 	            		for (int i = 0; i < arraysList.getLength(); i++) {
 	            			Element arrayNode = (Element) arraysList.item(i);
 	            			String name = arrayNode.getAttribute("name");
-	            			List<String> arrayContents = new LinkedList<String>();
+	            			List<String> arrayContents = new ArrayList<String>();
 	            			NodeList arrayItems = arrayNode.getElementsByTagName("item");
 	            			if (arrayItems != null) {
 	            				for (int j = 0; j < arrayItems.getLength(); j++) {

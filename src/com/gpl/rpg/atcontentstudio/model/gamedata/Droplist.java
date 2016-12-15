@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -203,13 +203,13 @@ public class Droplist extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map droplistJson = new HashMap();
+		Map droplistJson = new LinkedHashMap();
 		droplistJson.put("id", this.id);
 		if (this.dropped_items != null) {
 			List droppedItemsJson = new ArrayList();
 			droplistJson.put("items", droppedItemsJson);
 			for (DroppedItem droppedItem : this.dropped_items) {
-				Map droppedItemJson = new HashMap();
+				Map droppedItemJson = new LinkedHashMap();
 				droppedItemsJson.add(droppedItemJson);
 				if (droppedItem.item != null) {
 					droppedItemJson.put("itemID", droppedItem.item.id);
@@ -218,7 +218,7 @@ public class Droplist extends JSONElement {
 				}
 				if (droppedItem.chance != null) droppedItemJson.put("chance", JSONElement.printJsonChance(droppedItem.chance));
 				if (droppedItem.quantity_min != null || droppedItem.quantity_max != null) {
-					Map quantityJson = new HashMap();
+					Map quantityJson = new LinkedHashMap();
 					droppedItemJson.put("quantity", quantityJson);
 					if (droppedItem.quantity_min != null) quantityJson.put("min", droppedItem.quantity_min);
 					else quantityJson.put("min", 0);

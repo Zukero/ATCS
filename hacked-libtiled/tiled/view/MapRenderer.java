@@ -27,10 +27,10 @@
 
 package tiled.view;
 
-import tiled.core.TileLayer;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 
-import java.awt.*;
-import java.awt.image.BufferedImageOp;
+import tiled.core.TileLayer;
 
 /**
  * An interface defining methods to render a map.

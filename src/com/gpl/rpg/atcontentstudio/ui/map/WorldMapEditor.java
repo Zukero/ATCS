@@ -10,7 +10,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -291,7 +291,7 @@ public class WorldMapEditor extends Editor {
 						if (map.labelledMaps.get(selectedLabel) != null) {
 							map.labelledMaps.get(selectedLabel).clear();
 						} else {
-							map.labelledMaps.put(selectedLabel, new LinkedList<String>());
+							map.labelledMaps.put(selectedLabel, new ArrayList<String>());
 						}
 						for (String s : mapView.selected) {
 							map.labelledMaps.get(selectedLabel).add(s);
@@ -346,7 +346,7 @@ public class WorldMapEditor extends Editor {
 					wiz.addCreationListener(new WorldmapLabelEditionWizard.CreationCompletedListener() {
 						@Override
 						public void labelCreated(NamedArea created) {
-							worldmap.labelledMaps.put(created.id, new LinkedList<String>());
+							worldmap.labelledMaps.put(created.id, new ArrayList<String>());
 							worldmap.labelledMaps.get(created.id).addAll(mapView.selected);
 							mapView.revalidate();
 							mapView.repaint();

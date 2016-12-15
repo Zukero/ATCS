@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -180,7 +180,7 @@ public class Quest extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map questJson = new HashMap();
+		Map questJson = new LinkedHashMap();
 		questJson.put("id", this.id);
 		if (this.name != null) questJson.put("name", this.name);
 		if (this.visible_in_log != null) questJson.put("showInLog", this.visible_in_log);
@@ -188,7 +188,7 @@ public class Quest extends JSONElement {
 			List stagesJson = new ArrayList();
 			questJson.put("stages", stagesJson);
 			for (QuestStage stage : this.stages) {
-				Map stageJson = new HashMap();
+				Map stageJson = new LinkedHashMap();
 				stagesJson.add(stageJson);
 				if (stage.progress != null) stageJson.put("progress", stage.progress);
 				if (stage.log_text != null) stageJson.put("logText", stage.log_text);

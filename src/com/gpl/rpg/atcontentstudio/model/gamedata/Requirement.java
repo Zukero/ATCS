@@ -1,7 +1,7 @@
 package com.gpl.rpg.atcontentstudio.model.gamedata;
 
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class Requirement extends JSONElement {
 
 	private static final long serialVersionUID = 7295593297142310955L;
 	
-	private static Map<RequirementType, List<RequirementType>> COMPATIBLE_TYPES = new HashMap<RequirementType, List<RequirementType>>();
+	private static Map<RequirementType, List<RequirementType>> COMPATIBLE_TYPES = new LinkedHashMap<RequirementType, List<RequirementType>>();
 	
 	static {
 		List<RequirementType> questTypes = new ArrayList<RequirementType>();

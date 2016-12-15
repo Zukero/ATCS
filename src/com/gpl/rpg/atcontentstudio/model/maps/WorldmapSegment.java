@@ -3,11 +3,8 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 import java.awt.Image;
 import java.awt.Point;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +66,7 @@ public class WorldmapSegment extends GameDataElement {
 			String area;
 			if ((area = mapNode.getAttribute("area")) != null && !"".equals(area)) {
 				if (labelledMaps.get(area) == null) {
-					labelledMaps.put(area, new LinkedList<String>());
+					labelledMaps.put(area, new ArrayList<String>());
 				}
 				labelledMaps.get(area).add(mapNode.getAttribute("id"));
 			}

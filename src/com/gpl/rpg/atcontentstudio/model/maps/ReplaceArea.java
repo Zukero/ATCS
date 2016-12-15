@@ -1,10 +1,8 @@
 package com.gpl.rpg.atcontentstudio.model.maps;
 
 import java.awt.Image;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
@@ -47,7 +45,7 @@ public class ReplaceArea extends MapObject {
 		
 		
 		for (Object s : obj.getProperties().keySet()) {
-			if (replacements == null) replacements = new LinkedList<ReplaceArea.Replacement>();
+			if (replacements == null) replacements = new ArrayList<ReplaceArea.Replacement>();
 			replacements.add(new Replacement(s.toString(), obj.getProperties().getProperty(s.toString())));
 		}
 		
@@ -76,7 +74,7 @@ public class ReplaceArea extends MapObject {
 	}
 	
 	public void addReplacement(ReplaceArea.Replacement repl) {
-		if (replacements == null) replacements = new LinkedList<ReplaceArea.Replacement>();
+		if (replacements == null) replacements = new ArrayList<ReplaceArea.Replacement>();
 		replacements.add(repl);
 	}
 	

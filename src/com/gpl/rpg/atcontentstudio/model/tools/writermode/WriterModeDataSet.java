@@ -1,4 +1,4 @@
-package com.gpl.rpg.atcontentstudio.model.tools;
+package com.gpl.rpg.atcontentstudio.model.tools.writermode;
 
 import java.awt.Image;
 import java.io.File;
@@ -11,7 +11,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +23,10 @@ import org.json.simple.parser.ParseException;
 
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.io.JsonPrettyWriter;
+import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
-import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
@@ -42,7 +42,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	public GameSource parent;
 	public File writerFile;
 	
-	List<WriterModeData> writerModeDataList = new LinkedList<WriterModeData>();
+	List<WriterModeData> writerModeDataList = new ArrayList<WriterModeData>();
 	
 	public WriterModeDataSet(GameSource gameSource) {
 		this.parent = gameSource;
@@ -156,7 +156,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	
 	@SuppressWarnings("rawtypes")
 	public void save(File jsonFile) {
-		List<Map> dataToSave = new LinkedList<Map>();
+		List<Map> dataToSave = new ArrayList<Map>();
 		for (WriterModeData data : writerModeDataList) {
 			if (data.jsonFile.equals(jsonFile)) {
 				dataToSave.add(data.toJson());
@@ -193,7 +193,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	}
 	
 	public List<SaveEvent> attemptSave() {
-		List<SaveEvent> events = new LinkedList<SaveEvent>();
+		List<SaveEvent> events = new ArrayList<SaveEvent>();
 		for (WriterModeData data : writerModeDataList) {
 			if (data.state == State.created || data.state == State.modified) {
 				events.add(new SaveEvent(SaveEvent.Type.alsoSave, data));

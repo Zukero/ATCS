@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class NotificationsPane extends JList {
 	public static final String warn_img_name = "/com/gpl/rpg/atcontentstudio/img/warn.png";
 	public static final String error_img_name = "/com/gpl/rpg/atcontentstudio/img/error.png";
 	
-	public static final Map<Notification.Type, Icon> icons = new HashMap<Notification.Type, Icon>(Notification.Type.values().length);
+	public static final Map<Notification.Type, Icon> icons = new LinkedHashMap<Notification.Type, Icon>(Notification.Type.values().length);
 	
 	static {
 		try {

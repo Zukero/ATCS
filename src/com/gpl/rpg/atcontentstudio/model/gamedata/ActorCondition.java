@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -264,7 +264,7 @@ public class ActorCondition extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map jsonAC = new HashMap();
+		Map jsonAC = new LinkedHashMap();
 		jsonAC.put("id", this.id);
 		if (this.icon_id != null) jsonAC.put("iconID", this.icon_id);
 		if (this.display_name != null) jsonAC.put("name", this.display_name);
@@ -272,10 +272,10 @@ public class ActorCondition extends JSONElement {
 		if (this.positive != null && this.positive == 1) jsonAC.put("positive", this.positive);
 		if (this.stacking != null && this.stacking == 1) jsonAC.put("stacking", this.stacking);
 		if (this.round_effect != null) {
-			Map jsonRound = new HashMap();
+			Map jsonRound = new LinkedHashMap();
 			if (this.round_effect.visual_effect != null) jsonRound.put("visualEffectID", this.round_effect.visual_effect);
 			if (this.round_effect.hp_boost_min != null || this.round_effect.hp_boost_max != null) {
-				Map jsonHP = new HashMap();
+				Map jsonHP = new LinkedHashMap();
 				if (this.round_effect.hp_boost_min != null) jsonHP.put("min", this.round_effect.hp_boost_min);
 				else jsonHP.put("min", 0);
 				if (this.round_effect.hp_boost_max != null) jsonHP.put("max", this.round_effect.hp_boost_max);
@@ -283,7 +283,7 @@ public class ActorCondition extends JSONElement {
 				jsonRound.put("increaseCurrentHP", jsonHP);
 			}
 			if (this.round_effect.ap_boost_min != null || this.round_effect.ap_boost_max != null) {
-				Map jsonAP = new HashMap();
+				Map jsonAP = new LinkedHashMap();
 				if (this.round_effect.ap_boost_min != null) jsonAP.put("min", this.round_effect.ap_boost_min);
 				else jsonAP.put("min", 0);
 				if (this.round_effect.ap_boost_max != null) jsonAP.put("max", this.round_effect.ap_boost_max);
@@ -293,10 +293,10 @@ public class ActorCondition extends JSONElement {
 			jsonAC.put("roundEffect", jsonRound);
 		}
 		if (this.full_round_effect != null) {
-			Map jsonFullRound = new HashMap();
+			Map jsonFullRound = new LinkedHashMap();
 			if (this.full_round_effect.visual_effect != null) jsonFullRound.put("visualEffectID", this.full_round_effect.visual_effect);
 			if (this.full_round_effect.hp_boost_min != null || this.full_round_effect.hp_boost_max != null) {
-				Map jsonHP = new HashMap();
+				Map jsonHP = new LinkedHashMap();
 				if (this.full_round_effect.hp_boost_min != null) jsonHP.put("min", this.full_round_effect.hp_boost_min);
 				else jsonHP.put("min", 0);
 				if (this.full_round_effect.hp_boost_max != null) jsonHP.put("max", this.full_round_effect.hp_boost_max);
@@ -304,7 +304,7 @@ public class ActorCondition extends JSONElement {
 				jsonFullRound.put("increaseCurrentHP", jsonHP);
 			}
 			if (this.full_round_effect.ap_boost_min != null || this.full_round_effect.ap_boost_max != null) {
-				Map jsonAP = new HashMap();
+				Map jsonAP = new LinkedHashMap();
 				if (this.full_round_effect.ap_boost_min != null) jsonAP.put("min", this.full_round_effect.ap_boost_min);
 				else jsonAP.put("min", 0);
 				if (this.full_round_effect.ap_boost_max != null) jsonAP.put("max", this.full_round_effect.ap_boost_max);
@@ -314,10 +314,10 @@ public class ActorCondition extends JSONElement {
 			jsonAC.put("fullRoundEffect", jsonFullRound);
 		}
 		if (this.constant_ability_effect != null) {
-			Map jsonAbility = new HashMap();
+			Map jsonAbility = new LinkedHashMap();
 			if (this.constant_ability_effect.increase_attack_chance != null) jsonAbility.put("increaseAttackChance", this.constant_ability_effect.increase_attack_chance);
 			if (this.constant_ability_effect.increase_damage_min != null || this.constant_ability_effect.increase_damage_max != null) {
-				Map jsonAD = new HashMap();
+				Map jsonAD = new LinkedHashMap();
 				if (this.constant_ability_effect.increase_damage_min != null) jsonAD.put("min", this.constant_ability_effect.increase_damage_min);
 				else jsonAD.put("min", 0);
 				if (this.constant_ability_effect.increase_damage_max != null) jsonAD.put("max", this.constant_ability_effect.increase_damage_max);

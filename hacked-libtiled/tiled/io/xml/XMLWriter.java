@@ -28,9 +28,8 @@
 
 package tiled.io.xml;
 
-import java.lang.String;
-import java.io.Writer;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Stack;
 
 /**

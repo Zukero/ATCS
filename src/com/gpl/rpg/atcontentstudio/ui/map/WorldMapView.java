@@ -14,9 +14,9 @@ import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class WorldMapView extends JComponent implements Scrollable {
 	Project proj;
 	
 	
-	public Map<String, Rectangle> mapLocations = new HashMap<String, Rectangle>();
+	public Map<String, Rectangle> mapLocations = new LinkedHashMap<String, Rectangle>();
 	
 	public Set<String> selected = new HashSet<String>();
 	

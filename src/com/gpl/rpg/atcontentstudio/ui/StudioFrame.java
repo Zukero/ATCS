@@ -34,7 +34,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 
 public class StudioFrame extends JFrame {
 

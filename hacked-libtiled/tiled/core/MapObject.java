@@ -28,10 +28,12 @@
 
 package tiled.core;
 
-import java.awt.*;
-import java.util.Properties;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
+
 import javax.imageio.ImageIO;
 
 /**

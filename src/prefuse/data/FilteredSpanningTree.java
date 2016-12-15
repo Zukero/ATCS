@@ -4,13 +4,6 @@ import java.util.BitSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import prefuse.data.Edge;
-import prefuse.data.Graph;
-import prefuse.data.Node;
-import prefuse.data.Schema;
-import prefuse.data.Table;
-import prefuse.data.Tree;
-import prefuse.data.Tuple;
 import prefuse.data.tuple.TupleManager;
 import prefuse.visual.tuple.TableEdgeItem;
 

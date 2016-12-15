@@ -8,9 +8,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class SpritesheetEditor extends Editor {
 
 	private static final long serialVersionUID = 3956109815682889863L;
 
-	Map<String, JPanel> editorTabs = new HashMap<String, JPanel>();
+	Map<String, JPanel> editorTabs = new LinkedHashMap<String, JPanel>();
 	JideTabbedPane editorTabsHolder;
 	
 	private JSpinner widthField;

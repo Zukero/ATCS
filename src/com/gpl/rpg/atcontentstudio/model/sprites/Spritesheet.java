@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +43,8 @@ public class Spritesheet extends GameDataElement {
 	
 	//Lazy initialization.
 	public BufferedImage spritesheet = null;
-	public Map<Integer, BufferedImage> cache_full_size = new HashMap<Integer, BufferedImage>();
-	public Map<Integer, Image> cache_icon = new HashMap<Integer, Image>();
+	public Map<Integer, BufferedImage> cache_full_size = new LinkedHashMap<Integer, BufferedImage>();
+	public Map<Integer, Image> cache_icon = new LinkedHashMap<Integer, Image>();
 	
 	public Spritesheet(SpriteSheetSet parent, File f) {
 		this.spritesheetFile = f;

@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -386,7 +386,7 @@ public class NPC extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map npcJson = new HashMap();
+		Map npcJson = new LinkedHashMap();
 		npcJson.put("id", this.id);
 		if (this.name != null) npcJson.put("name", this.name);
 		if (this.icon_id != null) npcJson.put("iconID", this.icon_id);
@@ -397,7 +397,7 @@ public class NPC extends JSONElement {
 		if (this.monster_class != null) npcJson.put("monsterClass", this.monster_class.toString());
 		if (this.movement_type != null) npcJson.put("movementAggressionType", this.movement_type.toString());
 		if (this.attack_damage_min != null || this.attack_damage_max != null) {
-			Map adJson = new HashMap();
+			Map adJson = new LinkedHashMap();
 			npcJson.put("attackDamage", adJson);
 			if (this.attack_damage_min != null) adJson.put("min", this.attack_damage_min);
 			else adJson.put("min", 0);
@@ -423,10 +423,10 @@ public class NPC extends JSONElement {
 		if (this.block_chance != null) npcJson.put("blockChance", this.block_chance);
 		if (this.damage_resistance != null) npcJson.put("damageResistance", this.damage_resistance);
 		if (this.hit_effect != null) {
-			Map hitEffectJson = new HashMap();
+			Map hitEffectJson = new LinkedHashMap();
 			npcJson.put("hitEffect", hitEffectJson);
 			if (this.hit_effect.hp_boost_min != null || this.hit_effect.hp_boost_max != null) {
-				Map hpJson = new HashMap();
+				Map hpJson = new LinkedHashMap();
 				hitEffectJson.put("increaseCurrentHP", hpJson);
 				if (this.hit_effect.hp_boost_min != null) hpJson.put("min", this.hit_effect.hp_boost_min);
 				else hpJson.put("min", 0);
@@ -434,7 +434,7 @@ public class NPC extends JSONElement {
 				else hpJson.put("max", 0);
 			}
 			if (this.hit_effect.ap_boost_min != null || this.hit_effect.ap_boost_max != null) {
-				Map apJson = new HashMap();
+				Map apJson = new LinkedHashMap();
 				hitEffectJson.put("increaseCurrentAP", apJson);
 				if (this.hit_effect.ap_boost_min != null) apJson.put("min", this.hit_effect.ap_boost_min);
 				else apJson.put("min", 0);
@@ -445,7 +445,7 @@ public class NPC extends JSONElement {
 				List conditionsSourceJson = new ArrayList();
 				hitEffectJson.put("conditionsSource", conditionsSourceJson);
 				for (TimedConditionEffect condition : this.hit_effect.conditions_source) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsSourceJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);
@@ -461,7 +461,7 @@ public class NPC extends JSONElement {
 				List conditionsTargetJson = new ArrayList();
 				hitEffectJson.put("conditionsTarget", conditionsTargetJson);
 				for (TimedConditionEffect condition : this.hit_effect.conditions_target) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsTargetJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);

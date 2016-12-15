@@ -3,7 +3,7 @@ package com.gpl.rpg.atcontentstudio.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.Action;
@@ -22,7 +22,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGame;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.ActorConditionEditor;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DroplistEditor;
@@ -41,7 +41,7 @@ public class EditorsArea extends JPanel {
 
 	private static final long serialVersionUID = 8801849846876081538L;
 
-	private Map<Object, Editor> editors = new HashMap<Object, Editor>();
+	private Map<Object, Editor> editors = new LinkedHashMap<Object, Editor>();
 	private JideTabbedPane tabHolder;
 	
 	public EditorsArea() {

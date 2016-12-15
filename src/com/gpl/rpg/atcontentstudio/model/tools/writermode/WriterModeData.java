@@ -1,14 +1,13 @@
-package com.gpl.rpg.atcontentstudio.model.tools;
+package com.gpl.rpg.atcontentstudio.model.tools.writermode;
 
 import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
@@ -32,8 +32,8 @@ public class WriterModeData extends GameDataElement {
 	public String sketchName;
 	
 
-	public List<String> rootsId = new LinkedList<String>();
-	public List<WriterDialogue> roots = new LinkedList<WriterDialogue>();
+	public List<String> rootsId = new ArrayList<String>();
+	public List<WriterDialogue> roots = new ArrayList<WriterDialogue>();
 	public WriterDialogue begin;
 	public Map<String, WriterDialogue> nodesById = new LinkedHashMap<String, WriterDialogue>();
 
@@ -76,8 +76,8 @@ public class WriterModeData extends GameDataElement {
 		public String id;
 		public String id_prefix;
 		public int index;
-		public List<WriterReply> replies = new LinkedList<WriterReply>();
-		public List<WriterReply> parents = new LinkedList<WriterReply>();
+		public List<WriterReply> replies = new ArrayList<WriterReply>();
+		public List<WriterReply> parents = new ArrayList<WriterReply>();
 		
 		
 		public WriterDialogue() {}
@@ -93,10 +93,14 @@ public class WriterModeData extends GameDataElement {
 			return "Dialogue "+id_prefix+index;
 		}
 		
+		public String getID() {
+			return this.id != null ? this.id : this.id_prefix+this.index;
+		}
+		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public Map toJson() {
-			Map dialogueJson = new HashMap();
+			Map dialogueJson = new LinkedHashMap();
 			dialogueJson.put("id", id);
 			dialogueJson.put("id_prefix", id_prefix);
 			dialogueJson.put("index", index);
@@ -130,6 +134,22 @@ public class WriterModeData extends GameDataElement {
 		
 		public boolean isSpecial() {return false;}
 		
+
+		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited){
+			if (visited.get(this) != null) return visited.get(this);
+			Dialogue dialogue = new Dialogue();
+			dialogue.state = GameDataElement.State.parsed;
+			visited.put(this, dialogue);
+			dialogue.id = getID();
+			dialogue.message = this.text;
+			if (this.replies != null && !this.replies.isEmpty()) {
+				dialogue.replies = new ArrayList<Dialogue.Reply>();
+				for (WriterReply wReply : this.replies) {
+					dialogue.replies.add(wReply.toReply(visited));
+				}
+			}
+			return dialogue;
+		}
 		
 	}
 	
@@ -188,7 +208,7 @@ public class WriterModeData extends GameDataElement {
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public Map toJson() {
-			Map replyJson = new HashMap();
+			Map replyJson = new LinkedHashMap();
 			replyJson.put("text", text);
 			replyJson.put("special", isSpecial());
 			if (next_dialogue != null) {
@@ -198,6 +218,20 @@ public class WriterModeData extends GameDataElement {
 		}
 
 		public boolean isSpecial() {return false;}
+		
+		public Dialogue.Reply toReply(Map<WriterDialogue, Dialogue> visited) {
+			Dialogue.Reply reply = new Dialogue.Reply();
+			reply.text = this.text;
+			if (this.next_dialogue != null) {
+				this.next_dialogue.toDialogue(visited);
+				reply.next_phrase_id = this.next_dialogue.getID();
+			} else if (this.next_dialogue_id != null) {
+				reply.next_phrase_id = this.next_dialogue_id;
+			} else {
+				reply.next_phrase_id = "X";
+			}
+			return reply;
+		}
 
 	}
 	
@@ -410,4 +444,10 @@ public class WriterModeData extends GameDataElement {
 		return null;
 	}
 
+	public Collection<Dialogue> toDialogue(){
+		Map<WriterModeData.WriterDialogue, Dialogue> visited = new LinkedHashMap<WriterModeData.WriterDialogue, Dialogue>(); 
+		begin.toDialogue(visited);
+		return visited.values();
+	}
+	
 }

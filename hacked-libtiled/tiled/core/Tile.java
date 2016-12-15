@@ -28,7 +28,6 @@
 
 package tiled.core;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Properties;
 

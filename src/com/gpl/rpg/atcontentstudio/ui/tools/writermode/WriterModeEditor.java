@@ -7,10 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -42,9 +41,7 @@ import prefuse.data.FilteredSpanningTree;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Schema;
-import prefuse.data.SpanningTree;
 import prefuse.data.Tree;
-import prefuse.data.expression.BooleanLiteral;
 import prefuse.data.expression.ColumnExpression;
 import prefuse.render.DefaultRendererFactory;
 import prefuse.render.EdgeRenderer;
@@ -57,12 +54,12 @@ import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.EmptyReply;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.SpecialDialogue;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterDialogue;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterNode;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData.WriterReply;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.EmptyReply;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.SpecialDialogue;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.WriterDialogue;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.WriterNode;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.WriterReply;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
 
@@ -115,7 +112,7 @@ public class WriterModeEditor extends Editor {
 		private static final long serialVersionUID = -7992763190713052045L;
 
 		private MyGraph graph;
-    	private Map<WriterModeData.WriterNode, Node> cells = new HashMap<WriterModeData.WriterNode, Node>();
+    	private Map<WriterModeData.WriterNode, Node> cells = new LinkedHashMap<WriterModeData.WriterNode, Node>();
     	
     	private Node nullNode = null;
     	private Edge pendingEdge = null;

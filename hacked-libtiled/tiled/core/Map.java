@@ -29,7 +29,9 @@
 package tiled.core;
 
 import java.awt.Rectangle;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * The Map class is the focal point of the <code>tiled.core</code> package.

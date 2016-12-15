@@ -9,7 +9,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -190,7 +191,7 @@ public class GameDataCategory<E extends JSONElement> extends ArrayList<E> implem
 		List<SaveEvent> events = new ArrayList<SaveEvent>();
 		GameDataCategory<? extends JSONElement> impactedCategory = null;
 		String impactedFileName = fileName;
-		Map<String, Integer> containedIds = new HashMap<String, Integer>();
+		Map<String, Integer> containedIds = new LinkedHashMap<String, Integer>();
 		for (JSONElement node : this) {
 			if (node.getDataType() == GameSource.Type.created && getProject().baseContent.gameData.getGameDataElement(node.getClass(), node.id) != null) {
 				if (getProject().alteredContent.gameData.getGameDataElement(node.getClass(), node.id) != null) {

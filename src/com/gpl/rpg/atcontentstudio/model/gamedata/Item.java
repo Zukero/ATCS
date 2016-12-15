@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -492,7 +492,7 @@ public class Item extends JSONElement {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Map toJson() {
-		Map itemJson = new HashMap();
+		Map itemJson = new LinkedHashMap();
 		itemJson.put("id", this.id);
 		if (this.icon_id != null) itemJson.put("iconID", this.icon_id);
 		if (this.name != null) itemJson.put("name", this.name);
@@ -507,10 +507,10 @@ public class Item extends JSONElement {
 		}
 		if (this.description != null) itemJson.put("description", this.description);
 		if (this.equip_effect != null) {
-			Map equipEffectJson = new HashMap();
+			Map equipEffectJson = new LinkedHashMap();
 			itemJson.put("equipEffect", equipEffectJson);
 			if (this.equip_effect.damage_boost_min != null || this.equip_effect.damage_boost_max != null) {
-				Map damageJson = new HashMap();
+				Map damageJson = new LinkedHashMap();
 				equipEffectJson.put("increaseAttackDamage", damageJson);
 				if (this.equip_effect.damage_boost_min != null) damageJson.put("min", this.equip_effect.damage_boost_min);
 				else damageJson.put("min", 0);
@@ -532,7 +532,7 @@ public class Item extends JSONElement {
 				List conditionsJson = new ArrayList();
 				equipEffectJson.put("addedConditions", conditionsJson);
 				for (ConditionEffect condition : this.equip_effect.conditions) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);
@@ -544,10 +544,10 @@ public class Item extends JSONElement {
 			}
 		}
 		if (this.hit_effect != null) {
-			Map hitEffectJson = new HashMap();
+			Map hitEffectJson = new LinkedHashMap();
 			itemJson.put("hitEffect", hitEffectJson);
 			if (this.hit_effect.hp_boost_min != null || this.hit_effect.hp_boost_max != null) {
-				Map hpJson = new HashMap();
+				Map hpJson = new LinkedHashMap();
 				hitEffectJson.put("increaseCurrentHP", hpJson);
 				if (this.hit_effect.hp_boost_min != null) hpJson.put("min", this.hit_effect.hp_boost_min);
 				else hpJson.put("min", 0);
@@ -555,7 +555,7 @@ public class Item extends JSONElement {
 				else hpJson.put("max", 0);
 			}
 			if (this.hit_effect.ap_boost_min != null || this.hit_effect.ap_boost_max != null) {
-				Map apJson = new HashMap();
+				Map apJson = new LinkedHashMap();
 				hitEffectJson.put("increaseCurrentAP", apJson);
 				if (this.hit_effect.ap_boost_min != null) apJson.put("min", this.hit_effect.ap_boost_min);
 				else apJson.put("min", 0);
@@ -566,7 +566,7 @@ public class Item extends JSONElement {
 				List conditionsSourceJson = new ArrayList();
 				hitEffectJson.put("conditionsSource", conditionsSourceJson);
 				for (TimedConditionEffect condition : this.hit_effect.conditions_source) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsSourceJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);
@@ -582,7 +582,7 @@ public class Item extends JSONElement {
 				List conditionsTargetJson = new ArrayList();
 				hitEffectJson.put("conditionsTarget", conditionsTargetJson);
 				for (TimedConditionEffect condition : this.hit_effect.conditions_target) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsTargetJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);
@@ -596,14 +596,14 @@ public class Item extends JSONElement {
 			}
 		}
 		if (this.kill_effect != null) {
-			Map killEffectJson = new HashMap();
+			Map killEffectJson = new LinkedHashMap();
 			if (this.category != null && this.category.action_type != null && this.category.action_type == ItemCategory.ActionType.equip) {
 				itemJson.put("killEffect", killEffectJson);
 			} else if (this.category != null && this.category.action_type != null && this.category.action_type == ItemCategory.ActionType.use) {
 				itemJson.put("useEffect", killEffectJson);
 			}
 			if (this.kill_effect.hp_boost_min != null || this.kill_effect.hp_boost_max != null) {
-				Map hpJson = new HashMap();
+				Map hpJson = new LinkedHashMap();
 				killEffectJson.put("increaseCurrentHP", hpJson);
 				if (this.kill_effect.hp_boost_min != null) hpJson.put("min", this.kill_effect.hp_boost_min);
 				else hpJson.put("min", 0);
@@ -611,7 +611,7 @@ public class Item extends JSONElement {
 				else hpJson.put("min", 0);
 			}
 			if (this.kill_effect.ap_boost_min != null || this.kill_effect.ap_boost_max != null) {
-				Map apJson = new HashMap();
+				Map apJson = new LinkedHashMap();
 				killEffectJson.put("increaseCurrentAP", apJson);
 				if (this.kill_effect.ap_boost_min != null) apJson.put("min", this.kill_effect.ap_boost_min);
 				else apJson.put("min", 0);
@@ -622,7 +622,7 @@ public class Item extends JSONElement {
 				List conditionsSourceJson = new ArrayList();
 				killEffectJson.put("conditionsSource", conditionsSourceJson);
 				for (TimedConditionEffect condition : this.kill_effect.conditions_source) {
-					Map conditionJson = new HashMap();
+					Map conditionJson = new LinkedHashMap();
 					conditionsSourceJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);

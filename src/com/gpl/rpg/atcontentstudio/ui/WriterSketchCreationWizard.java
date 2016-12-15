@@ -15,16 +15,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
-import com.gpl.rpg.atcontentstudio.model.GameSource;
-import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
-import com.gpl.rpg.atcontentstudio.model.gamedata.ActorCondition;
-import com.gpl.rpg.atcontentstudio.model.gamedata.Item;
-import com.gpl.rpg.atcontentstudio.model.gamedata.ItemCategory;
-import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
-import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
-import com.gpl.rpg.atcontentstudio.model.tools.WriterModeData;
-import com.gpl.rpg.atcontentstudio.ui.JSONCreationWizard.DataType;
+import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class WriterSketchCreationWizard extends JDialog {
