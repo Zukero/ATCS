@@ -801,7 +801,7 @@ public class Project implements ProjectTreeNode, Serializable {
 	
 	/**
 	 * 
-	 * @param node. Before calling this method, make sure that no other node with the same class exist in either created or altered.
+	 * @param node. Before calling this method, make sure that no other node with the same class and id exist in either created or altered.
 	 */
 	public void createElement(JSONElement node) {
 		node.writable = true;
@@ -821,6 +821,34 @@ public class Project implements ProjectTreeNode, Serializable {
 			node.state =  GameDataElement.State.created;
 		}
 		fireElementAdded(node, getNodeIndex(node));
+	}
+	
+	/**
+	 * 
+	 * @param node. Before calling this method, make sure that no other node with the same class and id exist in either created or altered.
+	 */
+	public void createElements(List<JSONElement> nodes) {
+		for (JSONElement node : nodes) {
+			//Already added.
+			if (node.getProject() != null) continue;
+			node.writable = true;
+			if (getGameDataElement(node.getClass(), node.id) != null) {
+				GameDataElement existingNode = getGameDataElement(node.getClass(), node.id);
+				for (GameDataElement backlink : existingNode.getBacklinks()) {
+					backlink.elementChanged(existingNode, node);
+				}
+				existingNode.getBacklinks().clear();
+				node.writable = true;
+				alteredContent.gameData.addElement(node);
+			} else {
+				createdContent.gameData.addElement(node);
+			}
+		}
+		for (JSONElement node : nodes) {
+			node.link();
+			node.state =  GameDataElement.State.created;
+			fireElementAdded(node, getNodeIndex(node));
+		}
 	}
 	
 

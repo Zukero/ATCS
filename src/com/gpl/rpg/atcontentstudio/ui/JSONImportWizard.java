@@ -404,11 +404,8 @@ public class JSONImportWizard extends JDialog {
 		okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JSONElement lastNode = null;
-				for (JSONElement node : created) {
-					proj.createElement(node);
-					lastNode = node;
-				}
+				proj.createElements(created);
+				JSONElement lastNode = created.get(created.size() - 1);
 				if (lastNode != null) {
 					lastNode.save();
 					ATContentStudio.frame.selectInTree(lastNode);

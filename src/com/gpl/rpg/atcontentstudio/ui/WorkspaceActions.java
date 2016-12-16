@@ -342,12 +342,7 @@ public class WorkspaceActions {
 			if (selectedNode == null || selectedNode.getProject() == null || !(selectedNode instanceof WriterModeData)) return;
 			WriterModeData wData = (WriterModeData)selectedNode;
 			Collection<Dialogue> exported = wData.toDialogue();
-			for (Dialogue dialogue : exported) {
-				selectedNode.getProject().createElement(dialogue);
-			}
-			for (Dialogue dialogue : exported) {
-				dialogue.link();
-			}
+			selectedNode.getProject().createElements(new ArrayList<JSONElement>(exported));
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode != null && selectedNode instanceof WriterModeData);

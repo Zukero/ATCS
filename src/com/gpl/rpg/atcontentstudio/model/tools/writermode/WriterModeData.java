@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +78,7 @@ public class WriterModeData extends GameDataElement {
 		public int index;
 		public List<WriterReply> replies = new ArrayList<WriterReply>();
 		public List<WriterReply> parents = new ArrayList<WriterReply>();
-		
+		public Dialogue dialogue;
 		
 		public WriterDialogue() {}
 		
@@ -137,10 +137,14 @@ public class WriterModeData extends GameDataElement {
 
 		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited){
 			if (visited.get(this) != null) return visited.get(this);
-			Dialogue dialogue = new Dialogue();
-			dialogue.state = GameDataElement.State.parsed;
+			if (dialogue == null) {
+				dialogue = new Dialogue();
+				dialogue.id = getID();
+				dialogue.state = GameDataElement.State.parsed;
+			} else {
+				dialogue.state = GameDataElement.State.modified;
+			}
 			visited.put(this, dialogue);
-			dialogue.id = getID();
 			dialogue.message = this.text;
 			if (this.replies != null && !this.replies.isEmpty()) {
 				dialogue.replies = new ArrayList<Dialogue.Reply>();
@@ -182,6 +186,7 @@ public class WriterModeData extends GameDataElement {
 		public WriterDialogue parent;
 		public String next_dialogue_id;
 		public WriterDialogue next_dialogue;
+		public Dialogue.Reply reply;
 		
 		public WriterReply() {}
 		
@@ -220,7 +225,9 @@ public class WriterModeData extends GameDataElement {
 		public boolean isSpecial() {return false;}
 		
 		public Dialogue.Reply toReply(Map<WriterDialogue, Dialogue> visited) {
-			Dialogue.Reply reply = new Dialogue.Reply();
+			if (reply == null) {
+				reply = new Dialogue.Reply();
+			}
 			reply.text = this.text;
 			if (this.next_dialogue != null) {
 				this.next_dialogue.toDialogue(visited);

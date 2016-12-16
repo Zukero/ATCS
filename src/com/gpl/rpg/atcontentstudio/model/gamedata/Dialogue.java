@@ -224,10 +224,7 @@ public class Dialogue extends JSONElement {
 		if (replies != null) {
 			for (Reply reply : replies) {
 				if (reply.next_phrase_id != null) {
-					if (!reply.next_phrase_id.equals(Reply.EXIT_PHRASE_ID)
-						&& !reply.next_phrase_id.equals(Reply.FIGHT_PHRASE_ID)
-						&& !reply.next_phrase_id.equals(Reply.SHOP_PHRASE_ID)
-						&& !reply.next_phrase_id.equals(Reply.REMOVE_PHRASE_ID)) {
+					if (!Reply.KEY_PHRASE_ID.contains(reply.next_phrase_id)) {
 						reply.next_phrase = proj.getDialogue(reply.next_phrase_id);
 					}
 				}
