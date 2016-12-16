@@ -135,7 +135,7 @@ public class WriterModeData extends GameDataElement {
 		public boolean isSpecial() {return false;}
 		
 
-		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited){
+		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited) {
 			if (visited.get(this) != null) return visited.get(this);
 			if (dialogue == null) {
 				dialogue = new Dialogue();
@@ -153,6 +153,23 @@ public class WriterModeData extends GameDataElement {
 				}
 			}
 			return dialogue;
+		}
+		
+		public boolean hasChanged() {
+			return dialogue == null ||
+					text == null ? dialogue.message!=null : !text.equals(dialogue.message) ||
+					repliesHaveChanged();
+		}
+		
+		public boolean repliesHaveChanged() {
+			if (replies.isEmpty() && (dialogue.replies == null || dialogue.replies.isEmpty())) return false;
+			if (!replies.isEmpty() && (dialogue.replies == null || dialogue.replies.isEmpty())) return true;
+			if (replies.isEmpty() && (dialogue.replies != null && !dialogue.replies.isEmpty())) return true;
+			if (replies.size() != dialogue.replies.size()) return true;
+			for (WriterReply reply : replies) {
+				if (reply.hasChanged()) return true;
+			}
+			return false;
 		}
 		
 	}
@@ -239,6 +256,21 @@ public class WriterModeData extends GameDataElement {
 			}
 			return reply;
 		}
+		
+		public boolean hasChanged() {
+			if (reply == null) return true;
+			if (text == null && reply.text != null) return true;
+			if (text != null && reply.text == null) return true;
+			if (text != null && !text.equals(reply.text)) return true;
+			String targetDialogueId = next_dialogue != null ? next_dialogue.getID() : next_dialogue_id;
+			String replyTargetDialogueId = reply.next_phrase != null ? reply.next_phrase.id : reply.next_phrase_id;
+			if (targetDialogueId == null && replyTargetDialogueId != null) return true;
+			if (targetDialogueId != null && replyTargetDialogueId == null) return true;
+			if (targetDialogueId != null && !targetDialogueId.equals(replyTargetDialogueId)) return true;
+			return false;
+		}
+		
+		
 
 	}
 	
