@@ -99,7 +99,7 @@ public abstract class GameDataElement implements ProjectTreeNode, Serializable {
 	
 	@Override
 	public Project getProject() {
-		return parent.getProject();
+		return parent == null ? null : parent.getProject();
 	}
 	
 	

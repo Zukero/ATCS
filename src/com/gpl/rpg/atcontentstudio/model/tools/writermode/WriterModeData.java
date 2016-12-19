@@ -25,11 +25,10 @@ import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 public class WriterModeData extends GameDataElement {
 	private static final long serialVersionUID = -7062544089063979696L;
 	
-	//Available from state init.
 	public File jsonFile;
 
 	public Image npcIcon;
-	public String sketchName;
+//	public String sketchName;
 	
 
 	public List<String> rootsId = new ArrayList<String>();
@@ -37,7 +36,7 @@ public class WriterModeData extends GameDataElement {
 	public WriterDialogue begin;
 	public Map<String, WriterDialogue> nodesById = new LinkedHashMap<String, WriterDialogue>();
 
-	public Map<String, WriterDialogue> dialogueThreads = new LinkedHashMap<String, WriterDialogue>();
+	//public Map<String, WriterDialogue> dialogueThreads = new LinkedHashMap<String, WriterDialogue>();
 	public Map<String, Integer> threadsNextIndex = new LinkedHashMap<String, Integer>();
 	
 
@@ -45,10 +44,11 @@ public class WriterModeData extends GameDataElement {
 		this.id = id_prefix;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public  WriterModeData(WriterModeDataSet parent, @SuppressWarnings("rawtypes") Map jsonObj) {
 		this.parent = parent;
-		this.begin = new WriterDialogue(jsonObj);
-		this.id = begin.id_prefix;
+		this.jsonFile = parent.writerFile;
+		this.parse(jsonObj);
 		this.state = State.parsed;
 	}
 	
@@ -67,8 +67,6 @@ public class WriterModeData extends GameDataElement {
 		public String text;
 		
 		public abstract String getTitle();
-		@SuppressWarnings("rawtypes")
-		public abstract Map toJson();
 		
 	}
 	
@@ -78,6 +76,7 @@ public class WriterModeData extends GameDataElement {
 		public int index;
 		public List<WriterReply> replies = new ArrayList<WriterReply>();
 		public List<WriterReply> parents = new ArrayList<WriterReply>();
+		public String dialogue_id;
 		public Dialogue dialogue;
 		
 		public WriterDialogue() {}
@@ -98,37 +97,49 @@ public class WriterModeData extends GameDataElement {
 		}
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		@Override
-		public Map toJson() {
+		public void toJson(List<WriterDialogue> visited, List<Map> jsonData) {
+			if (visited.contains(this)) return;
+			visited.add(this);
 			Map dialogueJson = new LinkedHashMap();
+			jsonData.add(dialogueJson);
 			dialogueJson.put("id", id);
 			dialogueJson.put("id_prefix", id_prefix);
 			dialogueJson.put("index", index);
 			dialogueJson.put("text", text);
+			if (dialogue != null) {
+				dialogueJson.put("dialogue", dialogue.id);
+			} else if (dialogue_id != null) {
+				dialogueJson.put("dialogue", dialogue_id);
+			}
 			dialogueJson.put("special", isSpecial());
+			dialogueJson.put("begin", begin == this);
 			if (!replies.isEmpty()) {
 				List repliesJson = new ArrayList();
 				for (WriterReply reply : replies) {
-					repliesJson.add(reply.toJson());
+					repliesJson.add(reply.toJson(visited, jsonData));
 				}
 				dialogueJson.put("replies", repliesJson);
 			}
-			return dialogueJson;
 		}
 		
 		@SuppressWarnings("rawtypes")
 		public WriterDialogue(Map json) {
 			this.id = (String) json.get("id");
-			this.index = Integer.parseInt((String) json.get("index"));
+			this.index = ((Number)json.get("index")).intValue();
 			this.id_prefix = (String) json.get("id_prefix");
 			this.text = (String) json.get("text");
-			List repliesJson = (List) json.get("replies");
-			for (Object rJson : repliesJson) {
-				if (Boolean.parseBoolean((String)((Map)rJson).get("special"))) {
-					//TODO Check different cases. But there are none currently.
-					this.replies.add(new EmptyReply(this, ((Map)rJson)));
+			this.dialogue_id = (String) json.get("dialogue");
+			if (json.get("begin") != null && ((Boolean)json.get("begin"))) begin = this;
+			if (json.get("replies") != null) {
+				List repliesJson = (List) json.get("replies");
+				for (Object rJson : repliesJson) {
+					if (((Map)rJson).get("special") != null && (Boolean)((Map)rJson).get("special")) {
+						//TODO Check different cases. But there are none currently.
+						this.replies.add(new EmptyReply(this, ((Map)rJson)));
+					} else {
+						this.replies.add(new WriterReply(this, (Map)rJson));
+					}
 				}
-				this.replies.add(new WriterReply(this, (Map)rJson));
 			}
 		}
 		
@@ -142,7 +153,7 @@ public class WriterModeData extends GameDataElement {
 				dialogue.id = getID();
 				dialogue.state = GameDataElement.State.parsed;
 			} else {
-				dialogue.state = GameDataElement.State.modified;
+				if (hasChanged()) dialogue.state = GameDataElement.State.modified;
 			}
 			visited.put(this, dialogue);
 			dialogue.message = this.text;
@@ -228,13 +239,13 @@ public class WriterModeData extends GameDataElement {
 		}
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
-		@Override
-		public Map toJson() {
+		public Map toJson(List<WriterDialogue> visited, List<Map> jsonData) {
 			Map replyJson = new LinkedHashMap();
 			replyJson.put("text", text);
 			replyJson.put("special", isSpecial());
 			if (next_dialogue != null) {
-				replyJson.put("next_dialogue_id", next_dialogue.id);
+				replyJson.put("next_dialogue_id", next_dialogue.getID());
+				next_dialogue.toJson(visited, jsonData);
 			}
 			return replyJson;
 		}
@@ -364,9 +375,14 @@ public class WriterModeData extends GameDataElement {
 		return events;
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Map toJson() {
-		return begin.toJson();
+		List<Map> jsonData = new ArrayList<Map>();
+		begin.toJson(new ArrayList<WriterModeData.WriterDialogue>(), jsonData);
+		Map jsonObj = new LinkedHashMap();
+		jsonObj.put("id", id);
+		jsonObj.put("dialogues", jsonData);
+		return jsonObj;
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -412,18 +428,18 @@ public class WriterModeData extends GameDataElement {
 	@SuppressWarnings("rawtypes")
 	public void parse(Map json) {
 		this.id = (String) json.get("id");
-		this.sketchName = (String) json.get("name");
-		List jsonRootsId = (List) json.get("roots_id");
-		if (jsonRootsId != null) {
-			for (Object jsonRootId : jsonRootsId) {
-				rootsId.add((String) jsonRootId);
-			}
-		}
+//		this.sketchName = (String) json.get("name");
+//		List jsonRootsId = (List) json.get("roots_id");
+//		if (jsonRootsId != null) {
+//			for (Object jsonRootId : jsonRootsId) {
+//				rootsId.add((String) jsonRootId);
+//			}
+//		}
 		List jsonDialogues = (List) json.get("dialogues");
 		if (jsonDialogues != null) {
 			for (Object jsonDialogue : jsonDialogues) {
 				WriterDialogue dialogue = new WriterDialogue((Map)jsonDialogue);
-				nodesById.put(dialogue.id, dialogue);
+				nodesById.put(dialogue.getID(), dialogue);
 			}
 		}
 		this.state = State.parsed;
@@ -440,8 +456,12 @@ public class WriterModeData extends GameDataElement {
 		if (this.state == State.init) {
 			//Not parsed yet.
 			this.parse();
-		} else if (this.state == State.parsed) {
+		} 
+		if (this.state == State.parsed) {
 			for (WriterDialogue dialogue : nodesById.values()) {
+				if (dialogue.dialogue_id != null) {
+					dialogue.dialogue = getProject().getDialogue(dialogue.dialogue_id);
+				}
 				if (dialogue.replies == null) continue;
 				for (WriterReply reply : dialogue.replies) {
 					if (reply.next_dialogue_id != null) {
@@ -457,7 +477,8 @@ public class WriterModeData extends GameDataElement {
 				roots.add(nodesById.get(rootId));
 			}
 
-		} else if (this.state == State.linked) {
+		} 
+		if (this.state == State.linked) {
 			//Already linked.
 			return;
 		}

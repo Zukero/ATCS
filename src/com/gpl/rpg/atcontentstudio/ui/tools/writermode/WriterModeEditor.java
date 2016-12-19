@@ -4,11 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -54,6 +57,8 @@ import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 
+import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
+import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.EmptyReply;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.SpecialDialogue;
@@ -62,6 +67,7 @@ import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.WriterN
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.WriterReply;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
+import com.jidesoft.swing.JideBoxLayout;
 
 public class WriterModeEditor extends Editor {
 
@@ -80,8 +86,42 @@ public class WriterModeEditor extends Editor {
     	view = new WriterGraphView();
     	view.setLocation(0, 0);
     	setLayout(new BorderLayout());
+    	add(createButtonPane(), BorderLayout.NORTH);
     	add(view, BorderLayout.CENTER);
     }
+    
+    
+    public JPanel createButtonPane() {
+    	JPanel pane = new JPanel();
+    	pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.LINE_AXIS));
+    	JButton save = new JButton("Save sketch");
+    	JButton export = new JButton("Export sketch to game data");
+    	save.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				data.save();
+			}
+		});
+    	export.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Collection<Dialogue> exported = data.toDialogue();
+				data.getProject().createElements(new ArrayList<JSONElement>(exported));
+			}
+		});
+    	pane.add(save, JideBoxLayout.FIX);
+    	pane.add(export, JideBoxLayout.FIX);
+    	pane.add(new JPanel(), JideBoxLayout.VARY);
+    	return pane;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
    
     private void disposeOverlay() {
     	if (overlay != null) view.remove(overlay);

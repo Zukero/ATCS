@@ -253,6 +253,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 		}
 		if (higherEmptyParent == this && !this.isEmpty()) higherEmptyParent = null;
 		writerModeDataList.add(node);
+		if (node.jsonFile == null) node.jsonFile = this.writerFile;
 		node.parent = this;
 		if (higherEmptyParent != null) higherEmptyParent.notifyCreated();
 		else node.notifyCreated();
