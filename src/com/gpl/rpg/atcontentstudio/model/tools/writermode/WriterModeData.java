@@ -6,10 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -17,6 +18,7 @@ import org.json.simple.parser.ParseException;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
@@ -43,13 +45,19 @@ public class WriterModeData extends GameDataElement {
 	public WriterModeData(String id_prefix){
 		this.id = id_prefix;
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	public  WriterModeData(WriterModeDataSet parent, @SuppressWarnings("rawtypes") Map jsonObj) {
+	public  WriterModeData(WriterModeDataSet parent, Map jsonObj) {
 		this.parent = parent;
 		this.jsonFile = parent.writerFile;
 		this.parse(jsonObj);
 		this.state = State.parsed;
+	}
+	
+	public  WriterModeData(String id_prefix, Dialogue imported) {
+		this.id = id_prefix;
+		this.begin = new WriterDialogue(imported);
+		this.state = State.linked;
 	}
 	
 	public int getNextIndex(String id_prefix) {
@@ -81,6 +89,30 @@ public class WriterModeData extends GameDataElement {
 		
 		public WriterDialogue() {}
 		
+		public WriterDialogue(Dialogue dialogue) {
+			this.dialogue = dialogue;
+			this.text = dialogue.message;
+			this.id = this.dialogue_id = dialogue.id;
+			Pattern p = Pattern.compile("(.*)([0-9]+)");
+			Matcher m = p.matcher(dialogue.id);
+			if (m.matches()) {
+				this.id_prefix = m.group(1);
+				this.index = Integer.parseInt(m.group(2));
+			} else {
+				this.id_prefix = this.id+"_";
+			}
+			nodesById.put(this.id, this);
+			if (dialogue.replies != null) {
+				for (Dialogue.Reply reply : dialogue.replies) {
+					if (Dialogue.Reply.GO_NEXT_TEXT.equals(reply.text)) {
+						replies.add(new EmptyReply(this, reply));
+					} else {
+						replies.add(new WriterReply(this, reply));
+					}
+				}
+			}
+		}
+		
 		public WriterDialogue(String id_prefix) {
 			text = "";
 			this.id_prefix = id_prefix;
@@ -89,7 +121,7 @@ public class WriterModeData extends GameDataElement {
 		
 		@Override
 		public String getTitle() {
-			return "Dialogue "+id_prefix+index;
+			return "Dialogue "+getID();
 		}
 		
 		public String getID() {
@@ -146,22 +178,50 @@ public class WriterModeData extends GameDataElement {
 		public boolean isSpecial() {return false;}
 		
 
-		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited) {
+		public Dialogue toDialogue(Map<WriterDialogue, Dialogue> visited, List<Dialogue> created, List<Dialogue> modified) {
 			if (visited.get(this) != null) return visited.get(this);
+			//Creating a new Dialogue
 			if (dialogue == null) {
 				dialogue = new Dialogue();
 				dialogue.id = getID();
 				dialogue.state = GameDataElement.State.parsed;
+				created.add(dialogue);
 			} else {
-				if (hasChanged()) dialogue.state = GameDataElement.State.modified;
+				if (hasChanged()) {
+					if (dialogue.writable) {
+						//Modifying a created or altered Dialogue
+						dialogue.state = GameDataElement.State.modified;
+						modified.add(dialogue);
+					} else {
+						//Altering a game source Dialogue
+						Dialogue clone = (Dialogue) dialogue.clone();
+						if (this.replies != null) {
+							for (WriterReply wReply : this.replies) {
+								if (wReply.reply != null) {
+									wReply.reply = clone.replies.get(dialogue.replies.indexOf(wReply.reply));
+								}
+							}
+						}
+						dialogue = clone;
+						dialogue.state = GameDataElement.State.parsed;
+						created.add(dialogue);
+					}
+				}
 			}
 			visited.put(this, dialogue);
 			dialogue.message = this.text;
 			if (this.replies != null && !this.replies.isEmpty()) {
-				dialogue.replies = new ArrayList<Dialogue.Reply>();
-				for (WriterReply wReply : this.replies) {
-					dialogue.replies.add(wReply.toReply(visited));
+				if (dialogue.replies == null) {
+					dialogue.replies = new ArrayList<Dialogue.Reply>();
+				} else {
+					dialogue.replies.clear();
 				}
+				for (WriterReply wReply : this.replies) {
+					//if (wReply.reply != null && dialogue.replies)
+					dialogue.replies.add(wReply.toReply(visited, created, modified));
+				}
+			} else {
+				dialogue.replies = null;
 			}
 			return dialogue;
 		}
@@ -194,19 +254,19 @@ public class WriterModeData extends GameDataElement {
 		public SpecialDialogue duplicate() {return new SelectorDialogue();}
 	}
 	public class ShopDialogue extends SpecialDialogue {
-		public static final String id = "S";
+		public static final String id = Dialogue.Reply.SHOP_PHRASE_ID;
 		public SpecialDialogue duplicate() {return new ShopDialogue();}
 	}
 	public class FightDialogue extends SpecialDialogue {
-		public static final String id = "F";
+		public static final String id = Dialogue.Reply.FIGHT_PHRASE_ID;
 		public SpecialDialogue duplicate() {return new FightDialogue();}
 	}
 	public class EndDialogue extends SpecialDialogue {
-		public static final String id = "X";
+		public static final String id = Dialogue.Reply.EXIT_PHRASE_ID;
 		public SpecialDialogue duplicate() {return new EndDialogue();}
 	}
 	public class RemoveNPCDialogue extends SpecialDialogue {
-		public static final String id = "R";
+		public static final String id = Dialogue.Reply.REMOVE_PHRASE_ID;
 		public SpecialDialogue duplicate() {return new RemoveNPCDialogue();}
 	}
 	
@@ -224,6 +284,18 @@ public class WriterModeData extends GameDataElement {
 			parent.replies.add(this);
 		}
 
+		public WriterReply(WriterDialogue parent, Dialogue.Reply reply) {
+			this.parent = parent;
+			this.reply = reply;
+			this.text = reply.text;
+			this.next_dialogue_id = reply.next_phrase_id;
+			if (nodesById.get(this.next_dialogue_id) != null) {
+				this.next_dialogue = nodesById.get(this.next_dialogue_id);
+			} else if (reply.next_phrase != null ){
+				this.next_dialogue = new WriterDialogue(reply.next_phrase);
+			}
+		}
+		
 		@SuppressWarnings("rawtypes")
 		public WriterReply(WriterDialogue parent, Map json) {
 			this.parent = parent;
@@ -252,18 +324,18 @@ public class WriterModeData extends GameDataElement {
 
 		public boolean isSpecial() {return false;}
 		
-		public Dialogue.Reply toReply(Map<WriterDialogue, Dialogue> visited) {
+		public Dialogue.Reply toReply(Map<WriterDialogue, Dialogue> visited, List<Dialogue> created, List<Dialogue> modified) {
 			if (reply == null) {
 				reply = new Dialogue.Reply();
 			}
 			reply.text = this.text;
 			if (this.next_dialogue != null) {
-				this.next_dialogue.toDialogue(visited);
+				this.next_dialogue.toDialogue(visited, created, modified);
 				reply.next_phrase_id = this.next_dialogue.getID();
 			} else if (this.next_dialogue_id != null) {
 				reply.next_phrase_id = this.next_dialogue_id;
 			} else {
-				reply.next_phrase_id = "X";
+				reply.next_phrase_id = Dialogue.Reply.EXIT_PHRASE_ID;
 			}
 			return reply;
 		}
@@ -289,6 +361,10 @@ public class WriterModeData extends GameDataElement {
 
 		public boolean isSpecial() {return true;}
 		
+		public SpecialReply(WriterDialogue parent, Dialogue.Reply reply) {
+			super(parent, reply);
+		}
+		
 		public SpecialReply(WriterDialogue parent) {
 			super(parent);
 		}
@@ -298,15 +374,20 @@ public class WriterModeData extends GameDataElement {
 		}
 	}
 	public class EmptyReply extends SpecialReply {
+		
+		public EmptyReply(WriterDialogue parent, Dialogue.Reply reply) {
+			super(parent, reply);
+			text = Dialogue.Reply.GO_NEXT_TEXT;
+		}
 
 		public EmptyReply(WriterDialogue parent) {
 			super(parent);
-			text="N";
+			text = Dialogue.Reply.GO_NEXT_TEXT;
 		}
 		
 		public EmptyReply(WriterDialogue parent, Map json) {
 			super(parent, json);
-			text="N";
+			text = Dialogue.Reply.GO_NEXT_TEXT;
 		}
 	}
 	
@@ -471,6 +552,35 @@ public class WriterModeData extends GameDataElement {
 							reply.next_dialogue = nodesById.get(reply.next_dialogue_id);
 						}
 					}
+					//TODO Seriously, this is failure-prone by design. Can't do much better though...
+					List<Dialogue.Reply> linked = new ArrayList<Dialogue.Reply>(dialogue.dialogue.replies.size());
+					if (dialogue.dialogue != null && dialogue.dialogue.replies != null) {
+						//Try to hook to existing replies... not as easy when there's no ID.
+						Dialogue.Reply best = null;
+						int score, maxScore = 0;
+						for (Dialogue.Reply dReply : dialogue.dialogue.replies) {
+							//Never link twice to the same...
+							if (linked.contains(dReply)) continue;
+							score = 0;
+							//Arbitrary values... hopefully this gives good results.
+							//Same target gives good hope of preserving at least the structure.
+							if (dReply.next_phrase_id != null && dReply.next_phrase_id.equals(reply.next_dialogue_id)) score +=50;
+							//Same text is almost as good as an ID, but there may be duplicates due to requirements system...
+							if (dReply.text != null && dReply.text.equals(reply.text)) score +=40;
+							//Same slot in the list. That's not so bad if all else fails, and could help sort duplicates with same text.
+							if (dialogue.dialogue.replies.indexOf(dReply) == dialogue.replies.indexOf(reply)) score +=20;
+							//Both have null text. It's not much, but it's something....
+							if (dReply.text == null && reply.text == null) score += 10;
+							if (score > maxScore) {
+								maxScore = score;
+								best = dReply;
+							}							
+						}
+						if (maxScore > 0) {
+							reply.reply = best;
+							linked.add(best);
+						}
+					}
 				}
 			}
 			for (String rootId : rootsId) {
@@ -504,10 +614,15 @@ public class WriterModeData extends GameDataElement {
 		return null;
 	}
 
-	public Collection<Dialogue> toDialogue(){
+	public List<Dialogue> toDialogue(){
 		Map<WriterModeData.WriterDialogue, Dialogue> visited = new LinkedHashMap<WriterModeData.WriterDialogue, Dialogue>(); 
-		begin.toDialogue(visited);
-		return visited.values();
+		List<Dialogue> created = new ArrayList<Dialogue>();
+		List<Dialogue> modified = new ArrayList<Dialogue>();
+		begin.toDialogue(visited, created, modified);
+		for (Dialogue modifiedDialogue : modified) {
+			modifiedDialogue.childrenChanged(new ArrayList<ProjectTreeNode>());
+		}
+		return created;
 	}
 	
 }

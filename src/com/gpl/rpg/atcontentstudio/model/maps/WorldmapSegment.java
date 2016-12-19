@@ -3,8 +3,8 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 import java.awt.Image;
 import java.awt.Point;
 import java.io.ByteArrayOutputStream;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 

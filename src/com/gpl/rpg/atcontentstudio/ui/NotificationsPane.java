@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +24,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.NotificationListener;
 
 
+@SuppressWarnings("rawtypes")
 public class NotificationsPane extends JList {
 
 	private static final long serialVersionUID = -1100364214372392608L;
@@ -47,6 +48,7 @@ public class NotificationsPane extends JList {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public NotificationsPane() {
 		super();
 		MyListModel model = new MyListModel();

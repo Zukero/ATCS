@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -343,9 +342,22 @@ public class WorkspaceActions {
 			WriterModeData wData = (WriterModeData)selectedNode;
 			Collection<Dialogue> exported = wData.toDialogue();
 			selectedNode.getProject().createElements(new ArrayList<JSONElement>(exported));
+			wData.begin.dialogue.save();
+			wData.save();
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode != null && selectedNode instanceof WriterModeData);
+		}
+	};
+	
+	public ATCSAction createWriter = new ATCSAction("Generate dialogue sketch", "Generates a dialogue sketch from this dialogue and its tree.") {
+		public void actionPerformed(ActionEvent e) {
+			if (selectedNode == null || selectedNode.getProject() == null || !(selectedNode instanceof Dialogue)) return;
+			new WriterSketchCreationWizard(selectedNode.getProject(), (Dialogue)selectedNode).setVisible(true);
+			
+		};
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(selectedNode != null && selectedNode instanceof Dialogue);
 		}
 	};
 	
@@ -368,6 +380,7 @@ public class WorkspaceActions {
 		actions.add(exitATCS);
 		actions.add(testWriter);
 		actions.add(testCommitWriter);
+		actions.add(createWriter);
 		selectionChanged(null, null);
 	}
 	

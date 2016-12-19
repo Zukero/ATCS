@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
@@ -60,8 +59,10 @@ public class NPCEditor extends JSONElementEditor {
 	private JSpinner experienceField;
 	private MyComboBox dialogueBox;
 	private MyComboBox droplistBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox monsterClassBox;
 	private IntegerBasedCheckBox uniqueBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox moveTypeBox;
 	
 	private CollapsiblePanel combatTraitPane;
@@ -85,6 +86,7 @@ public class NPCEditor extends JSONElementEditor {
 	private JSpinner hitEffectAPMax;
 	
 	private SourceTimedConditionsListModel hitSourceConditionsListModel;
+	@SuppressWarnings("rawtypes")
 	private JList hitSourceConditionsList;
 	private MyComboBox sourceConditionBox;
 	private JSpinner sourceConditionMagnitude;
@@ -92,6 +94,7 @@ public class NPCEditor extends JSONElementEditor {
 	private JSpinner sourceConditionChance;
 	
 	private TargetTimedConditionsListModel hitTargetConditionsListModel;
+	@SuppressWarnings("rawtypes")
 	private JList hitTargetConditionsList;
 	private MyComboBox targetConditionBox;
 	private JSpinner targetConditionMagnitude;
@@ -157,6 +160,7 @@ public class NPCEditor extends JSONElementEditor {
 		}
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void insertFormViewDataField(JPanel pane) {
 		final NPC npc = (NPC) target;
@@ -344,7 +348,7 @@ public class NPCEditor extends JSONElementEditor {
 		pane.repaint();
 	}
 	
-	public static class TargetTimedConditionsListModel implements ListModel {
+	public static class TargetTimedConditionsListModel implements ListModel<NPC.TimedConditionEffect> {
 		
 		NPC.HitEffect source;
 		
@@ -359,7 +363,7 @@ public class NPCEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public NPC.TimedConditionEffect getElementAt(int index) {
 			if (source.conditions_target == null) return null;
 			return source.conditions_target.get(index);
 		}
@@ -406,7 +410,7 @@ public class NPCEditor extends JSONElementEditor {
 		}
 	}
 	
-	public static class SourceTimedConditionsListModel implements ListModel {
+	public static class SourceTimedConditionsListModel implements ListModel<NPC.TimedConditionEffect> {
 		
 		NPC.HitEffect source;
 		
@@ -421,7 +425,7 @@ public class NPCEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public NPC.TimedConditionEffect getElementAt(int index) {
 			if (source.conditions_source == null) return null;
 			return source.conditions_source.get(index);
 		}
@@ -472,7 +476,7 @@ public class NPCEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);

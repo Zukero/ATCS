@@ -57,6 +57,7 @@ public class DroplistEditor extends JSONElementEditor {
 		addEditorTab(json_view_id, getJSONView());
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void insertFormViewDataField(JPanel pane) {
 		
@@ -146,7 +147,7 @@ public class DroplistEditor extends JSONElementEditor {
 		pane.repaint();
 	}
 	
-	public class DroppedItemsListModel implements ListModel {
+	public class DroppedItemsListModel implements ListModel<Droplist.DroppedItem> {
 		
 		Droplist source;
 		
@@ -161,7 +162,7 @@ public class DroplistEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public Droplist.DroppedItem getElementAt(int index) {
 			if (source.dropped_items == null) return null;
 			return source.dropped_items.get(index);
 		}
@@ -212,7 +213,7 @@ public class DroplistEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);

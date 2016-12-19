@@ -18,10 +18,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImageOp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -114,8 +112,10 @@ public class TMXMapEditor extends Editor {
 	private RSyntaxTextArea editorPane;
 	
 	private IntegerBasedCheckBox outsideBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox colorFilterBox;
 	private LayerListModel layerListModel;
+	@SuppressWarnings("rawtypes")
 	private JList layerList;
 	private tiled.core.MapLayer selectedLayer;
 	private	JButton addTileLayer;
@@ -124,9 +124,10 @@ public class TMXMapEditor extends Editor {
 	
 	private JPanel layerDetailsPane;
 	private BooleanBasedCheckBox layerVisibleBox;
-	private BooleanBasedCheckBox activeLayerBox;
+	//private BooleanBasedCheckBox activeLayerBox;
 	private JTextField layerNameField;
 	private MapObjectsListModel groupObjectsListModel;
+	@SuppressWarnings("rawtypes")
 	private JList groupObjectsList;
 	private MapObject selectedMapObject;
 	private	JButton addMapchange;
@@ -140,32 +141,43 @@ public class TMXMapEditor extends Editor {
 	private	JButton deleteObject;
 	
 	private JPanel mapObjectSettingsPane;
+	@SuppressWarnings("rawtypes")
 	private JComboBox droplistBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox dialogueBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox mapBox;
 	private JTextField areaField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox targetAreaCombo;
+	@SuppressWarnings("rawtypes")
 	private JComboBox evaluateTriggerBox;
 	private JSpinner quantityField;
 	private JCheckBox activeForNewGame;
 	private JTextField spawngroupField;
+	@SuppressWarnings("rawtypes")
 	private JList npcList;
 	private SpawnGroupNpcListModel npcListModel;
 
+	@SuppressWarnings("rawtypes")
 	private JComboBox requirementTypeCombo;
 	private JPanel requirementParamsPane;
+	@SuppressWarnings("rawtypes")
 	private JComboBox requirementObj;
 	private JTextField requirementObjId;
 	private JSpinner requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
+	@SuppressWarnings("rawtypes")
 	private JList replacementsList;
 	private ReplacementsListModel replacementsListModel;
 	private ReplaceArea.Replacement selectedReplacement;
 	private JButton addReplacement;
 	private JButton deleteReplacement;
 	private JPanel replacementEditPane;
+	@SuppressWarnings("rawtypes")
 	private JComboBox sourceLayer;
+	@SuppressWarnings("rawtypes")
 	private JComboBox targetLayer;
 	
 	private TMXViewer tmxViewer;
@@ -195,6 +207,7 @@ public class TMXMapEditor extends Editor {
 	
 
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public JPanel getTmxEditorPane() {
 		final TMXMap map = (TMXMap) target;
 		final FieldUpdateListener listener = new MapFieldUpdater();
@@ -287,6 +300,7 @@ public class TMXMapEditor extends Editor {
 		return pane;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void updateLayerDetailsPane(JPanel pane, tiled.core.MapLayer selected, final FieldUpdateListener listener) {
 		final TMXMap map = (TMXMap)target;
 		pane.removeAll();
@@ -444,6 +458,7 @@ public class TMXMapEditor extends Editor {
 		pane.repaint();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateMapObjectSettingsPane(JPanel pane, final MapObject selected, final FieldUpdateListener listener) {
 		pane.removeAll();
 		boolean needVary = true;
@@ -908,6 +923,7 @@ public class TMXMapEditor extends Editor {
 		}
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JList addTMXMapSpritesheetsList(JPanel pane, TMXMap tmxMap) {
 		final JList list = new JList(new TMXMapSpritesheetsListModel(tmxMap));
 		list.addMouseListener(new MouseAdapter() {
@@ -935,6 +951,7 @@ public class TMXMapEditor extends Editor {
 		return list;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public class LayerListModel implements ListModel {
 
 		public TMXMap map;
@@ -995,7 +1012,7 @@ public class TMXMapEditor extends Editor {
 	public class LayerListRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = -6182599528961565957L;
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = (JLabel)c;
@@ -1011,7 +1028,7 @@ public class TMXMapEditor extends Editor {
 		}
 	}
 	
-	public class ReplacementsListModel implements ListModel {
+	public class ReplacementsListModel implements ListModel<ReplaceArea.Replacement> {
 		
 		public ReplaceArea area;
 		
@@ -1026,7 +1043,7 @@ public class TMXMapEditor extends Editor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public ReplaceArea.Replacement getElementAt(int index) {
 			if (index < 0 || index > getSize()) return null;
 			if (area.replacements == null) return null;
 			return area.replacements.get(index);
@@ -1077,7 +1094,7 @@ public class TMXMapEditor extends Editor {
 			this.area = area;
 		}
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = (JLabel)c;
@@ -1144,7 +1161,7 @@ public class TMXMapEditor extends Editor {
 		}
 	}
 	
-	public class MapObjectsListModel implements ListModel {
+	public class MapObjectsListModel implements ListModel<MapObject> {
 
 		public MapObjectGroup group;
 		
@@ -1158,7 +1175,7 @@ public class TMXMapEditor extends Editor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public MapObject getElementAt(int index) {
 			return group.mapObjects.get(index);
 		}
 		
@@ -1201,7 +1218,7 @@ public class TMXMapEditor extends Editor {
 	public class GroupObjectsRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = -6182599528961565957L;
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setText(((MapObject)value).name);
@@ -1211,7 +1228,7 @@ public class TMXMapEditor extends Editor {
 		}
 	}
 	
-	public class SpawnGroupNpcListModel implements ListModel {
+	public class SpawnGroupNpcListModel implements ListModel<NPC> {
 		
 		public SpawnArea area;
 		
@@ -1225,7 +1242,7 @@ public class TMXMapEditor extends Editor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public NPC getElementAt(int index) {
 			return area.spawnGroup.get(index);
 		}
 
@@ -1242,42 +1259,6 @@ public class TMXMapEditor extends Editor {
 		}
 	
 	}
-	
-	private static final BufferedImageOp colorFilterBlack20 = null;
-	private static final BufferedImageOp colorFilterBlack40 = null;
-	private static final BufferedImageOp colorFilterBlack60 = null;
-	private static final BufferedImageOp colorFilterBlack80 = null;
-	private static final BufferedImageOp colorFilterInvert = null;
-	private static final BufferedImageOp colorFilterBW = null;
-
-	
-//	private static final BufferedImageOp colorFilterBlack20 = createGrayScaleColorFilter(0.8f);
-//	private static final BufferedImageOp colorFilterBlack40 = createGrayScaleColorFilter(0.6f);
-//	private static final BufferedImageOp colorFilterBlack60 = createGrayScaleColorFilter(0.4f);
-//	private static final BufferedImageOp colorFilterBlack80 = createGrayScaleColorFilter(0.2f);
-//	private static final BufferedImageOp colorFilterInvert = createInvertColorFilter();
-//	private static final BufferedImageOp colorFilterBW = createBWColorFilter();
-//
-//    private static BufferedImageOp createGrayScaleColorFilter(float f) {
-//		byte[] gs = new byte[256];
-//		for (int i=0; i < 256; i++) {
-//			gs[i] = (byte)( i * f);
-//		}
-//    	return new LookupOp(new ByteLookupTable(0, gs), null);
-//	}
-//    
-//    private static BufferedImageOp createInvertColorFilter() {
-//    	byte[] invert = new byte[256];
-//		for (int i=0; i < 256; i++) {
-//			invert[i] =  (byte) (255 - i);
-//		}
-//    	return new LookupOp(new ByteLookupTable(0, invert), null);
-//	}
-//    
-//    
-//    private static BufferedImageOp createBWColorFilter() {
-//		return new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-//	}
 	
 	
 	public class TMXViewer extends JPanel implements Scrollable {
@@ -1525,7 +1506,7 @@ public class TMXMapEditor extends Editor {
 		
 	}
 	
-	public static class TMXMapSpritesheetsListModel implements ListModel {
+	public static class TMXMapSpritesheetsListModel implements ListModel<Spritesheet> {
 		
 		TMXMap map;
 		
@@ -1539,7 +1520,7 @@ public class TMXMapEditor extends Editor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public Spritesheet getElementAt(int index) {
 			for (Spritesheet sheet : map.usedSpritesheets) {
 				if (index == 0) return sheet;
 				index --;
@@ -1579,7 +1560,7 @@ public class TMXMapEditor extends Editor {
 		}
 		
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value == null) {
 				label.setText("none");
@@ -1724,6 +1705,7 @@ public class TMXMapEditor extends Editor {
 	
 	
 	public class MapFieldUpdater implements FieldUpdateListener {
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void valueChanged(JComponent source, Object value) {
 			TMXMap map = (TMXMap) target;

@@ -17,11 +17,14 @@ import javax.swing.event.DocumentListener;
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class WriterSketchCreationWizard extends JDialog {
 
+	private static final long serialVersionUID = 175788847797352548L;
+	
 	private WriterModeData creation = null;
 	final JLabel message;
 	final JTextField idField;
@@ -29,6 +32,10 @@ public class WriterSketchCreationWizard extends JDialog {
 	final Project proj;
 	
 	public WriterSketchCreationWizard(Project proj) {
+		this(proj, null);
+	}
+	
+	public WriterSketchCreationWizard(Project proj, final Dialogue dialogue) {
 		super(ATContentStudio.frame);
 		this.proj = proj;
 		
@@ -62,10 +69,14 @@ public class WriterSketchCreationWizard extends JDialog {
 		ok.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				creation = new WriterModeData(idField.getText());
 				WriterSketchCreationWizard.this.setVisible(false);
 				WriterSketchCreationWizard.this.dispose();
-				creation.state = State.created;
+				if (dialogue == null) {
+					creation = new WriterModeData(idField.getText());
+					creation.state = State.created;
+				} else {
+					creation = new WriterModeData(idField.getText(), dialogue);
+				}
 				WriterSketchCreationWizard.this.proj.createWriterSketch(creation);
 //				notifyCreated();
 				ATContentStudio.frame.selectInTree(creation);

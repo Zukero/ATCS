@@ -55,7 +55,8 @@ public class FilteredSpanningTree extends Tree {
      * unweighted breadth first traversal to build the spanning tree.
      * @param root the root node of the spanning tree
      */
-    public void buildSpanningTree(Node root) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public void buildSpanningTree(Node root) {
         // re-use a previously allocated tree if possible
         super.clearEdges();
         super.setRoot(root);

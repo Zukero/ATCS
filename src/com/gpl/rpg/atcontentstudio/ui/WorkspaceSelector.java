@@ -36,7 +36,7 @@ public class WorkspaceSelector extends JFrame {
 		final List<String> wsPaths = new ArrayList<String>();
 		
 		//Active widgets declaration
-		final JComboBox combo = new JComboBox();
+		final JComboBox<String> combo = new JComboBox<String>();
 		final JButton browse = new JButton("Browse...");
 		final JButton cancel = new JButton("Cancel");
 		final JButton ok = new JButton("Ok");

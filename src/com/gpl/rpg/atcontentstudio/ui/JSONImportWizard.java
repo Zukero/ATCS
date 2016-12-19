@@ -75,6 +75,7 @@ public class JSONImportWizard extends JDialog {
 	
 	JPanel pane;
 	JLabel message;
+	@SuppressWarnings("rawtypes")
 	JComboBox dataTypeCombo;
 	JRadioButton importFromFile;
 	JRadioButton importPasted;
@@ -83,11 +84,13 @@ public class JSONImportWizard extends JDialog {
 	JButton browse;
 	RSyntaxTextArea jsonPasteArea;
 	JScrollPane scroller;
+	@SuppressWarnings("rawtypes")
 	JList createdPreview;
 	JPanel buttonPane;
 	JButton ok, cancel;
 	ActionListener okListener, cancelListener;
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JSONImportWizard(Project proj) {
 
 		super(ATContentStudio.frame);
@@ -390,6 +393,7 @@ public class JSONImportWizard extends JDialog {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void showImportPreviewScreen(final List<JSONElement> created) {
 		pane.removeAll();
 		message.setText("The following data has been found. Click \"Ok\" to confirm.");
@@ -429,6 +433,7 @@ public class JSONImportWizard extends JDialog {
 		pane.repaint();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void showErrorScreen(List<String> errors) {
 		pane.removeAll();
 		message.setText("Failed to import. The following error(s) have been encountered:");
@@ -461,6 +466,7 @@ public class JSONImportWizard extends JDialog {
 		pane.repaint();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void showWarningScreen(List<String> warnings, final List<JSONElement> created) {
 		pane.removeAll();
 		message.setText("The following warnings(s) were raised while importing:");
@@ -508,7 +514,7 @@ public class JSONImportWizard extends JDialog {
 		}
 		
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value == null) {
 				label.setText("none");
@@ -552,7 +558,7 @@ public class JSONImportWizard extends JDialog {
 	public static class ErrorRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = -4265342800284721660L;
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setIcon(NotificationsPane.icons.get(Notification.Type.ERROR));
@@ -565,7 +571,7 @@ public class JSONImportWizard extends JDialog {
 	public static class WarningRenderer extends DefaultListCellRenderer {
 		private static final long serialVersionUID = -3836045237946111606L;
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setIcon(NotificationsPane.icons.get(Notification.Type.WARN));
@@ -574,6 +580,7 @@ public class JSONImportWizard extends JDialog {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static class GDEListModel implements ListModel {
 		
 		List<? extends Object> source;
@@ -617,6 +624,7 @@ public class JSONImportWizard extends JDialog {
 	}
 
 
+	@SuppressWarnings("rawtypes")
 	public static class DataTypeComboModel implements ComboBoxModel {
 
 		DataType selected = DataType.none;
@@ -658,7 +666,7 @@ public class JSONImportWizard extends JDialog {
 		private static final long serialVersionUID = 5621373849299980998L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setText(dataTypeDesc((DataType) value));

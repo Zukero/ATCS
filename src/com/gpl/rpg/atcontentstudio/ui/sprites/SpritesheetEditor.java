@@ -8,9 +8,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +56,7 @@ public class SpritesheetEditor extends Editor {
 	private JSpinner widthField;
 	private JSpinner heightField;
 	private JCheckBox animatedBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox categoryBox;
 	private JPanel spriteViewPane;
 	
@@ -160,6 +161,7 @@ public class SpritesheetEditor extends Editor {
 	}
 	
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static JList addBacklinksList(JPanel pane, Spritesheet sheet) {
 		final JList list = new JList(new SpritesheetsBacklinksListModel(sheet));
 		list.addMouseListener(new MouseAdapter() {
@@ -317,7 +319,7 @@ public class SpritesheetEditor extends Editor {
 	}
 	
 	
-	public static class SpritesheetsBacklinksListModel implements ListModel {
+	public static class SpritesheetsBacklinksListModel implements ListModel<ProjectTreeNode> {
 		
 		Spritesheet sheet;
 		
@@ -331,7 +333,7 @@ public class SpritesheetEditor extends Editor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public ProjectTreeNode getElementAt(int index) {
 			for (ProjectTreeNode node : sheet.getBacklinks()) {
 				if (index == 0) return node;
 				index --;
@@ -371,7 +373,7 @@ public class SpritesheetEditor extends Editor {
 		}
 		
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (value == null) {
 				label.setText("none");

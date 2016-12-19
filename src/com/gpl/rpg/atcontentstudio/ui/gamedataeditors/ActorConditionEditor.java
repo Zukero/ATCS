@@ -30,6 +30,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 	private JButton acIcon;
 	private JTextField idField;
 	private JTextField nameField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox categoryBox;
 	private IntegerBasedCheckBox positiveBox;
 	private IntegerBasedCheckBox stackingBox;

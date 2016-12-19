@@ -245,6 +245,10 @@ public class ProjectsTree extends JPanel {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.testCommitWriter));
 		}
+		if (actions.createWriter.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.createWriter));
+		}
 		if (addNextSeparator) {
 			popupMenu.add(new JSeparator());
 			addNextSeparator = false;

@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
@@ -60,6 +59,7 @@ public class ItemEditor extends JSONElementEditor {
 	private JTextField idField;
 	private JTextField nameField;
 	private JTextField descriptionField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox typeBox;
 	private IntegerBasedCheckBox manualPriceBox;
 	private JSpinner baseCostField;
@@ -82,6 +82,7 @@ public class ItemEditor extends JSONElementEditor {
 	private JSpinner equipIncReequipCost;
 	private JSpinner equipIncAttackCost;
 	private ConditionsListModel equipConditionsModel;
+	@SuppressWarnings("rawtypes")
 	private JList equipConditionsList;
 	private MyComboBox equipConditionBox;
 	private JSpinner equipConditionMagnitude;
@@ -93,12 +94,14 @@ public class ItemEditor extends JSONElementEditor {
 	private JSpinner hitAPMin;
 	private JSpinner hitAPMax;
 	private SourceTimedConditionsListModel hitSourceConditionsModel;
+	@SuppressWarnings("rawtypes")
 	private JList hitSourceConditionsList;
 	private MyComboBox hitSourceConditionBox;
 	private JSpinner hitSourceConditionMagnitude;
 	private JSpinner hitSourceConditionDuration;
 	private JSpinner hitSourceConditionChance;
 	private TargetTimedConditionsListModel hitTargetConditionsModel;
+	@SuppressWarnings("rawtypes")
 	private JList hitTargetConditionsList;
 	private MyComboBox hitTargetConditionBox;
 	private JSpinner hitTargetConditionMagnitude;
@@ -112,6 +115,7 @@ public class ItemEditor extends JSONElementEditor {
 	private JSpinner killAPMin;
 	private JSpinner killAPMax;
 	private SourceTimedConditionsListModel killSourceConditionsModel;
+	@SuppressWarnings("rawtypes")
 	private JList killSourceConditionsList;
 	private MyComboBox killSourceConditionBox;
 	private JSpinner killSourceConditionMagnitude;
@@ -125,6 +129,7 @@ public class ItemEditor extends JSONElementEditor {
 		addEditorTab(json_view_id, getJSONView());
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void insertFormViewDataField(JPanel pane) {
 
@@ -524,7 +529,7 @@ public class ItemEditor extends JSONElementEditor {
 		pane.repaint();
 	}
 	
-	public static class SourceTimedConditionsListModel implements ListModel {
+	public static class SourceTimedConditionsListModel implements ListModel<Item.TimedConditionEffect> {
 		
 		Item.KillEffect source;
 		
@@ -539,7 +544,7 @@ public class ItemEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public Item.TimedConditionEffect getElementAt(int index) {
 			if (source.conditions_source == null) return null;
 			return source.conditions_source.get(index);
 		}
@@ -586,7 +591,7 @@ public class ItemEditor extends JSONElementEditor {
 		}
 	}
 	
-	public static class TargetTimedConditionsListModel implements ListModel {
+	public static class TargetTimedConditionsListModel implements ListModel<Item.TimedConditionEffect> {
 		
 		Item.HitEffect source;
 		
@@ -601,7 +606,7 @@ public class ItemEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public Item.TimedConditionEffect getElementAt(int index) {
 			if (source.conditions_target == null) return null;
 			return source.conditions_target.get(index);
 		}
@@ -652,7 +657,7 @@ public class ItemEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);
@@ -669,7 +674,7 @@ public class ItemEditor extends JSONElementEditor {
 		}
 	}
 	
-	public static class ConditionsListModel implements ListModel {
+	public static class ConditionsListModel implements ListModel<Item.ConditionEffect> {
 		
 		Item.EquipEffect source;
 		
@@ -684,7 +689,7 @@ public class ItemEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public Item.ConditionEffect getElementAt(int index) {
 			if (source.conditions == null) return null;
 			return source.conditions.get(index);
 		}
@@ -735,7 +740,7 @@ public class ItemEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);

@@ -11,7 +11,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -827,7 +826,7 @@ public class Project implements ProjectTreeNode, Serializable {
 	 * 
 	 * @param node. Before calling this method, make sure that no other node with the same class and id exist in either created or altered.
 	 */
-	public void createElements(List<JSONElement> nodes) {
+	public void createElements(List<? extends JSONElement> nodes) {
 		for (JSONElement node : nodes) {
 			//Already added.
 			if (node.getProject() != null) continue;
@@ -892,7 +891,6 @@ public class Project implements ProjectTreeNode, Serializable {
 	public void createWriterSketch(WriterModeData node) {
 		node.writable = true;
 		createdContent.writerModeDataSet.add(node);
-		node.state =  GameDataElement.State.created;
 		node.link();
 		fireElementAdded(node, getNodeIndex(node));
 	}

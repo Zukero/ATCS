@@ -5,9 +5,9 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,11 +35,15 @@ public class SaveItemsWizard extends JDialog {
 
 	List<SaveEvent> events;
 	
+	@SuppressWarnings("rawtypes")
 	JList movedToCreated;
+	@SuppressWarnings("rawtypes")
 	JList movedToAltered;
+	@SuppressWarnings("rawtypes")
 	JList willBeSaved;
 	
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SaveItemsWizard(List<SaveEvent> events, GameDataElement originalRequester) {
 		super(ATContentStudio.frame);
 		this.events = events;
@@ -170,7 +174,6 @@ public class SaveItemsWizard extends JDialog {
 			buttonPane.add(okButton, JideBoxLayout.FIX);
 			pane.add(buttonPane, JideBoxLayout.FIX);
 			okButton.addActionListener(new ActionListener() {
-				@SuppressWarnings("unchecked")
 				@Override
 				public void actionPerformed(ActionEvent e) {
 
@@ -251,7 +254,7 @@ public class SaveItemsWizard extends JDialog {
 		private static final long serialVersionUID = 5764079243906396333L;
 		
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = (JLabel) c;

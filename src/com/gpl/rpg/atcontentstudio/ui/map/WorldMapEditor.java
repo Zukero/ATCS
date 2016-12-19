@@ -10,7 +10,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -107,6 +106,7 @@ public class WorldMapEditor extends Editor {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private JPanel buildSegmentTab(final WorldmapSegment worldmap) {
 		JPanel pane = new JPanel();
 		pane.setLayout(new JideBoxLayout(pane,  JideBoxLayout.PAGE_AXIS));
@@ -151,7 +151,7 @@ public class WorldMapEditor extends Editor {
 			final GDEComboModel<TMXMap> mapComboModel = new GDEComboModel<TMXMap>(worldmap.getProject(), null){
 				private static final long serialVersionUID = 2638082961277241764L;
 				@Override
-				public Object getTypedElementAt(int index) {
+				public TMXMap getTypedElementAt(int index) {
 					return project.getMap(index);
 				}
 				@Override

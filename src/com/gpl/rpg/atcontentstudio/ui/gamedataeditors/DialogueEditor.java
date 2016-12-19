@@ -11,7 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
@@ -85,7 +84,9 @@ public class DialogueEditor extends JSONElementEditor {
 	private MyComboBox switchToNpcBox;
 	
 	private RewardsListModel rewardsListModel;
+	@SuppressWarnings("rawtypes")
 	private JList rewardsList;
+	@SuppressWarnings("rawtypes")
 	private JComboBox rewardTypeCombo;
 	private JPanel rewardsParamsPane;
 	private MyComboBox rewardMap;
@@ -94,15 +95,19 @@ public class DialogueEditor extends JSONElementEditor {
 	private JSpinner rewardValue;
 	
 	private RepliesListModel repliesListModel;
+	@SuppressWarnings("rawtypes")
 	private JList repliesList;
 	private JPanel repliesParamsPane;
+	@SuppressWarnings("rawtypes")
 	private JComboBox replyTypeCombo;
 	private MyComboBox replyNextPhrase;
 	private String replyTextCache = null;
 	private JTextField replyText;
 	
 	private ReplyRequirementsListModel requirementsListModel;
+	@SuppressWarnings("rawtypes")
 	private JList requirementsList;
+	@SuppressWarnings("rawtypes")
 	private JComboBox requirementTypeCombo;
 	private JPanel requirementParamsPane;
 	private MyComboBox requirementObj;
@@ -149,6 +154,7 @@ public class DialogueEditor extends JSONElementEditor {
 		return pane;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void insertFormViewDataField(final JPanel pane) {
 		
 		final Dialogue dialogue = (Dialogue) target;
@@ -414,6 +420,7 @@ public class DialogueEditor extends JSONElementEditor {
 		pane.repaint();
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void updateRepliesEditorPane(final JPanel pane, final Dialogue.Reply reply, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (replyNextPhrase != null) {
@@ -680,7 +687,7 @@ public class DialogueEditor extends JSONElementEditor {
 	}
 	
 	
-	public static class RewardsListModel implements ListModel {
+	public static class RewardsListModel implements ListModel<Dialogue.Reward> {
 		
 		Dialogue source;
 		
@@ -695,7 +702,7 @@ public class DialogueEditor extends JSONElementEditor {
 		}
 		
 		@Override
-		public Object getElementAt(int index) {
+		public Dialogue.Reward getElementAt(int index) {
 			if (source.rewards == null) return null;
 			return source.rewards.get(index);
 		}
@@ -746,7 +753,7 @@ public class DialogueEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);
@@ -819,7 +826,7 @@ public class DialogueEditor extends JSONElementEditor {
 	}
 	
 	
-	public static class RepliesListModel implements ListModel {
+	public static class RepliesListModel implements ListModel<Dialogue.Reply> {
 
 		Dialogue source;
 
@@ -835,7 +842,7 @@ public class DialogueEditor extends JSONElementEditor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public Dialogue.Reply getElementAt(int index) {
 			if (source.replies == null) return null;
 			return source.replies.get(index);
 		}
@@ -907,7 +914,7 @@ public class DialogueEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				JLabel label = ((JLabel)c);
@@ -953,7 +960,7 @@ public class DialogueEditor extends JSONElementEditor {
 		}
 	}
 
-	public static class ReplyRequirementsListModel implements ListModel {
+	public static class ReplyRequirementsListModel implements ListModel<Requirement> {
 
 		Dialogue.Reply reply;
 		
@@ -968,7 +975,7 @@ public class DialogueEditor extends JSONElementEditor {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public Requirement getElementAt(int index) {
 			if (reply.requirements == null) return null;
 			return reply.requirements.get(index);
 		}
@@ -1022,7 +1029,7 @@ public class DialogueEditor extends JSONElementEditor {
 		private static final long serialVersionUID = 7987880146189575234L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				decorateRequirementJLabel((JLabel)c, (Requirement)value);

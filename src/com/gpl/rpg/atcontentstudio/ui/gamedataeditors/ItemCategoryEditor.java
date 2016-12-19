@@ -35,10 +35,14 @@ public class ItemCategoryEditor extends JSONElementEditor {
 	private JButton icIcon;
 	private JTextField idField;
 	private JTextField nameField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox slotBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox typeBox;
+	@SuppressWarnings("rawtypes")
 	private JComboBox sizeBox;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void insertFormViewDataField(JPanel pane) {
 		final ItemCategory ic = ((ItemCategory)target);
@@ -62,7 +66,7 @@ public class ItemCategoryEditor extends JSONElementEditor {
 		private static final long serialVersionUID = -8359181274986492979L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setIcon(new ImageIcon(ItemCategory.getIcon((ItemCategory.InventorySlot) value)));

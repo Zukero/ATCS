@@ -53,6 +53,7 @@ public class StudioFrame extends JFrame {
 		final JSplitPane topDown = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		final JSplitPane leftRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		
+		@SuppressWarnings("rawtypes")
 		JList notifs = new NotificationsPane();
 		projectTree = new ProjectsTree();
 		editors = new EditorsArea();

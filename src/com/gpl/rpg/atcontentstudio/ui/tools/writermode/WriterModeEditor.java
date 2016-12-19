@@ -10,9 +10,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -58,7 +57,6 @@ import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
-import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.EmptyReply;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.SpecialDialogue;
@@ -105,8 +103,10 @@ public class WriterModeEditor extends Editor {
     	export.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Collection<Dialogue> exported = data.toDialogue();
-				data.getProject().createElements(new ArrayList<JSONElement>(exported));
+				List<Dialogue> created = data.toDialogue();
+				data.getProject().createElements(created);
+				//data.begin.dialogue.save();
+				data.save();
 			}
 		});
     	pane.add(save, JideBoxLayout.FIX);
@@ -371,6 +371,7 @@ public class WriterModeEditor extends Editor {
     		}
     				
     		public String wordWrap(String in, int length) {
+    			if (in == null) return null;
     			final String newline = "\n";
     			//:: Trim
     			while(in.length() > 0 && (in.charAt(0) == '\t' || in.charAt(0) == ' ')) in = in.substring(1);

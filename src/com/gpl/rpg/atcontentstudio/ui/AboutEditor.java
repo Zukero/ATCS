@@ -81,6 +81,7 @@ public class AboutEditor extends Editor {
 	
 	
 	public static final AboutEditor instance = new AboutEditor();
+	@SuppressWarnings("resource")
 	private AboutEditor() {
 		this.name="About "+ATContentStudio.APP_NAME;
 		this.icon = new ImageIcon(DefaultIcons.getMainIconIcon());

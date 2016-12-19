@@ -59,6 +59,7 @@ public class JSONCreationWizard extends JDialog {
 	
 	private JSONElement creation = null;
 	final JLabel message;
+	@SuppressWarnings("rawtypes")
 	final JComboBox dataTypeCombo;
 	final JTextField idField;
 	final JTextField nameField;
@@ -85,6 +86,7 @@ public class JSONCreationWizard extends JDialog {
 		dataTypeCombo.setEnabled(false);
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public JSONCreationWizard(final Project proj) {
 		super(ATContentStudio.frame);
 		this.proj = proj;
@@ -501,6 +503,7 @@ public class JSONCreationWizard extends JDialog {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public static class DataTypeComboModel implements ComboBoxModel {
 
 		DataType selected = DataType.none;
@@ -542,7 +545,7 @@ public class JSONCreationWizard extends JDialog {
 		private static final long serialVersionUID = 5621373849299980998L;
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if (c instanceof JLabel) {
 				((JLabel)c).setText(JSONCreationWizard.dataTypeDesc((DataType) value));

@@ -306,15 +306,18 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return bbcb;
 	}
 	
-	public static JComboBox addEnumValueBox(JPanel pane, String label, @SuppressWarnings("rawtypes") Enum[] values, @SuppressWarnings("rawtypes") Enum initialValue, boolean writable) {
+	@SuppressWarnings("rawtypes")
+	public static JComboBox addEnumValueBox(JPanel pane, String label, Enum[] values, Enum initialValue, boolean writable) {
 		return addEnumValueBox(pane, label, values, initialValue, writable, new FieldUpdateListener() {@Override public void valueChanged(JComponent source, Object value) {}});
 	}
 	
-	public static JComboBox addEnumValueBox(JPanel pane, String label, @SuppressWarnings("rawtypes") Enum[] values, @SuppressWarnings("rawtypes") Enum initialValue, boolean writable, final FieldUpdateListener listener) {
+	@SuppressWarnings("rawtypes")
+	public static JComboBox addEnumValueBox(JPanel pane, String label, Enum[] values, Enum initialValue, boolean writable, final FieldUpdateListener listener) {
 		JPanel comboPane = new JPanel();
 		comboPane.setLayout(new JideBoxLayout(comboPane, JideBoxLayout.LINE_AXIS, 6));
 		JLabel comboLabel = new JLabel(label);
 		comboPane.add(comboLabel, JideBoxLayout.FIX);
+		@SuppressWarnings("unchecked")
 		final JComboBox enumValuesCombo = new JComboBox(values);
 		enumValuesCombo.setEnabled(writable);
 		enumValuesCombo.setSelectedItem(initialValue);
@@ -347,7 +350,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<NPC> comboModel = new GDEComboModel<NPC>(proj, npc){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public NPC getTypedElementAt(int index) {
 				return project.getNPC(index);
 			}
 			@Override
@@ -362,7 +365,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<ActorCondition> comboModel = new GDEComboModel<ActorCondition>(proj, acond){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public ActorCondition getTypedElementAt(int index) {
 				return project.getActorCondition(index);
 			}
 			@Override
@@ -377,7 +380,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<Item> comboModel = new GDEComboModel<Item>(proj, item){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public Item getTypedElementAt(int index) {
 				return project.getItem(index);
 			}
 			@Override
@@ -392,7 +395,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<ItemCategory> comboModel = new GDEComboModel<ItemCategory>(proj, ic){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public ItemCategory getTypedElementAt(int index) {
 				return project.getItemCategory(index);
 			}
 			@Override
@@ -407,7 +410,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<Quest> comboModel = new GDEComboModel<Quest>(proj, quest){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public Quest getTypedElementAt(int index) {
 				return project.getQuest(index);
 			}
 			@Override
@@ -422,7 +425,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<Droplist> comboModel = new GDEComboModel<Droplist>(proj, droplist){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public Droplist getTypedElementAt(int index) {
 				return project.getDroplist(index);
 			}
 			@Override
@@ -437,7 +440,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<Dialogue> comboModel = new GDEComboModel<Dialogue>(proj, dialogue){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public Dialogue getTypedElementAt(int index) {
 				return project.getDialogue(index);
 			}
 			@Override
@@ -452,7 +455,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		final GDEComboModel<TMXMap> comboModel = new GDEComboModel<TMXMap>(proj, map){
 			private static final long serialVersionUID = 2638082961277241764L;
 			@Override
-			public Object getTypedElementAt(int index) {
+			public TMXMap getTypedElementAt(int index) {
 				return project.getMap(index);
 			}
 			@Override
@@ -463,6 +466,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return addGDEBox(pane, label, map, TMXMap.class, comboModel, writable, listener);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public MyComboBox addGDEBox(JPanel pane, String label, GameDataElement gde, final Class<? extends GameDataElement> dataClass, final GDEComboModel<? extends GameDataElement> comboModel, final boolean writable, final FieldUpdateListener listener) {
 		JPanel gdePane = new JPanel();
 		gdePane.setLayout(new JideBoxLayout(gdePane, JideBoxLayout.LINE_AXIS, 6));
@@ -529,6 +533,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return gdeBox;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JList addBacklinksList(JPanel pane, GameDataElement gde) {
 		final JList list = new JList(new GDEBacklinksListModel(gde));
 		list.addMouseListener(new MouseAdapter() {
@@ -561,7 +566,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return list;
 	}
 	
-	public static abstract class GDEComboModel<E extends GameDataElement> extends AbstractListModel implements ComboBoxModel {
+	public static abstract class GDEComboModel<E extends GameDataElement> extends AbstractListModel<E> implements ComboBoxModel<E> {
 
 		private static final long serialVersionUID = -5854574666510314715L;
 		
@@ -577,14 +582,14 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		public abstract int getSize();
 
 		@Override
-		public Object getElementAt(int index) {
+		public E getElementAt(int index) {
 			if (index == 0) {
 				return null;
 			}
 			return getTypedElementAt(index - 1);
 		}
 		
-		public abstract Object getTypedElementAt(int index);
+		public abstract E getTypedElementAt(int index);
 		
 		@SuppressWarnings("unchecked")
 		@Override
@@ -620,6 +625,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 			this.writable = writable;
 		}
 		
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
@@ -642,7 +648,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		
 	}
 	
-	public static class GDEBacklinksListModel implements ListModel {
+	public static class GDEBacklinksListModel implements ListModel<GameDataElement> {
 		
 		GameDataElement source;
 		
@@ -667,7 +673,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public GameDataElement getElementAt(int index) {
 			for (GameDataElement gde : source.getBacklinks()) {
 				if (index == 0) return gde;
 				index --;
@@ -694,6 +700,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		}
 	}
 	
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	public class MyComboBox extends JComboBox implements ProjectElementListener {
 		
 		private static final long serialVersionUID = -4184228604170642567L;
@@ -706,13 +713,11 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 			Editor.this.addElementListener(dataType, this);
 		}
 		
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void elementAdded(GameDataElement added, int index) {
 			((GDEComboModel)getModel()).itemAdded(added, index);
 		}
 
-		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void elementRemoved(GameDataElement removed, int index) {
 			((GDEComboModel)getModel()).itemRemoved(removed, index);
