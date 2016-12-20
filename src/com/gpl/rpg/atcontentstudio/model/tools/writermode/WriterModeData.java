@@ -78,6 +78,14 @@ public class WriterModeData extends GameDataElement {
 		
 	}
 	
+	public WriterDialogue createDialogue(Dialogue dialogue) {
+		if (dialogue.message == null) {
+			return new SelectorDialogue(dialogue);
+		} else {
+			return new WriterDialogue(dialogue);
+		}
+	}
+	
 	public class WriterDialogue extends WriterNode {
 		public String id;
 		public String id_prefix;
@@ -104,7 +112,7 @@ public class WriterModeData extends GameDataElement {
 			nodesById.put(this.id, this);
 			if (dialogue.replies != null) {
 				for (Dialogue.Reply reply : dialogue.replies) {
-					if (Dialogue.Reply.GO_NEXT_TEXT.equals(reply.text)) {
+					if (Dialogue.Reply.GO_NEXT_TEXT.equals(reply.text) || reply.text == null) {
 						replies.add(new EmptyReply(this, reply));
 					} else {
 						replies.add(new WriterReply(this, reply));
@@ -194,7 +202,9 @@ public class WriterModeData extends GameDataElement {
 						modified.add(dialogue);
 					} else {
 						//Altering a game source Dialogue
-						Dialogue clone = (Dialogue) dialogue.clone();
+						//Dialogue clone = (Dialogue) dialogue.clone();
+						dialogue.getProject().makeWritable(dialogue);
+						Dialogue clone = dialogue.getProject().getDialogue(dialogue.id);
 						if (this.replies != null) {
 							for (WriterReply wReply : this.replies) {
 								if (wReply.reply != null) {
@@ -247,11 +257,19 @@ public class WriterModeData extends GameDataElement {
 	
 	public abstract class SpecialDialogue extends WriterDialogue {
 		
+		public SpecialDialogue() {}
 		public boolean isSpecial() {return true;}
 		public abstract SpecialDialogue duplicate();
+		public SpecialDialogue(Dialogue dialogue) {
+			super(dialogue);
+		}
 	}
 	public class SelectorDialogue extends SpecialDialogue {
+		public SelectorDialogue() {}
 		public SpecialDialogue duplicate() {return new SelectorDialogue();}
+		public SelectorDialogue(Dialogue dialogue) {
+			super(dialogue);
+		}
 	}
 	public class ShopDialogue extends SpecialDialogue {
 		public static final String id = Dialogue.Reply.SHOP_PHRASE_ID;
@@ -369,7 +387,7 @@ public class WriterModeData extends GameDataElement {
 			super(parent);
 		}
 		
-		public SpecialReply(WriterDialogue parent, Map json) {
+		public SpecialReply(WriterDialogue parent, @SuppressWarnings("rawtypes") Map json) {
 			super(parent, json);
 		}
 	}
@@ -385,7 +403,7 @@ public class WriterModeData extends GameDataElement {
 			text = Dialogue.Reply.GO_NEXT_TEXT;
 		}
 		
-		public EmptyReply(WriterDialogue parent, Map json) {
+		public EmptyReply(WriterDialogue parent, @SuppressWarnings("rawtypes") Map json) {
 			super(parent, json);
 			text = Dialogue.Reply.GO_NEXT_TEXT;
 		}

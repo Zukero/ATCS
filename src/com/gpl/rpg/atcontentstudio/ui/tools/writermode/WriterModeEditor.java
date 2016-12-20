@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JInternalFrame;
@@ -74,12 +75,15 @@ public class WriterModeEditor extends Editor {
 	private JComponent overlay = null;
     private Display view;
     
-    private WriterModeData data;
+    final private WriterModeData data;
 	private WriterNode selected = null;
 	private WriterNode prevSelected = null;
     
     public WriterModeEditor(WriterModeData data) {
+    	this.target = data;
     	this.data = data;
+    	this.name = data.id;
+    	this.icon = new ImageIcon(DefaultIcons.getDialogueIcon());
     	selected = data.begin;
     	view = new WriterGraphView();
     	view.setLocation(0, 0);
@@ -367,6 +371,7 @@ public class WriterModeEditor extends Editor {
     		
     		@Override
     		protected String getText(VisualItem item) {
+    			if (!item.getBoolean(IS_REPLY) && super.getText(item) == null) return "[Selector]";
     			return wordWrap(super.getText(item), 40);
     		}
     				

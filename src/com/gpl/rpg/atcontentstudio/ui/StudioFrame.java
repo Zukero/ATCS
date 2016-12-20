@@ -195,6 +195,11 @@ public class StudioFrame extends JFrame {
 		editors.openEditor(node);
 	}
 	
+	public void openEditor(WriterModeData node) {
+		node.link();
+		editors.openEditor(node);
+	}
+	
 
 	public void openEditor(GameDataElement node) {
 		if (node instanceof JSONElement) {
@@ -203,6 +208,8 @@ public class StudioFrame extends JFrame {
 			openEditor((Spritesheet) node);
 		} else if (node instanceof TMXMap) {
 			openEditor((TMXMap) node);
+		} else if (node instanceof WriterModeData) {
+			openEditor((WriterModeData) node);
 		}
 	}
 	
@@ -211,10 +218,6 @@ public class StudioFrame extends JFrame {
 	}
 
 	public void openEditor(WorldmapSegment node) {
-		editors.openEditor(node);
-	}
-	
-	public void openEditor(WriterModeData node) {
 		editors.openEditor(node);
 	}
 	

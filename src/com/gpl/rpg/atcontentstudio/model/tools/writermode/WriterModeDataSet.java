@@ -41,7 +41,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	public GameSource parent;
 	public File writerFile;
 	
-	List<WriterModeData> writerModeDataList = new ArrayList<WriterModeData>();
+	public List<WriterModeData> writerModeDataList = new ArrayList<WriterModeData>();
 	
 	public WriterModeDataSet(GameSource gameSource) {
 		this.parent = gameSource;
@@ -79,6 +79,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 		return false;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration children() {
 		return Collections.enumeration(writerModeDataList);
@@ -201,6 +202,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 		return events;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public void parse() {
 		if (!writerFile.exists()) return;
 		JSONParser parser = new JSONParser();
@@ -210,7 +212,9 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 			List writerDataListJson = (List) parser.parse(reader);
 			for (Object obj : writerDataListJson) {
 				Map jsonObj = (Map)obj;
-				writerModeDataList.add(new WriterModeData(this, jsonObj));
+				WriterModeData data = new WriterModeData(this, jsonObj);
+				data.writable = true;
+				writerModeDataList.add(data);
 			}
 		} catch (FileNotFoundException e) {
 			Notification.addError("Error while parsing JSON file "+writerFile.getAbsolutePath()+": "+e.getMessage());
@@ -252,6 +256,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 		}
 		if (higherEmptyParent == this && !this.isEmpty()) higherEmptyParent = null;
 		writerModeDataList.add(node);
+		node.writable = true;
 		if (node.jsonFile == null) node.jsonFile = this.writerFile;
 		node.parent = this;
 		if (higherEmptyParent != null) higherEmptyParent.notifyCreated();

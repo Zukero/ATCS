@@ -6,7 +6,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +34,7 @@ import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
+import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeDataSet;
 import com.gpl.rpg.atcontentstudio.ui.tools.BeanShellView;
 import com.gpl.rpg.atcontentstudio.ui.tools.ItemsTableView;
 import com.gpl.rpg.atcontentstudio.ui.tools.NPCsTableView;
@@ -131,6 +131,9 @@ public class WorkspaceActions {
 					} else if (element instanceof TMXMap) {
 						TMXMapSet parent = (TMXMapSet) element.getParent();
 						parent.tmxMaps.remove(element);
+					} else if (element instanceof WriterModeData) {
+						WriterModeDataSet parent = (WriterModeDataSet) element.getParent();
+						parent.writerModeDataList.remove(element);
 					}
 				}
 				new Thread() {
@@ -169,6 +172,12 @@ public class WorkspaceActions {
 							} else {
 								new SaveItemsWizard(events, null).setVisible(true);
 							}
+						} else if (node instanceof TMXMap) {
+							TMXMapSet parent = (TMXMapSet) node.getParent();
+							parent.tmxMaps.remove(node);
+						} else if (node instanceof WriterModeData) {
+							WriterModeDataSet parent = (WriterModeDataSet) node.getParent();
+							parent.writerModeDataList.remove(node);
 						}
 					}
 				}.start();
@@ -315,7 +324,7 @@ public class WorkspaceActions {
 		};
 	};
 	
-	public ATCSAction testWriter = new ATCSAction("Create dialogue sketch", "Test the Writer Mode"){
+	public ATCSAction testWriter = new ATCSAction("Create dialogue sketch", "Create a dialogue sketch for fast dialogue edition"){
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
 			new WriterSketchCreationWizard(selectedNode.getProject()).setVisible(true);
@@ -336,7 +345,7 @@ public class WorkspaceActions {
 		}
 	};
 	
-	public ATCSAction testCommitWriter = new ATCSAction("Export dialogue sketch", "Exports the dialogue sketch as real JSON data dialogues") {
+	/*public ATCSAction testCommitWriter = new ATCSAction("Export dialogue sketch", "Exports the dialogue sketch as real JSON data dialogues") {
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null || !(selectedNode instanceof WriterModeData)) return;
 			WriterModeData wData = (WriterModeData)selectedNode;
@@ -348,7 +357,7 @@ public class WorkspaceActions {
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode != null && selectedNode instanceof WriterModeData);
 		}
-	};
+	};*/
 	
 	public ATCSAction createWriter = new ATCSAction("Generate dialogue sketch", "Generates a dialogue sketch from this dialogue and its tree.") {
 		public void actionPerformed(ActionEvent e) {
@@ -379,7 +388,7 @@ public class WorkspaceActions {
 		actions.add(showAbout);
 		actions.add(exitATCS);
 		actions.add(testWriter);
-		actions.add(testCommitWriter);
+//		actions.add(testCommitWriter);
 		actions.add(createWriter);
 		selectionChanged(null, null);
 	}

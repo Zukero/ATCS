@@ -22,7 +22,7 @@ import com.gpl.rpg.atcontentstudio.ui.WorkspaceSelector;
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.4.8";
+	public static final String APP_VERSION = "v0.5.0";
 
 	public static boolean STARTED = false;
 	public static StudioFrame frame = null;
