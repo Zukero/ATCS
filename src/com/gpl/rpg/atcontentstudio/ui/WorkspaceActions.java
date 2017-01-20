@@ -429,20 +429,24 @@ public class WorkspaceActions {
 		}
 
 		@Override
-		public synchronized void putValue(String key, Object value) {
+		public void putValue(String key, Object value) {
 			PropertyChangeEvent event = new PropertyChangeEvent(this, key, values.get(key), value);
 			values.put(key,  value);
-			for (PropertyChangeListener l : listeners) {
-				l.propertyChange(event);
+			synchronized(listeners) {
+				for (PropertyChangeListener l : listeners) {
+					l.propertyChange(event);
+				}
 			}
 		}
 
 		@Override
-		public synchronized void setEnabled(boolean b) {
+		public void setEnabled(boolean b) {
 			PropertyChangeEvent event = new PropertyChangeEvent(this, "enabled", isEnabled(), b);
 			enabled = b;
-			for (PropertyChangeListener l : listeners) {
-				l.propertyChange(event);
+			synchronized(listeners) {
+				for (PropertyChangeListener l : listeners) {
+					l.propertyChange(event);
+				}
 			}
 		}
 
@@ -454,13 +458,17 @@ public class WorkspaceActions {
 		private Set<PropertyChangeListener> listeners = new HashSet<PropertyChangeListener>();
 		
 		@Override
-		public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
-			listeners.add(listener);
+		public void addPropertyChangeListener(PropertyChangeListener listener) {
+			synchronized(listeners) {
+				listeners.add(listener);
+			}
 		}
 
 		@Override
-		public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
-			listeners.remove(listener);
+		public void removePropertyChangeListener(PropertyChangeListener listener) {
+			synchronized(listeners) {
+				listeners.remove(listener);
+			}
 		}
 		
 	}

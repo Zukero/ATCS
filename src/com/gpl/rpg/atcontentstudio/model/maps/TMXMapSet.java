@@ -2,6 +2,10 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,12 +21,14 @@ import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
+import com.gpl.rpg.atcontentstudio.model.sprites.SpriteSheetSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
 public class TMXMapSet implements ProjectTreeNode {
 
-	public static final String DEFAULT_REL_PATH_IN_SOURCE = "res/xml/";
-	public static final String DEFAULT_REL_PATH_IN_PROJECT = "maps/";
+	public static final String DEFAULT_REL_PATH_IN_SOURCE = "res"+File.separator+"xml"+File.separator;
+	public static final String DEFAULT_REL_PATH_IN_PROJECT = "maps"+File.separator;
+	public static final String DEFAULT_REL_PATH_TO_DRAWABLE = ".."+File.separator+"drawable"+File.separator;
 
 	public static final String GAME_MAPS_ARRAY_NAME = "loadresource_maps";
 	public static final String DEBUG_SUFFIX = "_debug";
@@ -43,6 +49,15 @@ public class TMXMapSet implements ProjectTreeNode {
 			this.mapFolder = new File(source.baseFolder, DEFAULT_REL_PATH_IN_PROJECT);
 			if (!this.mapFolder.exists()) {
 				this.mapFolder.mkdirs();
+			}
+			Path target = Paths.get(getProject().baseContent.gameSprites.drawableFolder.getAbsolutePath());
+			Path link = Paths.get(new File(mapFolder.getAbsolutePath()+File.separator+DEFAULT_REL_PATH_TO_DRAWABLE).getAbsolutePath());
+			if (!Files.exists(link)) {
+				try {
+					Files.createSymbolicLink(link, target);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		this.tmxMaps = new ArrayList<TMXMap>();

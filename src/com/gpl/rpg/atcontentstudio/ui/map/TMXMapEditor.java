@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1604,6 +1605,17 @@ public class TMXMapEditor extends Editor {
 		savePane.add(gdeIcon, JideBoxLayout.FIX);
 		savePane.setLayout(new JideBoxLayout(savePane, JideBoxLayout.LINE_AXIS, 6));
 		if (map.writable) {
+			gdeIcon.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Runtime.getRuntime().exec(new String[]{"tiled",map.tmxFile.getAbsolutePath()});
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+			
 			if (map.getDataType() == GameSource.Type.altered) {
 				savePane.add(message = new JLabel(ALTERED_MESSAGE), JideBoxLayout.FIX);
 			} else if (map.getDataType() == GameSource.Type.created) {
