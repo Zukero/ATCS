@@ -92,6 +92,15 @@ public class MapColorFilters {
 					0.00f, 0.00f, 0.00f, 1.0f, 0.0f
 			});
 			break;
+		case none:
+			f=1f;
+			newComp = new MatrixComposite(new float[]{
+					f,     0.00f, 0.00f, 0.0f, 0.0f,
+					0.00f, f,     0.00f, 0.0f, 0.0f,
+					0.00f, 0.00f, f,     0.0f, 0.0f,
+					0.00f, 0.00f, 0.00f, 1.0f, 0.0f
+			});
+			break;
 		default:
 			break;
 	

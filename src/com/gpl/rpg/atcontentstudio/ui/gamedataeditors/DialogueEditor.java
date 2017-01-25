@@ -91,6 +91,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JPanel rewardsParamsPane;
 	private MyComboBox rewardMap;
 	private JTextField rewardObjId;
+	private JComboBox rewardObjIdCombo;
 	private MyComboBox rewardObj;
 	private JSpinner rewardValue;
 	
@@ -360,6 +361,14 @@ public class DialogueEditor extends JSONElementEditor {
 			case deactivateMapObjectGroup:
 				rewardMap = addMapBox(pane, ((Dialogue)target).getProject(), "Map Name: ", reward.map, writable, listener);
 				rewardObjId = addTextField(pane, "Group ID: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = null;
+				rewardObj = null;
+				rewardValue = null;
+				break;
+			case changeMapFilter:
+				rewardMap = addMapBox(pane, ((Dialogue)target).getProject(), "Map Name: ", reward.map, writable, listener);
+				rewardObjId = null;
+				rewardObjIdCombo = addEnumValueBox(pane, "Color Filter", TMXMap.ColorFilter.values(), reward.reward_obj_id != null ? TMXMap.ColorFilter.valueOf(reward.reward_obj_id) : TMXMap.ColorFilter.none, writable, listener);
 				rewardObj = null;
 				rewardValue = null;
 				break;
@@ -368,30 +377,35 @@ public class DialogueEditor extends JSONElementEditor {
 			case spawnAll:
 				rewardMap = addMapBox(pane, ((Dialogue)target).getProject(), "Map Name: ", reward.map, writable, listener);
 				rewardObjId = addTextField(pane, "Area ID: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = null;
 				rewardObj = null;
 				rewardValue = null;
 				break;
 			case actorCondition:
 				rewardMap = null;
 				rewardObjId = null;
+				rewardObjIdCombo = null;
 				rewardObj = addActorConditionBox(pane, ((Dialogue)target).getProject(), "Actor Condition: ", (ActorCondition) reward.reward_obj, writable, listener);
 				rewardValue = addIntegerField(pane, "Duration: ", reward.reward_value, false, writable, listener);
 				break;
 			case alignmentChange:
 				rewardMap = null;
 				rewardObjId = addTextField(pane, "Faction: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = null;
 				rewardObj = null;
 				rewardValue = addIntegerField(pane, "Value: ", reward.reward_value, true, writable, listener);
 				break;
 			case createTimer:
 				rewardMap = null;
 				rewardObjId = addTextField(pane, "Timer ID: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = null;
 				rewardObj = null;
 				rewardValue = null;
 				break;
 			case dropList:
 				rewardMap = null;
 				rewardObjId = null;
+				rewardObjIdCombo = null;
 				rewardObj = addDroplistBox(pane, ((Dialogue)target).getProject(), "Droplist: ", (Droplist) reward.reward_obj, writable, listener);
 				rewardValue = null;
 				break;
@@ -404,12 +418,14 @@ public class DialogueEditor extends JSONElementEditor {
 			case questProgress:
 				rewardMap = null;
 				rewardObjId = null;
+				rewardObjIdCombo = null;
 				rewardObj = addQuestBox(pane, ((Dialogue)target).getProject(), "Quest: ", (Quest) reward.reward_obj, writable, listener);
 				rewardValue = addIntegerField(pane, "Step ID: ", reward.reward_value, false, writable, listener);
 				break;
 			case skillIncrease:
 				rewardMap = null;
 				rewardObjId = addTextField(pane, "Skill ID: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = null;
 				rewardObj = null;
 				rewardValue = null;
 				break;
@@ -819,6 +835,10 @@ public class DialogueEditor extends JSONElementEditor {
 				label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
 				label.setIcon(new ImageIcon(DefaultIcons.getNPCIcon()));
 				break;
+			case changeMapFilter:
+				label.setText("Change map filter to "+rewardObjDesc+" on map "+reward.map_name);
+				label.setIcon(new ImageIcon(DefaultIcons.getReplaceIcon()));
+				break;
 			}
 		} else {
 			label.setText("New, undefined reward");
@@ -1099,6 +1119,9 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardsListModel.itemChanged(selectedReward);
 			} else if (source == rewardObjId) {
 				selectedReward.reward_obj_id = rewardObjId.getText();
+				rewardsListModel.itemChanged(selectedReward);
+			} else if (source == rewardObjIdCombo) {
+				selectedReward.reward_obj_id = rewardObjIdCombo.getSelectedItem().toString();
 				rewardsListModel.itemChanged(selectedReward);
 			} else if (source == rewardObj) {
 				if (selectedReward.reward_obj != null) {

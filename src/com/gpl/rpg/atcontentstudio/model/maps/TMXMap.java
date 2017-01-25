@@ -39,6 +39,7 @@ public class TMXMap extends GameDataElement {
 	public static final String WALKABLE_LAYER_NAME = "Walkable";
 	
 	public enum ColorFilter {
+		none,
 		black20,
 		black40,
 		black60,
