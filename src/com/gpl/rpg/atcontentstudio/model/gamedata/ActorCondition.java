@@ -147,7 +147,7 @@ public class ActorCondition extends JSONElement {
 	public void parse(Map aCondJson) {
 
 		if (aCondJson.get("category") != null) this.category = ACCategory.valueOf((String) aCondJson.get("category"));
-		this.positive = JSONElement.getInteger((Number) aCondJson.get("positive"));
+		this.positive = JSONElement.getInteger((Number) aCondJson.get("isPositive"));
 		Map abilityEffect = (Map) aCondJson.get("abilityEffect");
 		if (abilityEffect != null) {
 			this.constant_ability_effect = new AbilityEffect();
@@ -269,8 +269,8 @@ public class ActorCondition extends JSONElement {
 		if (this.icon_id != null) jsonAC.put("iconID", this.icon_id);
 		if (this.display_name != null) jsonAC.put("name", this.display_name);
 		if (this.category != null) jsonAC.put("category", this.category.toString());
-		if (this.positive != null && this.positive == 1) jsonAC.put("positive", this.positive);
-		if (this.stacking != null && this.stacking == 1) jsonAC.put("stacking", this.stacking);
+		if (this.positive != null && this.positive == 1) jsonAC.put("isPositive", this.positive);
+		if (this.stacking != null && this.stacking == 1) jsonAC.put("isStacking", this.stacking);
 		if (this.round_effect != null) {
 			Map jsonRound = new LinkedHashMap();
 			if (this.round_effect.visual_effect != null) jsonRound.put("visualEffectID", this.round_effect.visual_effect);
