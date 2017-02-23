@@ -1,6 +1,6 @@
 !include MUI2.nsh
 
-!define VERSION "0.5.0"
+!define VERSION "0.5.1"
 !define JAVA_BIN "java"
 
 Name "Andor's Trail Content Studio v${VERSION}"
@@ -63,7 +63,7 @@ Section install
   SetOutPath "$INSTDIR\lib\"
   file "jide-oss.jar"
   file "ui.jar"
-  file "AndorsTrainer_v0.1.2.jar"
+  file "AndorsTrainer_v0.1.3.jar"
   file "junit-4.10.jar"
   file "json_simple-1.1.jar"
   file "ATCS_v${VERSION}.jar"
@@ -93,10 +93,11 @@ Section uninstall
   Delete "$INSTDIR\lib\ui.jar"
   Delete "$INSTDIR\lib\junit-4.10.jar"
   Delete "$INSTDIR\lib\json_simple-1.1.jar"
-  Delete "$INSTDIR\lib\AndorsTrainer_v0.1.2.jar"
+  Delete "$INSTDIR\lib\AndorsTrainer_v0.1.3.jar"
   Delete "$INSTDIR\lib\ATCS_v${VERSION}.jar"
   Delete "$INSTDIR\lib\rsyntaxtextarea.jar"
   Delete "$INSTDIR\lib\prefuse.jar"
+  Delete "$INSTDIR\lib\bsh-2.0b4.jar"
   RMDir "$INSTDIR\lib\"
   Delete "$INSTDIR\ATCS.ico"
   Delete "$INSTDIR\ATCS.cmd"
