@@ -35,6 +35,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	public Preferences preferences = new Preferences();
 	public File baseFolder;
 	public File settingsFile;
+	public transient WorkspaceSettings settings;
 	public transient List<ProjectTreeNode> projects = new ArrayList<ProjectTreeNode>();
 	public Set<String> projectsName = new HashSet<String>();
 	public Map<String, Boolean> projectsOpenByName = new HashMap<String, Boolean>();
@@ -53,6 +54,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 				e.printStackTrace();
 			}
 		}
+		settings = new WorkspaceSettings(this);
 		settingsFile = new File(workspaceRoot, WS_SETTINGS_FILE);
 		if (!settingsFile.exists()) {
 			try {
@@ -89,6 +91,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	}
 
 	public void save() {
+		settings.save();
 		SettingsSave.saveInstance(this, settingsFile, "Workspace");
 	}
 
@@ -229,6 +232,7 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	}
 
 	public void refreshTransients() {
+		this.settings = new WorkspaceSettings(this);
 		this.projects = new ArrayList<ProjectTreeNode>();
 		Set<String> projectsFailed = new HashSet<String>();
 		for (String projectName : projectsName) {
