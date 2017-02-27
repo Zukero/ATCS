@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -17,6 +19,7 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -41,8 +44,10 @@ import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
+import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
+import com.gpl.rpg.atcontentstudio.utils.DesktopIntegration;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
@@ -84,6 +89,14 @@ public class SpritesheetEditor extends Editor {
 		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS, 6));
 
 		add(getWarningLabel(), JideBoxLayout.FIX);
+		JButton openImage = new JButton(new ImageIcon(DefaultIcons.getTileLayerImage()));
+		openImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DesktopIntegration.openImage(((Spritesheet)target).spritesheetFile);
+			}
+		});
+		pane.add(openImage, JideBoxLayout.FIX);
 		addLabelField(pane, "Spritesheet ID: ", sheet.id);
 		addLabelField(pane, "File: ", sheet.spritesheetFile.getAbsolutePath());
 		widthField = addIntegerField(pane, "Sprite width (px): ", sheet.spriteWidth, false, true, listener);

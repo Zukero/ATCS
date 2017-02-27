@@ -9,6 +9,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -108,8 +111,48 @@ public class FileUtils {
 				}
 			}
 		}
-		
-		
+	}
+	
+	public static boolean makeSymlink(File targetFile, File linkFile) {
+		Path target = Paths.get(targetFile.getAbsolutePath());
+		Path link = Paths.get(linkFile.getAbsolutePath());
+		if (!Files.exists(link)) {
+			try {
+				Files.createSymbolicLink(link, target);
+			} catch (Exception e) {
+				System.err.println("Failed to create symbolic link to target \""+targetFile.getAbsolutePath()+"\" as \""+linkFile.getAbsolutePath()+"\" the java.nio way:");
+				e.printStackTrace();
+				switch (DesktopIntegration.detectedOS) {
+				case Windows:
+					System.err.println("Trying the Windows way with mklink");
+					try {
+						Runtime.getRuntime().exec("mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					break;
+				case MacOS:
+				case NIX:
+				case Other:
+					System.err.println("Trying the unix way with ln -s");
+					try {
+						Runtime.getRuntime().exec("ln -s "+targetFile.getAbsolutePath()+" "+linkFile.getAbsolutePath());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					break;
+				default:
+					System.out.println("Unrecognized OS. Please contact ATCS dev.");
+					break;
+					
+				}
+			}
+		}
+		if (!Files.exists(link)) {
+			System.err.println("Failed to create link \""+linkFile.getAbsolutePath()+"\" targetting \""+targetFile.getAbsolutePath()+"\"");
+			System.err.println("You can try running ATCS with administrative privileges once, or create the symbolic link manually.");
+		}
+		return true;
 	}
 	
 }

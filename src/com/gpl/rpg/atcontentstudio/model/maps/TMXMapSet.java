@@ -23,6 +23,7 @@ import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.model.sprites.SpriteSheetSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
+import com.gpl.rpg.atcontentstudio.utils.FileUtils;
 
 public class TMXMapSet implements ProjectTreeNode {
 
@@ -50,15 +51,7 @@ public class TMXMapSet implements ProjectTreeNode {
 			if (!this.mapFolder.exists()) {
 				this.mapFolder.mkdirs();
 			}
-			Path target = Paths.get(getProject().baseContent.gameSprites.drawableFolder.getAbsolutePath());
-			Path link = Paths.get(new File(mapFolder.getAbsolutePath()+File.separator+DEFAULT_REL_PATH_TO_DRAWABLE).getAbsolutePath());
-			if (!Files.exists(link)) {
-				try {
-					Files.createSymbolicLink(link, target);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			FileUtils.makeSymlink(getProject().baseContent.gameSprites.drawableFolder, new File(mapFolder.getAbsolutePath()+File.separator+DEFAULT_REL_PATH_TO_DRAWABLE));
 		}
 		this.tmxMaps = new ArrayList<TMXMap>();
 		

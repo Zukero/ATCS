@@ -370,6 +370,15 @@ public class WorkspaceActions {
 		}
 	};
 	
+	public ATCSAction editWorkspaceSettings = new ATCSAction("Edit Workspace Settings", "Change the preferences of this workspace.") {
+		public void actionPerformed(ActionEvent e) {
+			new WorkspaceSettingsEditor(Workspace.activeWorkspace.settings);
+		};
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(true);
+		};
+	};
+	
 	List<ATCSAction> actions = new ArrayList<WorkspaceActions.ATCSAction>();
 	
 	public WorkspaceActions() {
@@ -390,6 +399,7 @@ public class WorkspaceActions {
 		actions.add(testWriter);
 //		actions.add(testCommitWriter);
 		actions.add(createWriter);
+		actions.add(editWorkspaceSettings);
 		selectionChanged(null, null);
 	}
 	

@@ -129,6 +129,8 @@ public class StudioFrame extends JFrame {
 		fileMenu.add(new JMenuItem(actions.closeProject));
 		fileMenu.add(new JMenuItem(actions.deleteProject));
 		fileMenu.add(new JSeparator());
+		fileMenu.add(new JMenuItem(actions.editWorkspaceSettings));
+		fileMenu.add(new JSeparator());
 		fileMenu.add(new JMenuItem(actions.exitATCS));
 		getJMenuBar().add(fileMenu);
 		

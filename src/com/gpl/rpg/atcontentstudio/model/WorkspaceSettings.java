@@ -28,16 +28,16 @@ public class WorkspaceSettings {
 	public File file;
 	
 	public static Boolean DEFAULT_USE_SYS_MAP_EDITOR = true;
-	public Setting<Boolean> useSystemDefaultMapEditor = new Setting<Boolean>("useSystemDefaultMapEditor", DEFAULT_USE_SYS_MAP_EDITOR);
+	public Setting<Boolean> useSystemDefaultMapEditor = new PrimitiveSetting<Boolean>("useSystemDefaultMapEditor", DEFAULT_USE_SYS_MAP_EDITOR);
 	public static String DEFAULT_MAP_EDITOR_COMMAND = "tiled";
-	public Setting<String> mapEditorCommand = new Setting<String>("mapEditorCommand", DEFAULT_MAP_EDITOR_COMMAND);
+	public Setting<String> mapEditorCommand = new PrimitiveSetting<String>("mapEditorCommand", DEFAULT_MAP_EDITOR_COMMAND);
 	
 	public static Boolean DEFAULT_USE_SYS_IMG_VIEWER = true;
-	public Setting<Boolean> useSystemDefaultImageViewer = new Setting<Boolean>("useSystemDefaultImageViewer", DEFAULT_USE_SYS_MAP_EDITOR);
-	public static Boolean DEFAULT_USE_SYS_IMG_EDITOR = true;
-	public Setting<Boolean> useSystemDefaultImageEditor = new Setting<Boolean>("useSystemDefaultImageEditor", DEFAULT_USE_SYS_MAP_EDITOR);
+	public Setting<Boolean> useSystemDefaultImageViewer = new PrimitiveSetting<Boolean>("useSystemDefaultImageViewer", DEFAULT_USE_SYS_IMG_VIEWER);
+	public static Boolean DEFAULT_USE_SYS_IMG_EDITOR = false;
+	public Setting<Boolean> useSystemDefaultImageEditor = new PrimitiveSetting<Boolean>("useSystemDefaultImageEditor", DEFAULT_USE_SYS_IMG_EDITOR);
 	public static String DEFAULT_IMG_EDITOR_COMMAND = "gimp";
-	public Setting<String> imageEditorCommand = new Setting<String>("imageEditorCommand", DEFAULT_MAP_EDITOR_COMMAND);
+	public Setting<String> imageEditorCommand = new PrimitiveSetting<String>("imageEditorCommand", DEFAULT_IMG_EDITOR_COMMAND);
 
 	public List<Setting<? extends Object>> settings = new ArrayList<Setting<? extends Object>>();
 	
@@ -133,14 +133,13 @@ public class WorkspaceSettings {
 		}
 	}
 	
-	class Setting<X extends Object> {
+	public abstract class Setting<X extends Object> {
+
+		public String id;
+		public X value, defaultValue;
 		
-		X value, defaultValue;
-		String id;
-		
-		public Setting(String id, X defaultValue) {
-			this.id = id;
-			this.value = this.defaultValue = defaultValue;
+		public void setCurrentValue(X value) {
+			this.value = value;
 		}
 		
 		public X getCurrentValue() {
@@ -155,15 +154,49 @@ public class WorkspaceSettings {
 			value = defaultValue;
 		}
 		
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		public void readFromJson(Map json) {
-			value = (X)json.get(id);
-		}
+		public abstract void readFromJson(Map json);
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void saveToJson(Map json) {
 			if (!defaultValue.equals(value)) json.put(id, value);
 		}
 	}
+	
+	public class PrimitiveSetting<X extends Object> extends Setting<X> {
+		
+		
+		public PrimitiveSetting(String id, X defaultValue) {
+			this.id = id;
+			this.value = this.defaultValue = defaultValue;
+		}
+		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		public void readFromJson(Map json) {
+			if (json.get(id) != null) value = (X)json.get(id);
+		}
+		
+		
+	}
+	
+	public class ListSetting<X extends Object> extends Setting<List<X>> {
+
+		public ListSetting(String id, List<X> defaultValue) {
+			this.id = id;
+			this.value = this.defaultValue = defaultValue;
+		}
+		
+		@Override
+		public void readFromJson(Map json) {
+			value = new ArrayList<X>();
+			if (json.get(id) != null) {
+				for (Object o : ((List)json.get(id))) {
+					value.add((X)o);
+				}
+			}
+		}
+		
+	}
+	
+	
 
 }

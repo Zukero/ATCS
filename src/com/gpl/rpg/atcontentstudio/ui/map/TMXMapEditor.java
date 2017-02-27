@@ -99,6 +99,7 @@ import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
 import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
+import com.gpl.rpg.atcontentstudio.utils.DesktopIntegration;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
@@ -1608,11 +1609,7 @@ public class TMXMapEditor extends Editor {
 			gdeIcon.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					try {
-						Runtime.getRuntime().exec(new String[]{"tiled",map.tmxFile.getAbsolutePath()});
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
+					DesktopIntegration.openTmxMap(map.tmxFile);
 				}
 			});
 			
