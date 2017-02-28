@@ -850,6 +850,34 @@ public class Project implements ProjectTreeNode, Serializable {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param node. Before calling this method, make sure that no other map with the same id exist in either created or altered.
+	 */
+	public void createElement(TMXMap node) {
+		node.writable = true;
+		if (getMap(node.id) != null) {
+			GameDataElement existingNode = getMap(node.id);
+			for (GameDataElement backlink : existingNode.getBacklinks()) {
+				backlink.elementChanged(existingNode, node);
+			}
+			existingNode.getBacklinks().clear();
+			node.writable = true;
+			node.tmxFile = new File(alteredContent.baseFolder, node.tmxFile.getName());
+			node.parent = alteredContent.gameMaps;
+			alteredContent.gameMaps.addMap(node);
+			node.link();
+			node.state = GameDataElement.State.created;
+		} else {
+			node.tmxFile = new File(createdContent.baseFolder, node.tmxFile.getName());
+			node.parent = createdContent.gameMaps;
+			createdContent.gameMaps.addMap(node);
+			node.link();
+			node.state =  GameDataElement.State.created;
+		}
+		fireElementAdded(node, getNodeIndex(node));
+	}
+	
 
 	public void moveToCreated(JSONElement target) {
 		target.childrenRemoved(new ArrayList<ProjectTreeNode>());

@@ -69,8 +69,8 @@ public class SpritesheetEditor extends Editor {
 	public static JComponent getWarningLabel() {
 		JLabel label = new JLabel(
 				"<html><i>" +
-				"The data presented here is not part of the game.<br/>" +
-				"What you change here will be changed in your ATCS project.<br/>" +
+				"The data accompamying the image here is not part of the game.<br/>" +
+				"What you change here will be changed in your ATCS project only.<br/>" +
 				"None of this is exported to JSON or TMX, although it must be set correctly in order to choose tiles & icons correctly.<br/>" +
 				"</i></html>");
 		return label;
@@ -88,7 +88,8 @@ public class SpritesheetEditor extends Editor {
 		
 		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS, 6));
 
-		add(getWarningLabel(), JideBoxLayout.FIX);
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new JideBoxLayout(buttonPane, JideBoxLayout.LINE_AXIS));
 		JButton openImage = new JButton(new ImageIcon(DefaultIcons.getTileLayerImage()));
 		openImage.addActionListener(new ActionListener() {
 			@Override
@@ -96,7 +97,10 @@ public class SpritesheetEditor extends Editor {
 				DesktopIntegration.openImage(((Spritesheet)target).spritesheetFile);
 			}
 		});
-		pane.add(openImage, JideBoxLayout.FIX);
+		buttonPane.add(openImage, JideBoxLayout.FIX);
+		buttonPane.add(getWarningLabel(), JideBoxLayout.FIX);
+		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
+		pane.add(buttonPane, JideBoxLayout.FIX);
 		addLabelField(pane, "Spritesheet ID: ", sheet.id);
 		addLabelField(pane, "File: ", sheet.spritesheetFile.getAbsolutePath());
 		widthField = addIntegerField(pane, "Sprite width (px): ", sheet.spriteWidth, false, true, listener);

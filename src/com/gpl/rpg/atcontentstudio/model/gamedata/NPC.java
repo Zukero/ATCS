@@ -17,6 +17,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 
 public class NPC extends JSONElement {
 
@@ -95,7 +96,7 @@ public class NPC extends JSONElement {
 	
 	@Override
 	public String getDesc() {
-		return (this.state == State.modified ? "*" : "")+name+" ("+id+")";
+		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+name+" ("+id+")";
 	}
 
 	public static String getStaticDesc() {

@@ -226,7 +226,16 @@ public class WorkspaceActions {
 		}
 	};
 	
-
+	public ATCSAction createMap = new ATCSAction("Create TMX Map", "Opens the TMX Map creation wizard") {
+		public void actionPerformed(ActionEvent e) {
+			if (selectedNode == null || selectedNode.getProject() == null) return;
+			new TMXMapCreationWizard(selectedNode.getProject()).setVisible(true);
+		}
+		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
+			setEnabled(selectedNode != null && selectedNode.getProject() != null);
+		}
+	};
+	
 	public ATCSAction createWorldmap = new ATCSAction("Create Worldmap segment", "Opens the worldmap segment creation wizard") {
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
@@ -389,6 +398,7 @@ public class WorkspaceActions {
 		actions.add(saveElement);
 		actions.add(deleteSelected);
 		actions.add(createGDE);
+		actions.add(createMap);
 		actions.add(importJSON);
 		actions.add(loadSave);
 		actions.add(compareItems);

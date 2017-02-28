@@ -202,6 +202,10 @@ public class ProjectsTree extends JPanel {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.importJSON));
 		}
+		if (actions.createMap.isEnabled()) {
+			addNextSeparator = true;
+			popupMenu.add(new JMenuItem(actions.createMap));
+		}
 		if (actions.createWorldmap.isEnabled()) {
 			addNextSeparator = true;
 			popupMenu.add(new JMenuItem(actions.createWorldmap));

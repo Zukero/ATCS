@@ -140,6 +140,7 @@ public class StudioFrame extends JFrame {
 		projectMenu.add(new JSeparator());
 		projectMenu.add(new JMenuItem(actions.createGDE));
 		projectMenu.add(new JMenuItem(actions.importJSON));
+		projectMenu.add(new JMenuItem(actions.createMap));
 		projectMenu.add(new JMenuItem(actions.createWorldmap));
 		projectMenu.add(new JMenuItem(actions.loadSave));
 		getJMenuBar().add(projectMenu);

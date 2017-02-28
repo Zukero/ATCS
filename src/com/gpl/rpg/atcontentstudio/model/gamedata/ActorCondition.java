@@ -86,7 +86,7 @@ public class ActorCondition extends JSONElement {
 	
 	@Override
 	public String getDesc() {
-		return (this.state == State.modified ? "*" : "")+display_name+" ("+id+")";
+		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+display_name+" ("+id+")";
 	}
 	
 	@SuppressWarnings("rawtypes")

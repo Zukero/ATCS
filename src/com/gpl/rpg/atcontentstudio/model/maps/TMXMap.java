@@ -197,7 +197,7 @@ public class TMXMap extends GameDataElement {
 	}
 	@Override
 	public String getDesc() {
-		return (this.state == State.modified ? "*" : "")+id;
+		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+id;
 	}
 	
 	@Override
@@ -309,8 +309,10 @@ public class TMXMap extends GameDataElement {
 			parse();
 		}
 		if (this.state == GameDataElement.State.parsed || this.state == GameDataElement.State.created) {
-			for (MapObjectGroup group : groups) {
-				group.link();
+			if (groups != null) {
+				for (MapObjectGroup group : groups) {
+					group.link();
+				}
 			}
 		}
 	}
