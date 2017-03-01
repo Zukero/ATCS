@@ -29,6 +29,7 @@ public class ContainerArea extends MapObject {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (oldOne == droplist) {
+			oldOne.removeBacklink(parentMap);
 			droplist = (Droplist) newOne;
 			newOne.addBacklink(parentMap);
 		}

@@ -3,9 +3,14 @@ package com.gpl.rpg.atcontentstudio.model.maps;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -87,6 +92,44 @@ public class TMXMapSet implements ProjectTreeNode {
 				return o1.id.compareTo(o2.id);
 			}
 		});
+		if (source.type == GameSource.Type.created | source.type == GameSource.Type.altered) {
+			final Path folderPath = Paths.get(mapFolder.getAbsolutePath());
+			Thread watcher = new Thread("Map folder watcher for "+source.type) {
+				public void run() {
+					WatchService watchService;
+
+					while(getProject().open) {
+						try {
+							watchService = FileSystems.getDefault().newWatchService();
+							WatchKey watchKey = folderPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+							WatchKey wk;
+							validService: while(getProject().open) {
+								wk = watchService.take();
+								for (WatchEvent<?> event : wk.pollEvents()) {
+									Path changed = (Path) event.context();
+									String name = changed.getFileName().toString();
+									System.out.println("Changed: "+name);
+									String id = name.substring(0, name.length() - 4);
+									TMXMap map = getMap(id);
+									if (map != null) {
+										map.mapChangedOnDisk();
+									}
+								}
+								if(!wk.reset()) {
+									watchService.close();
+									break validService;
+								}
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				};
+			};
+			watcher.start();
+		}
 	}
 	
 	@Override

@@ -42,6 +42,7 @@ public class ScriptArea extends MapObject {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (oldOne == dialogue) {
+			oldOne.removeBacklink(parentMap);
 			dialogue = (Dialogue) newOne;
 			newOne.addBacklink(parentMap);
 		}

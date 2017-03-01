@@ -18,7 +18,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,6 +34,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -103,13 +103,15 @@ import com.gpl.rpg.atcontentstudio.utils.DesktopIntegration;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
-public class TMXMapEditor extends Editor {
+public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListener{
 
 	private static final long serialVersionUID = -3079451876618342442L;
 
 
 	Map<String, JPanel> editorTabs = new LinkedHashMap<String, JPanel>();
 	JideTabbedPane editorTabsHolder;
+
+	private JButton reload;
 	
 	private RSyntaxTextArea editorPane;
 	
@@ -189,6 +191,7 @@ public class TMXMapEditor extends Editor {
 		this.name = map.getDesc();
 		this.icon = new ImageIcon(DefaultIcons.getTiledIconIcon());
 		
+		map.addMapChangedOnDiskListener(this);
 		
 		setLayout(new BorderLayout());
 		editorTabsHolder = new JideTabbedPane(JideTabbedPane.BOTTOM);
@@ -1601,10 +1604,10 @@ public class TMXMapEditor extends Editor {
 	}
 
 	public JButton createButtonPane(JPanel pane, final Project proj, final TMXMap map, final FieldUpdateListener listener) {
-		final JButton gdeIcon = new JButton(new ImageIcon(DefaultIcons.getTiledIconImage()));
 		JPanel savePane = new JPanel();
-		savePane.add(gdeIcon, JideBoxLayout.FIX);
 		savePane.setLayout(new JideBoxLayout(savePane, JideBoxLayout.LINE_AXIS, 6));
+		final JButton gdeIcon = new JButton(new ImageIcon(DefaultIcons.getTiledIconImage()));
+		savePane.add(gdeIcon, JideBoxLayout.FIX);
 		if (map.writable) {
 			gdeIcon.addActionListener(new ActionListener() {
 				@Override
@@ -1612,7 +1615,25 @@ public class TMXMapEditor extends Editor {
 					DesktopIntegration.openTmxMap(map.tmxFile);
 				}
 			});
-			
+			reload = new JButton("Reload");
+			reload.setEnabled(map.changedOnDisk);
+			savePane.add(reload, JideBoxLayout.FIX);
+			reload.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (map.state == GameDataElement.State.modified) {
+						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in ATCS. All ATCS-made changes will be lost if you confirm.\n On the other hand, if you save using ATCS, all external changes will be lost.\n Do you want to reload?", "Confirm reload?", JOptionPane.OK_CANCEL_OPTION);
+						if (confirm == JOptionPane.CANCEL_OPTION) return;
+					}
+					reload.setEnabled(false);
+					(new Thread(){
+						public void run() {
+							map.reload();
+						}
+					}).start();
+				}
+			});
 			if (map.getDataType() == GameSource.Type.altered) {
 				savePane.add(message = new JLabel(ALTERED_MESSAGE), JideBoxLayout.FIX);
 			} else if (map.getDataType() == GameSource.Type.created) {
@@ -1623,6 +1644,10 @@ public class TMXMapEditor extends Editor {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					if (map.state != TMXMap.State.saved) { 
+						if (map.changedOnDisk) {
+							int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in an external tool. All external changes will be lost if you confirm.\n On the other hand, if you reload in ATCS, all ATCS-made changes will be lost.\n Do you want to save?", "Confirm save?", JOptionPane.OK_CANCEL_OPTION);
+							if (confirm == JOptionPane.CANCEL_OPTION) return;
+						}
 						map.save();
 						ATContentStudio.frame.nodeChanged(map);
 					}
@@ -2291,5 +2316,23 @@ public class TMXMapEditor extends Editor {
 		g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
 		g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
     }
+
+
+
+	@Override
+	public void mapChanged() {
+		if (reload != null) reload.setEnabled(true);
+	}
+
+
+
+	@Override
+	public void mapReloaded() {
+		ATContentStudio.frame.nodeChanged(target);
+		((TMXMap)target).removeMapChangedOnDiskListener(this);
+		ATContentStudio.frame.closeEditor(target);
+		ATContentStudio.frame.openEditor(target);
+		
+	}
 	
 }

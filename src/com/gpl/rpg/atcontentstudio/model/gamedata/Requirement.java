@@ -145,8 +145,9 @@ public class Requirement extends JSONElement {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (this.required_obj == oldOne) {
+			oldOne.removeBacklink((GameDataElement) this.parent);
 			this.required_obj = newOne;
-			if (newOne != null) newOne.addBacklink(this);
+			if (newOne != null) newOne.addBacklink((GameDataElement) this.parent);
 		}
 	}
 	@Override

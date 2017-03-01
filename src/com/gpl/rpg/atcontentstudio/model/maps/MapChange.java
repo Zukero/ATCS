@@ -37,6 +37,7 @@ public class MapChange extends MapObject {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (oldOne == map) {
+			oldOne.removeBacklink(parentMap);
 			map = (TMXMap) newOne;
 			newOne.addBacklink(parentMap);
 		}

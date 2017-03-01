@@ -26,6 +26,7 @@ import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
+import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 
@@ -61,6 +62,8 @@ public class TMXMap extends GameDataElement {
 	public ColorFilter colorFilter = null;
 
 	public boolean writable = false;
+	public boolean changedOnDisk = false;
+	public int dismissNextChangeNotif = 0;
 
 	public TMXMap(TMXMapSet parent, File f) {
 		this.parent = parent;
@@ -270,10 +273,13 @@ public class TMXMap extends GameDataElement {
 	public void save() {
 		if (writable) {
 			try {
+				//TODO: check in fileutils, to test the workspace's filesystem once at startup, and figure out how many of these can occur, instead of hard-coded '2'
+				dismissNextChangeNotif += 2;
 				FileWriter w = new FileWriter(tmxFile);
 				w.write(toXml());
 				w.close();
 				this.state = State.saved;
+				changedOnDisk = false;
 				Notification.addSuccess("TMX file "+tmxFile.getAbsolutePath()+" saved.");
 			} catch (IOException e) {
 				Notification.addError("Error while writing TMX file "+tmxFile.getAbsolutePath()+" : "+e.getMessage());
@@ -392,5 +398,77 @@ public class TMXMap extends GameDataElement {
 				ABOVE_LAYER_NAME.equalsIgnoreCase(name) ||
 				WALKABLE_LAYER_NAME.equalsIgnoreCase(name);
 	}
+
+	
+	public void reload() {
+		tmxMap = null;
+		for (Spritesheet s : usedSpritesheets) {
+			s.elementChanged(this, null);
+		}
+		usedSpritesheets.clear();
+		for (MapObjectGroup g : groups) {
+			for (MapObject o : g.mapObjects) {
+				if (o instanceof ContainerArea) {
+					if (((ContainerArea)o).droplist != null) ((ContainerArea)o).droplist.elementChanged(this, null);
+				} else if (o instanceof KeyArea) {
+					if (((KeyArea)o).dialogue != null) ((KeyArea)o).dialogue.elementChanged(this, null);
+					if (((KeyArea)o).requirement != null && ((KeyArea)o).requirement.required_obj != null) ((KeyArea)o).requirement.required_obj.elementChanged(this, null);
+				} else if (o instanceof MapChange) {
+					if (((MapChange)o).map != null) ((MapChange)o).map.elementChanged(this, null);
+				} else if (o instanceof ReplaceArea) {
+					if (((ReplaceArea)o).requirement != null && ((ReplaceArea)o).requirement.required_obj != null) ((ReplaceArea)o).requirement.required_obj.elementChanged(this, null);
+				} else if (o instanceof RestArea) {
+				} else if (o instanceof ScriptArea) {
+					if (((ScriptArea)o).dialogue != null) ((ScriptArea)o).dialogue.elementChanged(this, null);
+				} else if (o instanceof SignArea) {
+					if (((SignArea)o).dialogue != null) ((SignArea)o).dialogue.elementChanged(this, null);
+				} else if (o instanceof SpawnArea) {
+					if (((SpawnArea)o).spawnGroup != null) {
+						for (NPC n : ((SpawnArea)o).spawnGroup) {
+							n.elementChanged(this, null);
+						}
+					}
+				}
+			}
+		}
+		groups.clear();
+		outside = null;
+		colorFilter = null;
+		
+		state = GameDataElement.State.init;
+		this.link();
+		
+		changedOnDisk = false;
+		for (MapChangedOnDiskListener l : new ArrayList<TMXMap.MapChangedOnDiskListener>(listeners)) {
+			l.mapReloaded();
+		}
+	}
+	
+	public void mapChangedOnDisk() {
+		if (dismissNextChangeNotif > 0) {
+			dismissNextChangeNotif--;
+		} else {
+			changedOnDisk = true;
+			for (MapChangedOnDiskListener l : new ArrayList<TMXMap.MapChangedOnDiskListener>(listeners)) {
+				l.mapChanged();
+			}
+		}
+	}
+	
+	public interface MapChangedOnDiskListener {
+		public void mapChanged();
+		public void mapReloaded();
+	}
+	
+	private List<MapChangedOnDiskListener> listeners = new ArrayList<TMXMap.MapChangedOnDiskListener>();
+	
+	public void addMapChangedOnDiskListener(MapChangedOnDiskListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeMapChangedOnDiskListener(MapChangedOnDiskListener l) {
+		listeners.remove(l);
+	}
+	
 	
 }
