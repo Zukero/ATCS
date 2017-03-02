@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ComboBoxModel;
@@ -231,7 +232,7 @@ public class TMXMapCreationWizard extends JDialog {
 		public void mapCreated(TMXMap created);
 	}
 	
-	private List<CreationCompletedListener> listeners = new ArrayList<TMXMapCreationWizard.CreationCompletedListener>();
+	private List<CreationCompletedListener> listeners = new CopyOnWriteArrayList<TMXMapCreationWizard.CreationCompletedListener>();
 	
 	public void addCreationListener(CreationCompletedListener l) {
 		listeners.add(l);
@@ -257,7 +258,7 @@ public class TMXMapCreationWizard extends JDialog {
 			return proj.getMap(index);
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {

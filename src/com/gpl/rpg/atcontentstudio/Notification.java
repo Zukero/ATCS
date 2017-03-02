@@ -2,11 +2,12 @@ package com.gpl.rpg.atcontentstudio;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Notification {
 
 	public static List<Notification> notifs = new ArrayList<Notification>();
-	private static List<NotificationListener> listeners = new ArrayList<NotificationListener>();
+	private static List<NotificationListener> listeners = new CopyOnWriteArrayList<NotificationListener>();
 	public static boolean showS = true, showI = true, showW = true, showE = true;
 	
 	static {

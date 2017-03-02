@@ -103,7 +103,7 @@ public class WorldmapSegment extends GameDataElement {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		oldOne.removeBacklink(this);
-		newOne.addBacklink(this);
+		if(newOne != null) newOne.addBacklink(this);
 	}
 
 	@Override

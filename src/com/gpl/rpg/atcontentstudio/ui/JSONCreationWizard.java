@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -518,7 +519,7 @@ public class JSONCreationWizard extends JDialog {
 			return DataType.values()[index];
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -584,7 +585,7 @@ public class JSONCreationWizard extends JDialog {
 		public void elementCreated(JSONElement created);
 	}
 	
-	private List<CreationCompletedListener> listeners = new ArrayList<JSONCreationWizard.CreationCompletedListener>();
+	private List<CreationCompletedListener> listeners = new CopyOnWriteArrayList<JSONCreationWizard.CreationCompletedListener>();
 	
 	public void addCreationListener(CreationCompletedListener l) {
 		listeners.add(l);

@@ -451,12 +451,14 @@ public class Item extends JSONElement {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (this.category == oldOne) {
+			oldOne.removeBacklink(this);
 			this.category = (ItemCategory) newOne;
 			if (newOne != null) newOne.addBacklink(this);
 		} else {
 			if (this.equip_effect != null && this.equip_effect.conditions != null) {
 				for (ConditionEffect c : this.equip_effect.conditions) {
 					if (c.condition == oldOne) {
+						oldOne.removeBacklink(this);
 						c.condition = (ActorCondition) newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}
@@ -465,6 +467,7 @@ public class Item extends JSONElement {
 			if (this.hit_effect != null && this.hit_effect.conditions_source != null) {
 				for (TimedConditionEffect c : this.hit_effect.conditions_source) {
 					if (c.condition == oldOne) {
+						oldOne.removeBacklink(this);
 						c.condition = (ActorCondition) newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}
@@ -473,6 +476,7 @@ public class Item extends JSONElement {
 			if (this.hit_effect != null && this.hit_effect.conditions_target != null) {
 				for (TimedConditionEffect c : this.hit_effect.conditions_target) {
 					if (c.condition == oldOne) {
+						oldOne.removeBacklink(this);
 						c.condition = (ActorCondition) newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}
@@ -482,6 +486,7 @@ public class Item extends JSONElement {
 			if (this.kill_effect != null && this.kill_effect.conditions_source != null) {
 				for (TimedConditionEffect c : this.kill_effect.conditions_source) {
 					if (c.condition == oldOne) {
+						oldOne.removeBacklink(this);
 						c.condition = (ActorCondition) newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}

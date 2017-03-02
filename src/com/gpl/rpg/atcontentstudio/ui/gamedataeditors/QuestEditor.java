@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -293,7 +294,7 @@ public class QuestEditor extends JSONElementEditor {
 			if (quest.stages.isEmpty()) quest.stages = null;
 		}
 		
-		public List<TableModelListener> listeners = new ArrayList<TableModelListener>();
+		public List<TableModelListener> listeners = new CopyOnWriteArrayList<TableModelListener>();
 		
 		@Override
 		public void addTableModelListener(TableModelListener l) {

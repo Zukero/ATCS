@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.tree.TreeNode;
 
@@ -439,7 +440,7 @@ public class TMXMap extends GameDataElement {
 		this.link();
 		
 		changedOnDisk = false;
-		for (MapChangedOnDiskListener l : new ArrayList<TMXMap.MapChangedOnDiskListener>(listeners)) {
+		for (MapChangedOnDiskListener l : listeners) {
 			l.mapReloaded();
 		}
 	}
@@ -449,7 +450,7 @@ public class TMXMap extends GameDataElement {
 			dismissNextChangeNotif--;
 		} else {
 			changedOnDisk = true;
-			for (MapChangedOnDiskListener l : new ArrayList<TMXMap.MapChangedOnDiskListener>(listeners)) {
+			for (MapChangedOnDiskListener l : listeners) {
 				l.mapChanged();
 			}
 		}
@@ -460,7 +461,7 @@ public class TMXMap extends GameDataElement {
 		public void mapReloaded();
 	}
 	
-	private List<MapChangedOnDiskListener> listeners = new ArrayList<TMXMap.MapChangedOnDiskListener>();
+	private List<MapChangedOnDiskListener> listeners = new CopyOnWriteArrayList<TMXMap.MapChangedOnDiskListener>();
 	
 	public void addMapChangedOnDiskListener(MapChangedOnDiskListener l) {
 		listeners.add(l);

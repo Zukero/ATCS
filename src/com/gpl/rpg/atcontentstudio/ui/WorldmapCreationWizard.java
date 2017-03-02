@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -144,7 +145,7 @@ public class WorldmapCreationWizard extends JDialog {
 		public void segmentCreated(WorldmapSegment created);
 	}
 	
-	private List<CreationCompletedListener> listeners = new ArrayList<WorldmapCreationWizard.CreationCompletedListener>();
+	private List<CreationCompletedListener> listeners = new CopyOnWriteArrayList<WorldmapCreationWizard.CreationCompletedListener>();
 	
 	public void addCreationListener(CreationCompletedListener l) {
 		listeners.add(l);

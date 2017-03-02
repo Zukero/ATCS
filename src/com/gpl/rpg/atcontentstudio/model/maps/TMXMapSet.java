@@ -108,7 +108,6 @@ public class TMXMapSet implements ProjectTreeNode {
 								for (WatchEvent<?> event : wk.pollEvents()) {
 									Path changed = (Path) event.context();
 									String name = changed.getFileName().toString();
-									System.out.println("Changed: "+name);
 									String id = name.substring(0, name.length() - 4);
 									TMXMap map = getMap(id);
 									if (map != null) {

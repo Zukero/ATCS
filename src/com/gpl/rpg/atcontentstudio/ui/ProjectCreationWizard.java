@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
@@ -67,7 +68,7 @@ public class ProjectCreationWizard extends JDialog {
 				return Project.ResourceSet.values()[index];
 			}
 
-			List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+			List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 			
 			@Override
 			public void addListDataListener(ListDataListener l) {

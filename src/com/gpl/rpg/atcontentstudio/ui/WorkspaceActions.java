@@ -12,6 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -452,10 +454,8 @@ public class WorkspaceActions {
 		public void putValue(String key, Object value) {
 			PropertyChangeEvent event = new PropertyChangeEvent(this, key, values.get(key), value);
 			values.put(key,  value);
-			synchronized(listeners) {
-				for (PropertyChangeListener l : listeners) {
-					l.propertyChange(event);
-				}
+			for (PropertyChangeListener l : listeners) {
+				l.propertyChange(event);
 			}
 		}
 
@@ -463,10 +463,8 @@ public class WorkspaceActions {
 		public void setEnabled(boolean b) {
 			PropertyChangeEvent event = new PropertyChangeEvent(this, "enabled", isEnabled(), b);
 			enabled = b;
-			synchronized(listeners) {
-				for (PropertyChangeListener l : listeners) {
-					l.propertyChange(event);
-				}
+			for (PropertyChangeListener l : listeners) {
+				l.propertyChange(event);
 			}
 		}
 
@@ -475,20 +473,16 @@ public class WorkspaceActions {
 			return enabled;
 		}
 
-		private Set<PropertyChangeListener> listeners = new HashSet<PropertyChangeListener>();
+		private List<PropertyChangeListener> listeners = new CopyOnWriteArrayList<PropertyChangeListener>();
 		
 		@Override
 		public void addPropertyChangeListener(PropertyChangeListener listener) {
-			synchronized(listeners) {
-				listeners.add(listener);
-			}
+			listeners.add(listener);
 		}
 
 		@Override
 		public void removePropertyChangeListener(PropertyChangeListener listener) {
-			synchronized(listeners) {
-				listeners.remove(listener);
-			}
+			listeners.remove(listener);
 		}
 		
 	}

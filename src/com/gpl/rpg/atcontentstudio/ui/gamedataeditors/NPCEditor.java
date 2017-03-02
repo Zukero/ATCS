@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
@@ -397,7 +398,7 @@ public class NPCEditor extends JSONElementEditor {
 			}
 		}
 		
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -459,7 +460,7 @@ public class NPCEditor extends JSONElementEditor {
 			}
 		}
 		
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {

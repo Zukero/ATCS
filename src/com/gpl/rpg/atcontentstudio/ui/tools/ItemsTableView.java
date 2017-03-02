@@ -2,6 +2,7 @@ package com.gpl.rpg.atcontentstudio.ui.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -200,7 +201,7 @@ public class ItemsTableView extends ElementTableView {
 			//not editable.
 		}
 
-		List<TableModelListener> listeners = new ArrayList<TableModelListener>();
+		List<TableModelListener> listeners = new CopyOnWriteArrayList<TableModelListener>();
 		
 		@Override
 		public void addTableModelListener(TableModelListener l) {

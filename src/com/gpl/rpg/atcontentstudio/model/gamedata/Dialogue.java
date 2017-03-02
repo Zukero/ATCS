@@ -349,18 +349,21 @@ public class Dialogue extends JSONElement {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (switch_to_npc == oldOne) {
+			oldOne.removeBacklink(this);
 			switch_to_npc = (NPC) newOne;
 			if (newOne != null) newOne.addBacklink(this);
 		} else {
 			if (replies != null) {
 				for (Reply r : replies) {
 					if (r.next_phrase == oldOne) {
+						oldOne.removeBacklink(this);
 						r.next_phrase = (Dialogue) newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}
 					if (r.requirements != null) {
 						for (Requirement req : r.requirements) {
 							if (req.required_obj == oldOne) {
+								oldOne.removeBacklink(this);
 								req.required_obj = newOne;
 								if (newOne != null) newOne.addBacklink(this);
 							}
@@ -371,6 +374,7 @@ public class Dialogue extends JSONElement {
 			if (rewards != null) {
 				for (Reward r : rewards) {
 					if (r.reward_obj == oldOne) {
+						oldOne.removeBacklink(this);
 						r.reward_obj = newOne;
 						if (newOne != null) newOne.addBacklink(this);
 					}

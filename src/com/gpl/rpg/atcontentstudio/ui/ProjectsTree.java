@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -655,7 +656,7 @@ public class ProjectsTree extends JPanel {
 			return ((ProjectTreeNode)parent).getIndex((ProjectTreeNode) child);
 		}
 
-		List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
+		List<TreeModelListener> listeners = new CopyOnWriteArrayList<TreeModelListener>();
 		
 		@Override
 		public void addTreeModelListener(TreeModelListener l) {

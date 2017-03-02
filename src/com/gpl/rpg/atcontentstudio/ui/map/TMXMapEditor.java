@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxModel;
@@ -890,7 +891,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			return index;
 		}
 		
-		List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
+		List<TreeModelListener> listeners = new CopyOnWriteArrayList<TreeModelListener>();
 
 		@Override
 		public void addTreeModelListener(TreeModelListener l) {
@@ -999,7 +1000,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			}
 		}
 		
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -1078,7 +1079,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			}
 		}
 		
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -1150,7 +1151,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			return availableLayers.size();
 		}
 		
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		@Override
 		public void addListDataListener(ListDataListener l) {
 			listeners.add(l);
@@ -1206,7 +1207,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			}
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -1251,7 +1252,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			return area.spawnGroup.get(index);
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {
@@ -1533,7 +1534,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			return null;
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {

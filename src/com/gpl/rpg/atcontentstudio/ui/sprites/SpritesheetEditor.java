@@ -15,6 +15,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -259,7 +260,7 @@ public class SpritesheetEditor extends Editor {
 			
 		}
 
-		List<TableModelListener> listeners = new ArrayList<TableModelListener>();
+		List<TableModelListener> listeners = new CopyOnWriteArrayList<TableModelListener>();
 		
 		@Override
 		public void addTableModelListener(TableModelListener l) {
@@ -358,7 +359,7 @@ public class SpritesheetEditor extends Editor {
 			return null;
 		}
 
-		List<ListDataListener> listeners = new ArrayList<ListDataListener>();
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
 		
 		@Override
 		public void addListDataListener(ListDataListener l) {

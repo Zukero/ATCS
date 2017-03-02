@@ -194,6 +194,7 @@ public class Droplist extends JSONElement {
 		if (dropped_items != null) {
 			for (DroppedItem di : dropped_items) {
 				if (di.item == oldOne) {
+					oldOne.removeBacklink(this);
 					di.item = (Item) newOne;
 					if (newOne != null) newOne.addBacklink(this);
 				}

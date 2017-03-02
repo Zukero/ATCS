@@ -357,16 +357,19 @@ public class NPC extends JSONElement {
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
 		if (dialogue == oldOne) {
+			oldOne.removeBacklink(this);
 			this.dialogue = (Dialogue) newOne;
 			if (newOne != null) newOne.addBacklink(this);
 		} else {
 			if (this.droplist == oldOne) {
+				oldOne.removeBacklink(this);
 				this.droplist = (Droplist) newOne;
 				if (newOne != null) newOne.addBacklink(this);
 			} else {
 				if (this.hit_effect != null && this.hit_effect.conditions_source != null) {
 					for (TimedConditionEffect tce : this.hit_effect.conditions_source) {
 						if (tce.condition == oldOne) {
+							oldOne.removeBacklink(this);
 							tce.condition = (ActorCondition) newOne;
 							if (newOne != null) newOne.addBacklink(this);
 						}
@@ -375,6 +378,7 @@ public class NPC extends JSONElement {
 				if (this.hit_effect != null && this.hit_effect.conditions_target != null) {
 					for (TimedConditionEffect tce : this.hit_effect.conditions_target) {
 						if (tce.condition == oldOne) {
+							oldOne.removeBacklink(this);
 							tce.condition = (ActorCondition) newOne;
 							if (newOne != null) newOne.addBacklink(this);
 						}
