@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -101,6 +102,7 @@ import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
 import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
 import com.gpl.rpg.atcontentstudio.utils.DesktopIntegration;
+import com.gpl.rpg.atcontentstudio.utils.FileUtils;
 import com.jidesoft.swing.JideBoxLayout;
 import com.jidesoft.swing.JideTabbedPane;
 
@@ -1613,6 +1615,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			gdeIcon.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (map.state == GameDataElement.State.modified) {
+						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in ATCS.\nYou'd better save your changes in ATCS before opening this map with the external editor.\nDo you want to save before opening the file?", "Save before opening?", JOptionPane.YES_NO_CANCEL_OPTION);
+						if (confirm == JOptionPane.CANCEL_OPTION) return;
+						if (confirm == JOptionPane.YES_OPTION) map.save();
+					}
 					DesktopIntegration.openTmxMap(map.tmxFile);
 				}
 			});
@@ -1648,6 +1655,12 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 						if (map.changedOnDisk) {
 							int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in an external tool. All external changes will be lost if you confirm.\n On the other hand, if you reload in ATCS, all ATCS-made changes will be lost.\n Do you want to save?", "Confirm save?", JOptionPane.OK_CANCEL_OPTION);
 							if (confirm == JOptionPane.CANCEL_OPTION) return;
+							File backup = FileUtils.backupFile(map.tmxFile); 
+							if (backup != null) {
+								JOptionPane.showMessageDialog(TMXMapEditor.this, "The externally-modified file was backed up as "+backup.getAbsolutePath(), "File backed up", JOptionPane.INFORMATION_MESSAGE);
+							} else {
+								JOptionPane.showMessageDialog(TMXMapEditor.this, "The externally-modified file could not be backed up.", "File backup failed", JOptionPane.ERROR_MESSAGE);
+							}
 						}
 						map.save();
 						ATContentStudio.frame.nodeChanged(map);

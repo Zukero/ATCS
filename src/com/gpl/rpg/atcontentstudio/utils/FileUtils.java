@@ -9,9 +9,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -153,6 +155,16 @@ public class FileUtils {
 			System.err.println("You can try running ATCS with administrative privileges once, or create the symbolic link manually.");
 		}
 		return true;
+	}
+
+	public static File backupFile(File f) {
+		try {
+			Path returned = Files.copy(Paths.get(f.getAbsolutePath()), Paths.get(f.getAbsolutePath()+".bak"), StandardCopyOption.REPLACE_EXISTING);
+			return returned.toFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 }
