@@ -31,7 +31,7 @@ public class ContainerArea extends MapObject {
 		if (oldOne == droplist) {
 			oldOne.removeBacklink(parentMap);
 			droplist = (Droplist) newOne;
-			newOne.addBacklink(parentMap);
+			if (newOne != null) newOne.addBacklink(parentMap);
 		}
 	}
 	

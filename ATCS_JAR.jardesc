@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="ATContentStudio/ATCS_v0.5.2.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ATContentStudio/ATCS_JAR.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <file path="/ATContentStudio/nsisHeaderBase2.xcf"/>
+        <file path="/ATContentStudio/ATCS_v0.5.1.jar"/>
+        <file path="/ATContentStudio/nsisBorderBannerBase.xcf"/>
+        <file path="/ATContentStudio/.project"/>
+        <javaElement handleIdentifier="=ATContentStudio/res"/>
+        <javaElement handleIdentifier="=ATContentStudio/src"/>
+        <file path="/ATContentStudio/folderIconBase.xcf"/>
+        <file path="/ATContentStudio/.gitignore"/>
+        <file path="/ATContentStudio/fileIconBase.xcf"/>
+        <javaElement handleIdentifier="=ATContentStudio/hacked-libtiled"/>
+        <file path="/ATContentStudio/arrows.xcf"/>
+        <file path="/ATContentStudio/.classpath"/>
+        <file path="/ATContentStudio/ATCS_v0.5.0.jar"/>
+    </selectedElements>
+</jardesc>

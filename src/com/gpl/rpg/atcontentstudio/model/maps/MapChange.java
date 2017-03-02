@@ -39,7 +39,7 @@ public class MapChange extends MapObject {
 		if (oldOne == map) {
 			oldOne.removeBacklink(parentMap);
 			map = (TMXMap) newOne;
-			newOne.addBacklink(parentMap);
+			if (newOne != null) newOne.addBacklink(parentMap);
 		}
 	}
 	

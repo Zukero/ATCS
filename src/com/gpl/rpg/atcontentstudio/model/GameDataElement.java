@@ -4,10 +4,10 @@ import java.awt.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.tree.TreeNode;
 
@@ -32,7 +32,7 @@ public abstract class GameDataElement implements ProjectTreeNode, Serializable {
 	public boolean writable = false;
 	
 	//List of objects whose transition to "linked" state made them point to this instance.
-	private Map<GameDataElement, Integer> backlinks = new LinkedHashMap<GameDataElement, Integer>();
+	private Map<GameDataElement, Integer> backlinks = new ConcurrentHashMap<GameDataElement, Integer>();
 
 	public String id = null;
 	

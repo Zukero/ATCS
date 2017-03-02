@@ -66,7 +66,7 @@ public class SpawnArea extends MapObject {
 		if (replacedIndex >= 0) {
 			oldOne.removeBacklink(parentMap);
 			spawnGroup.set(replacedIndex, (NPC) newOne);
-			newOne.addBacklink(parentMap);
+			if (newOne != null) newOne.addBacklink(parentMap);
 		}
 	}
 	

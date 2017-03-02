@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -128,9 +129,13 @@ public class FileUtils {
 				case Windows:
 					System.err.println("Trying the Windows way with mklink");
 					try {
-						Runtime.getRuntime().exec("mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath());
+						Runtime.getRuntime().exec("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath());
 					} catch (IOException e1) {
 						e1.printStackTrace();
+					}
+					System.err.println("Attempting UAC elevation through VBS script.");
+					if (!linkFile.exists()) {
+						runWithUac("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath(), 3, linkFile);
 					}
 					break;
 				case MacOS:
@@ -165,6 +170,30 @@ public class FileUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	static final String uacBatName = "ATCS_elevateWithUac.bat";
+	public static void runWithUac(String command, int tries, File checkExists) {
+		File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
+		File batFile = new File(tmpFolder, uacBatName);
+		batFile.deleteOnExit();
+		FileWriter writer;
+		try {
+			writer = new FileWriter(batFile, false);
+			writer.write(
+				"@echo Set objShell = CreateObject(\"Shell.Application\") > %temp%\\sudo.tmp.vbs\r\n"
+				+ "@echo args = Right(\"%*\", (Len(\"%*\") - Len(\"%1\"))) >> %temp%\\sudo.tmp.vbs\r\n"
+				+ "@echo objShell.ShellExecute \"%1\", args, \"\", \"runas\" >> %temp%\\sudo.tmp.vbs\r\n"
+				+ "@cscript %temp%\\sudo.tmp.vbs\r\n"
+				+ "del /f %temp%\\sudo.tmp.vbs\r\n");
+			writer.close();
+			while (!checkExists.exists() && tries-- > 0) {
+				Runtime.getRuntime().exec(new String[]{"cmd.exe","/C", batFile.getAbsolutePath()+" "+command});
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 }

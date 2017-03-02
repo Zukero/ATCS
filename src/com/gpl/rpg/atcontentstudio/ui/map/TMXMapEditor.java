@@ -1615,10 +1615,13 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			gdeIcon.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (map.state == GameDataElement.State.modified) {
-						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in ATCS.\nYou'd better save your changes in ATCS before opening this map with the external editor.\nDo you want to save before opening the file?", "Save before opening?", JOptionPane.YES_NO_CANCEL_OPTION);
+					if (map.state == GameDataElement.State.modified || map.state == GameDataElement.State.created) {
+						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You have unsaved changes in ATCS.\nYou'd better save your changes in ATCS before opening this map with the external editor.\nDo you want to save before opening the file?", "Save before opening?", JOptionPane.YES_NO_CANCEL_OPTION);
 						if (confirm == JOptionPane.CANCEL_OPTION) return;
-						if (confirm == JOptionPane.YES_OPTION) map.save();
+						if (confirm == JOptionPane.YES_OPTION) {
+							map.save();
+							ATContentStudio.frame.nodeChanged(map);
+						}
 					}
 					DesktopIntegration.openTmxMap(map.tmxFile);
 				}

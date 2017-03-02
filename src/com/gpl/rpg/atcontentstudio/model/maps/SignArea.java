@@ -33,7 +33,7 @@ public class SignArea extends MapObject {
 		if (oldOne == dialogue) {
 			oldOne.removeBacklink(parentMap);
 			dialogue = (Dialogue) newOne;
-			newOne.addBacklink(parentMap);
+			if (newOne != null) newOne.addBacklink(parentMap);
 		}
 	}
 	

@@ -56,7 +56,7 @@ public class ProjectCreationWizard extends JDialog {
 		atSourceSelectionCombo = new JComboBox<String>();
 		resourceSetToUse = new JComboBox<Project.ResourceSet>(new ComboBoxModel<Project.ResourceSet>() {
 
-			Project.ResourceSet selected = Project.ResourceSet.allFiles;
+			Project.ResourceSet selected = Project.ResourceSet.gameData;
 			
 			@Override
 			public int getSize() {
