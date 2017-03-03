@@ -23,6 +23,8 @@ public class WorkspaceSettings {
 	
 	public static final String VERSION_KEY = "ATCS_Version";
 	public static final String FILENAME = "workspace_settings.json";
+	
+	public static final int SETTINGS_VERSION = 1;
 
 	public Workspace parent;
 	public File file;
@@ -61,10 +63,10 @@ public class WorkspaceSettings {
 			reader = new FileReader(f);
 			@SuppressWarnings("rawtypes")
 			Map jsonSettings = (Map) parser.parse(reader);
-			String version = (String) jsonSettings.get(VERSION_KEY);
+			Integer version = (Integer) jsonSettings.get(VERSION_KEY);
 			if (version != null) {
-				if ("v0.5.2".equals(version)) {
-					loadv052(jsonSettings);
+				if (version >= 1) {
+					loadv1(jsonSettings);
 				}
 			}
 			
@@ -88,7 +90,7 @@ public class WorkspaceSettings {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private void loadv052(Map jsonSettings) {
+	private void loadv1(Map jsonSettings) {
 		for (Setting s : settings) {
 			s.readFromJson(jsonSettings);
 		}

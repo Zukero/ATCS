@@ -1,7 +1,8 @@
 !include MUI2.nsh
 
-!define VERSION "0.5.1"
-!define JAVA_BIN "java"
+!define VERSION "0.5.2"
+!define TRAINER_VERSION "0.1.3"
+!define JAVA_BIN "javaw"
 
 Name "Andor's Trail Content Studio v${VERSION}"
 OutFile "ATCS_v${VERSION}_Setup.exe"
@@ -57,13 +58,32 @@ Section install
   Call GetJRE
   Pop $R0
   FileOpen $9 "ATCS.cmd" w
-  FileWrite $9 'start "" "$R0" -Xmx512M -cp "lib\AndorsTrainer_v0.1.1.jar;lib\jide-oss.jar;lib\ui.jar;lib\junit-4.10.jar;lib\json_simple-1.1.jar;lib\rsyntaxtextarea.jar;lib\prefuse.jar;lib\bsh-2.0b4.jar;lib\ATCS_v${VERSION}.jar" com.gpl.rpg.atcontentstudio.ATContentStudio'
+  FileWrite $9 '@echo off'
+  FileWrite $9 ''
+  FileWrite $9 'set ATCS_DIR=%~dp0'
+  FileWrite $9 'set MAX_MEM=512M'
+  FileWrite $9 'set CP=%ATCS_DIR%lib\*'
+  FileWrite $9 'set JAVA=$R0'
+  FileWrite $9 'set JAVA_OPTS='
+  FileWrite $9 'set ENV_FILE=%ATCS_DIR%ATCS.env.bat'
+  FileWrite $9 'set MAIN_CLASS=com.gpl.rpg.atcontentstudio.ATContentStudio'
+  FileWrite $9 ''
+  FileWrite $9 'if exist %ENV_FILE% (' 
+  FileWrite $9 '  call %ENV_FILE%'
+  FileWrite $9 ') else ('
+  FileWrite $9 '  echo REM set MAX_MEM=%MAX_MEM% > %ENV_FILE%'
+  FileWrite $9 '  echo REM set JAVA=%JAVA% >> %ENV_FILE%'
+  FileWrite $9 '  echo REM set JAVA_OPTS=%JAVA_OPTS% >> %ENV_FILE%'
+  FileWrite $9 '  echo. >> %ENV_FILE%'
+  FileWrite $9 ')'
+  FileWrite $9 ''
+  FileWrite $9 'start "" "%JAVA%" %JAVA_OPTS% -Xmx%MAX_MEM% -cp "%CP%" %MAIN_CLASS%'
   FileClose $9
   
   SetOutPath "$INSTDIR\lib\"
   file "jide-oss.jar"
   file "ui.jar"
-  file "AndorsTrainer_v0.1.3.jar"
+  file "AndorsTrainer_v${TRAINER_VERSION}.jar"
   file "junit-4.10.jar"
   file "json_simple-1.1.jar"
   file "ATCS_v${VERSION}.jar"
@@ -93,7 +113,7 @@ Section uninstall
   Delete "$INSTDIR\lib\ui.jar"
   Delete "$INSTDIR\lib\junit-4.10.jar"
   Delete "$INSTDIR\lib\json_simple-1.1.jar"
-  Delete "$INSTDIR\lib\AndorsTrainer_v0.1.3.jar"
+  Delete "$INSTDIR\lib\AndorsTrainer_v${TRAINER_VERSION}.jar"
   Delete "$INSTDIR\lib\ATCS_v${VERSION}.jar"
   Delete "$INSTDIR\lib\rsyntaxtextarea.jar"
   Delete "$INSTDIR\lib\prefuse.jar"
@@ -101,6 +121,7 @@ Section uninstall
   RMDir "$INSTDIR\lib\"
   Delete "$INSTDIR\ATCS.ico"
   Delete "$INSTDIR\ATCS.cmd"
+  Delete "$INSTDIR\ATCS.env.bat"
   
   Delete "$INSTDIR\Uninstall.exe"
 

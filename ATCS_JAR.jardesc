@@ -11,18 +11,8 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <file path="/ATContentStudio/nsisHeaderBase2.xcf"/>
-        <file path="/ATContentStudio/ATCS_v0.5.1.jar"/>
-        <file path="/ATContentStudio/nsisBorderBannerBase.xcf"/>
-        <file path="/ATContentStudio/.project"/>
         <javaElement handleIdentifier="=ATContentStudio/res"/>
         <javaElement handleIdentifier="=ATContentStudio/src"/>
-        <file path="/ATContentStudio/folderIconBase.xcf"/>
-        <file path="/ATContentStudio/.gitignore"/>
-        <file path="/ATContentStudio/fileIconBase.xcf"/>
         <javaElement handleIdentifier="=ATContentStudio/hacked-libtiled"/>
-        <file path="/ATContentStudio/arrows.xcf"/>
-        <file path="/ATContentStudio/.classpath"/>
-        <file path="/ATContentStudio/ATCS_v0.5.0.jar"/>
     </selectedElements>
 </jardesc>
