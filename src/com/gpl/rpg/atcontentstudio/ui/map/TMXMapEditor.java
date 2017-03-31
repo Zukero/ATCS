@@ -131,7 +131,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	
 	private JPanel layerDetailsPane;
 	private BooleanBasedCheckBox layerVisibleBox;
-	//private BooleanBasedCheckBox activeLayerBox;
+	private JCheckBox groupActiveForNewGame;
 	private JTextField layerNameField;
 	private MapObjectsListModel groupObjectsListModel;
 	@SuppressWarnings("rawtypes")
@@ -160,7 +160,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	@SuppressWarnings("rawtypes")
 	private JComboBox evaluateTriggerBox;
 	private JSpinner quantityField;
-	private JCheckBox activeForNewGame;
+	private JCheckBox spawnActiveForNewGame;
 	private JTextField spawngroupField;
 	@SuppressWarnings("rawtypes")
 	private JList npcList;
@@ -332,7 +332,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					break;
 				}
 			}
-			activeForNewGame = addBooleanBasedCheckBox(groupDetailPane, "Active for new game", objGroup.active, map.writable, listener);
+			groupActiveForNewGame = addBooleanBasedCheckBox(groupDetailPane, "Active for new game", objGroup.active, map.writable, listener);
 			groupObjectsListModel = new MapObjectsListModel(objGroup);
 			groupObjectsList = new JList(groupObjectsListModel);
 			groupObjectsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -576,7 +576,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			areaField = addTextField(pane, "Spawn area ID: ", ((SpawnArea)selected).name, ((TMXMap)target).writable, listener);
 			spawngroupField = addTextField(pane, "Spawn group ID: ", ((SpawnArea)selected).spawngroup_id, ((TMXMap)target).writable, listener);
 			quantityField = addIntegerField(pane, "Number of spawned NPCs: ", ((SpawnArea)selected).quantity, false, ((TMXMap)target).writable, listener);
-			activeForNewGame = addBooleanBasedCheckBox(pane, "Active in a new game: ", ((SpawnArea)selected).active, ((TMXMap)target).writable, listener);
+			spawnActiveForNewGame = addBooleanBasedCheckBox(pane, "Active in a new game: ", ((SpawnArea)selected).active, ((TMXMap)target).writable, listener);
 			npcListModel = new SpawnGroupNpcListModel((SpawnArea) selected);
 			npcList = new JList(npcListModel);
 			npcList.setCellRenderer(new GDERenderer(true, ((TMXMap)target).writable));
@@ -1775,9 +1775,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				modified = false;
 				tmxViewer.revalidate();
 				tmxViewer.repaint();
-			}  else if (source == activeForNewGame) {
+			}  else if (source == groupActiveForNewGame) {
 				if (selectedLayer instanceof tiled.core.ObjectGroup) {
-					map.getGroup((tiled.core.ObjectGroup) selectedLayer).active = activeForNewGame.isSelected();
+					map.getGroup((tiled.core.ObjectGroup) selectedLayer).active = groupActiveForNewGame.isSelected();
 				}
 				modified = true;
 			} else if (source == layerList) {
@@ -1904,7 +1904,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					SpawnArea area = (SpawnArea) selectedMapObject;
 					area.quantity = (Integer) value;
 				}
-			} else if (source == activeForNewGame) {
+			} else if (source == spawnActiveForNewGame) {
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea) selectedMapObject;
 					area.active = (Boolean) value;
