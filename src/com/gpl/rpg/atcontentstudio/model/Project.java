@@ -665,6 +665,26 @@ public class Project implements ProjectTreeNode, Serializable {
 		return sheet;
 	}
 	
+	public int getSpritesheetCount() {
+		return createdContent.gameSprites.spritesheets.size() + baseContent.gameSprites.spritesheets.size();
+	}
+
+	public Spritesheet getSpritesheet(int index) {
+		if (index < createdContent.gameSprites.spritesheets.size()) {
+			return createdContent.gameSprites.spritesheets.get(index);
+		} else if (index < getQuestCount()){
+			return getSpritesheet(baseContent.gameSprites.spritesheets.get(index - createdContent.gameSprites.spritesheets.size()).id);
+		}
+		return null;
+	}
+	
+	public int getSpritesheetIndex(Spritesheet spritesheet) {
+		if (spritesheet.getDataType() == GameSource.Type.created) {
+			return createdContent.gameSprites.spritesheets.indexOf(spritesheet);
+		} else {
+			return createdContent.gameSprites.spritesheets.size() + baseContent.gameSprites.spritesheets.indexOf(baseContent.gameSprites.getSpritesheet(spritesheet.id));
+		}
+	}
 	
 	public TMXMap getMap(String id) {
 		TMXMap map = createdContent.gameMaps.getMap(id);

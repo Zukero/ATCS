@@ -445,6 +445,7 @@ public class SpritesheetEditor extends Editor {
 			} else if (source == categoryBox) {
 				sheet.category = (Spritesheet.Category) value;
 			}
+			sheet.save();
 		}
 	}
 

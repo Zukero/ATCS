@@ -35,13 +35,26 @@ public class SpriteChooser extends JDialog {
 	private static final int MAX_PER_ROW = 10;
 	
 	public static Map<Project, Map<Spritesheet.Category, SpriteChooser>> cache = new LinkedHashMap<Project, Map<Spritesheet.Category,SpriteChooser>>();
-
+	public static Map<Project, Map<Spritesheet.Category, List<Spritesheet>>> cacheValidator = new LinkedHashMap<Project, Map<Category,List<Spritesheet>>>();
+	
+	
 	public static SpriteChooser getChooser(Project proj, Spritesheet.Category category) {
 		if (cache.get(proj) == null) {
 			cache.put(proj, new LinkedHashMap<Spritesheet.Category, SpriteChooser>());
 		}
 		if (cache.get(proj).get(category) == null) {
 			cache.get(proj).put(category, new SpriteChooser(proj, category));
+		} else {
+			List<Spritesheet> spritesheets = new ArrayList<Spritesheet>();
+			for (int i=0; i<proj.getSpritesheetCount(); i++) {
+				Spritesheet sheet = proj.getSpritesheet(i);
+				if (sheet.category == category) {
+					spritesheets.add(sheet);
+				}
+			}
+			if ( !spritesheets.equals(cacheValidator.get(proj).get(category)) ) {
+				cache.get(proj).put(category, new SpriteChooser(proj, category));
+			}
 		}
 		SpriteChooser wanted = cache.get(proj).get(category);
 		wanted.group.clearSelection();
@@ -65,11 +78,16 @@ public class SpriteChooser extends JDialog {
 		setTitle("Select a sprite");
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		List<Spritesheet> spritesheets = new ArrayList<Spritesheet>();
-		for (Spritesheet sheet : proj.baseContent.gameSprites.spritesheets) {
+		for (int i=0; i<proj.getSpritesheetCount(); i++) {
+			Spritesheet sheet = proj.getSpritesheet(i);
 			if (sheet.category == category) {
 				spritesheets.add(sheet);
 			}
 		}
+		if (cacheValidator.get(proj) == null) {
+			cacheValidator.put(proj, new LinkedHashMap<Spritesheet.Category, List<Spritesheet>>());
+		}
+		cacheValidator.get(proj).put(category, spritesheets);
 		
 		
 		JPanel pane = new JPanel();

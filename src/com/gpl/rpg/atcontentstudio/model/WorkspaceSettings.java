@@ -110,7 +110,7 @@ public class WorkspaceSettings {
 			return;
 		}
 
-		json.put(VERSION_KEY, ATContentStudio.APP_VERSION);
+		json.put(VERSION_KEY, SETTINGS_VERSION);
 		StringWriter writer = new JsonPrettyWriter();
 		try {
 			JSONObject.writeJSONString(json, writer);

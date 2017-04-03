@@ -20,6 +20,8 @@ import com.gpl.rpg.atcontentstudio.model.GameSource;
 public class ActorCondition extends JSONElement {
 	
 	private static final long serialVersionUID = -3969824899972048507L;
+
+	public static final Integer CLEAR_AC_MAGNITUDE = -99;
 	
 	// Available from init state
 	//public String id; inherited.

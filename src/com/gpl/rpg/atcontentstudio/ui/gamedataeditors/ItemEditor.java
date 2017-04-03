@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -15,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -98,6 +100,8 @@ public class ItemEditor extends JSONElementEditor {
 	@SuppressWarnings("rawtypes")
 	private JList hitSourceConditionsList;
 	private MyComboBox hitSourceConditionBox;
+	private JRadioButton hitSourceConditionClear;
+	private JRadioButton hitSourceConditionApply;
 	private JSpinner hitSourceConditionMagnitude;
 	private JSpinner hitSourceConditionDuration;
 	private JSpinner hitSourceConditionChance;
@@ -105,6 +109,8 @@ public class ItemEditor extends JSONElementEditor {
 	@SuppressWarnings("rawtypes")
 	private JList hitTargetConditionsList;
 	private MyComboBox hitTargetConditionBox;
+	private JRadioButton hitTargetConditionClear;
+	private JRadioButton hitTargetConditionApply;
 	private JSpinner hitTargetConditionMagnitude;
 	private JSpinner hitTargetConditionDuration;
 	private JSpinner hitTargetConditionChance;
@@ -119,6 +125,8 @@ public class ItemEditor extends JSONElementEditor {
 	@SuppressWarnings("rawtypes")
 	private JList killSourceConditionsList;
 	private MyComboBox killSourceConditionBox;
+	private JRadioButton killSourceConditionClear;
+	private JRadioButton killSourceConditionApply;
 	private JSpinner killSourceConditionMagnitude;
 	private JSpinner killSourceConditionDuration;
 	private JSpinner killSourceConditionChance;
@@ -461,55 +469,169 @@ public class ItemEditor extends JSONElementEditor {
 		
 	}
 	
-	public void updateHitSourceTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, FieldUpdateListener listener) {
+	public void updateHitSourceTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (hitSourceConditionBox != null) {
 			removeElementListener(hitSourceConditionBox);
 		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
+		}
+		
 		boolean writable = ((Item)target).writable;
 		Project proj = ((Item)target).getProject();
 		
 		hitSourceConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		hitSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
-		hitSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		hitSourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
+		hitSourceConditionApply = new JRadioButton("Apply new condition");
+		pane.add(hitSourceConditionApply, JideBoxLayout.FIX);
+		hitSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		hitSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		hitSourceConditionClear = new JRadioButton("Clear active condition");
+		pane.add(hitSourceConditionClear, JideBoxLayout.FIX);
+		
+		ButtonGroup radioGroup = new ButtonGroup();
+		radioGroup.add(hitSourceConditionApply);
+		radioGroup.add(hitSourceConditionClear);
+		
+		if (condition != null && condition.magnitude != null && condition.magnitude == ActorCondition.CLEAR_AC_MAGNITUDE) {
+			hitSourceConditionClear.setSelected(true);
+			hitSourceConditionApply.setSelected(false);
+			hitSourceConditionMagnitude.setEnabled(false);
+			hitSourceConditionDuration.setEnabled(false);
+		} else {
+			hitSourceConditionClear.setSelected(false);
+			hitSourceConditionApply.setSelected(true);
+			hitSourceConditionMagnitude.setEnabled(true);
+			hitSourceConditionDuration.setEnabled(true);
+		}
+		
+		hitSourceConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitSourceConditionClear, new Boolean(hitSourceConditionClear.isSelected()));
+			}
+		});
+		hitSourceConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitSourceConditionApply, new Boolean(hitSourceConditionApply.isSelected()));
+			}
+		});
 		
 		pane.revalidate();
 		pane.repaint();
 	}
 
-	public void updateHitTargetTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, FieldUpdateListener listener) {
+	public void updateHitTargetTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (hitTargetConditionBox != null) {
 			removeElementListener(hitTargetConditionBox);
+		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
 		}
 		
 		boolean writable = ((Item)target).writable;
 		Project proj = ((Item)target).getProject();
 
 		hitTargetConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		hitTargetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
-		hitTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		hitTargetConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
-
+		hitTargetConditionApply = new JRadioButton("Apply new condition");
+		pane.add(hitTargetConditionApply, JideBoxLayout.FIX);
+		hitTargetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		hitTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		hitTargetConditionClear = new JRadioButton("Clear active condition");
+		pane.add(hitTargetConditionClear, JideBoxLayout.FIX);
+		
+		ButtonGroup radioGroup = new ButtonGroup();
+		radioGroup.add(hitTargetConditionApply);
+		radioGroup.add(hitTargetConditionClear);
+		
+		if (condition != null && condition.magnitude != null && condition.magnitude == ActorCondition.CLEAR_AC_MAGNITUDE) {
+			hitTargetConditionClear.setSelected(true);
+			hitTargetConditionApply.setSelected(false);
+			hitTargetConditionMagnitude.setEnabled(false);
+			hitTargetConditionDuration.setEnabled(false);
+		} else {
+			hitTargetConditionClear.setSelected(false);
+			hitTargetConditionApply.setSelected(true);
+			hitTargetConditionMagnitude.setEnabled(true);
+			hitTargetConditionDuration.setEnabled(true);
+		}
+		
+		hitTargetConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitTargetConditionClear, new Boolean(hitTargetConditionClear.isSelected()));
+			}
+		});
+		hitTargetConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitTargetConditionApply, new Boolean(hitTargetConditionApply.isSelected()));
+			}
+		});
+		
 		pane.revalidate();
 		pane.repaint();
 	}
 
-	public void updateKillSourceTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, FieldUpdateListener listener) {
+	public void updateKillSourceTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (killSourceConditionBox != null) {
 			removeElementListener(killSourceConditionBox);
+		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
 		}
 		
 		boolean writable = ((Item)target).writable;
 		Project proj = ((Item)target).getProject();
 
 		killSourceConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		killSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
-		killSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		killSourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
-
+		killSourceConditionApply = new JRadioButton("Apply new condition");
+		pane.add(killSourceConditionApply, JideBoxLayout.FIX);
+		killSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		killSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		killSourceConditionClear = new JRadioButton("Clear active condition");
+		pane.add(killSourceConditionClear, JideBoxLayout.FIX);
+		
+		ButtonGroup radioGroup = new ButtonGroup();
+		radioGroup.add(killSourceConditionApply);
+		radioGroup.add(killSourceConditionClear);
+		
+		if (condition != null && condition.magnitude != null && condition.magnitude == ActorCondition.CLEAR_AC_MAGNITUDE) {
+			killSourceConditionClear.setSelected(true);
+			killSourceConditionApply.setSelected(false);
+			killSourceConditionMagnitude.setEnabled(false);
+			killSourceConditionDuration.setEnabled(false);
+		} else {
+			killSourceConditionClear.setSelected(false);
+			killSourceConditionApply.setSelected(true);
+			killSourceConditionMagnitude.setEnabled(true);
+			killSourceConditionDuration.setEnabled(true);
+		}
+		
+		killSourceConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(killSourceConditionClear, new Boolean(killSourceConditionClear.isSelected()));
+			}
+		});
+		killSourceConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(killSourceConditionApply, new Boolean(killSourceConditionApply.isSelected()));
+			}
+		});
 		pane.revalidate();
 		pane.repaint();
 	}
@@ -518,6 +640,11 @@ public class ItemEditor extends JSONElementEditor {
 		pane.removeAll();
 		if (equipConditionBox != null) {
 			removeElementListener(equipConditionBox);
+		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
 		}
 		
 		boolean writable = ((Item)target).writable;
@@ -666,7 +793,11 @@ public class ItemEditor extends JSONElementEditor {
 				
 				if (effect.condition != null) {
 					label.setIcon(new ImageIcon(effect.condition.getIcon()));
-					label.setText(effect.chance+"% chances to give "+effect.duration+" rounds of "+effect.condition.getDesc()+" x"+effect.magnitude);
+					if (effect.magnitude == ActorCondition.CLEAR_AC_MAGNITUDE) {
+						label.setText(effect.chance+"% chances to clear "+effect.condition.getDesc());
+					} else {
+						label.setText(effect.chance+"% chances to give "+effect.duration+" rounds of "+effect.condition.getDesc()+" x"+effect.magnitude);
+					}
 				} else {
 					label.setText("New, undefined actor condition effect.");
 				}
@@ -984,6 +1115,20 @@ public class ItemEditor extends JSONElementEditor {
 				}
 				hitSourceConditionsModel.itemChanged(selectedHitEffectSourceCondition);
 				updateHit = true;
+			} else if (source == hitSourceConditionClear) {
+				selectedHitEffectSourceCondition.magnitude = ActorCondition.CLEAR_AC_MAGNITUDE;
+				selectedHitEffectSourceCondition.duration = null;
+				hitSourceConditionMagnitude.setEnabled(false);
+				hitSourceConditionDuration.setEnabled(false);
+				hitSourceConditionsModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
+			}  else if (source == hitSourceConditionApply) {
+				selectedHitEffectSourceCondition.magnitude = 0;
+				selectedHitEffectSourceCondition.duration = 0;
+				hitSourceConditionMagnitude.setEnabled(true);
+				hitSourceConditionDuration.setEnabled(true);
+				hitSourceConditionsModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
 			} else if (source == hitSourceConditionMagnitude) {
 				selectedHitEffectSourceCondition.magnitude = (Integer) value;
 				hitSourceConditionsModel.itemChanged(selectedHitEffectSourceCondition);
@@ -1009,6 +1154,20 @@ public class ItemEditor extends JSONElementEditor {
 				} else {
 					selectedHitEffectTargetCondition.condition_id = null;
 				}
+				hitTargetConditionsModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			} else if (source == hitTargetConditionClear) {
+				selectedHitEffectTargetCondition.magnitude = ActorCondition.CLEAR_AC_MAGNITUDE;
+				selectedHitEffectTargetCondition.duration = null;
+				hitTargetConditionMagnitude.setEnabled(false);
+				hitTargetConditionDuration.setEnabled(false);
+				hitTargetConditionsModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			}  else if (source == hitTargetConditionApply) {
+				selectedHitEffectTargetCondition.magnitude = 0;
+				selectedHitEffectTargetCondition.duration = 0;
+				hitTargetConditionMagnitude.setEnabled(true);
+				hitTargetConditionDuration.setEnabled(true);
 				hitTargetConditionsModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionMagnitude) {
@@ -1052,6 +1211,20 @@ public class ItemEditor extends JSONElementEditor {
 				} else {
 					selectedKillEffectCondition.condition_id = null;
 				}
+				killSourceConditionsModel.itemChanged(selectedKillEffectCondition);
+				updateKill = true;
+			} else if (source == killSourceConditionClear) {
+				selectedKillEffectCondition.magnitude = ActorCondition.CLEAR_AC_MAGNITUDE;
+				selectedKillEffectCondition.duration = null;
+				killSourceConditionMagnitude.setEnabled(false);
+				killSourceConditionDuration.setEnabled(false);
+				killSourceConditionsModel.itemChanged(selectedKillEffectCondition);
+				updateKill = true;
+			}  else if (source == killSourceConditionApply) {
+				selectedKillEffectCondition.magnitude = 0;
+				selectedKillEffectCondition.duration = 0;
+				killSourceConditionMagnitude.setEnabled(true);
+				killSourceConditionDuration.setEnabled(true);
 				killSourceConditionsModel.itemChanged(selectedKillEffectCondition);
 				updateKill = true;
 			} else if (source == killSourceConditionMagnitude) {
