@@ -55,6 +55,8 @@ Section install
   SetOutPath $INSTDIR
   file "ATCS.ico"
   
+  Delete "$INSTDIR\lib\*"
+  
   Call GetJRE
   Pop $R0
   FileOpen $9 "ATCS.cmd" w
