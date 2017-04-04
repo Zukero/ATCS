@@ -1,5 +1,6 @@
 package com.gpl.rpg.atcontentstudio.model.gamedata;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.io.File;
 import java.io.Serializable;
@@ -7,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.tree.TreeNode;
 
 import com.gpl.rpg.atcontentstudio.Notification;
@@ -60,6 +63,10 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 			if (!baseFolder.exists()) this.baseFolder.mkdirs();
 		} else if (parent.type.equals(GameSource.Type.source)) {
 			this.baseFolder = new File(source.baseFolder, DEFAULT_REL_PATH_IN_SOURCE);
+			if(!this.baseFolder.exists()){
+				folderNotFound();
+				System.exit(0);
+			}
 		}
 		
 		actorConditions = new GameDataCategory<ActorCondition>(this, ActorCondition.getStaticDesc());
@@ -463,4 +470,17 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 		return null;
 	}
 	
+	public void folderNotFound(){
+		JFrame frame = new JFrame();
+		frame.setTitle("AT Folder not found");
+		frame.setSize(330, 100);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JLabel text = new JLabel("<html>The Andor's trail projet has been moved or deleted,<br>so Andor's Trail Content Studio cannot load the project.</html>");
+		text.setFont(new Font("Calibri",Font.CENTER_BASELINE, 14));
+		frame.add(text);
+		frame.setVisible(true);
+		while(true);
+	}
+
 }
