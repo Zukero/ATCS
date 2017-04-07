@@ -97,7 +97,7 @@ public class SavedGame extends GameDataElement {
 	}
 	@Override
 	public String getDesc() {
-		return loadedSave.displayInfo;
+		return (needsSaving() ? "*" : "")+loadedSave.displayInfo;
 	}
 
 	@Override

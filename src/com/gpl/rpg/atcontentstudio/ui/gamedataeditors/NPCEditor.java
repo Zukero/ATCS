@@ -166,7 +166,7 @@ public class NPCEditor extends JSONElementEditor {
 	public void insertFormViewDataField(JPanel pane) {
 		final NPC npc = (NPC) target;
 		
-		final FieldUpdateListener listener = new NPCFieldUpdate();
+		final FieldUpdateListener listener = new NPCFieldUpdater();
 		
 		npcIcon = createButtonPane(pane, npc.getProject(), npc, NPC.class, npc.getImage(), Spritesheet.Category.monster, listener);
 		
@@ -504,17 +504,29 @@ public class NPCEditor extends JSONElementEditor {
 		return true;
 	}
 	
-	public class NPCFieldUpdate implements FieldUpdateListener {
+	public class NPCFieldUpdater implements FieldUpdateListener {
 
 		@Override
 		public void valueChanged(JComponent source, Object value) {
 			NPC npc = (NPC)target;
 			boolean updateHit = false;
 			if (source == idField) {
-				npc.id = (String) value;
-				NPCEditor.this.name = npc.getDesc();
-				npc.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(NPCEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					npc.id = (String) value;
+					NPCEditor.this.name = npc.getDesc();
+					npc.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(NPCEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == nameField) {
 				npc.name = (String) value;
 				NPCEditor.this.name = npc.getDesc();

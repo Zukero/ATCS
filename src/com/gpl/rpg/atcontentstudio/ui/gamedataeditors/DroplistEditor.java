@@ -248,10 +248,22 @@ public class DroplistEditor extends JSONElementEditor {
 		public void valueChanged(JComponent source, Object value) {
 			Droplist droplist = ((Droplist)target);
 			if (source == idField) {
-				droplist.id = (String) value;
-				DroplistEditor.this.name = droplist.getDesc();
-				droplist.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(DroplistEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					droplist.id = (String) value;
+					DroplistEditor.this.name = droplist.getDesc();
+					droplist.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(DroplistEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == itemCombo) {
 				if (selectedItem.item != null) {
 					selectedItem.item.removeBacklink(droplist);

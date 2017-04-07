@@ -110,7 +110,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 
 	@Override
 	public String getDesc() {
-		return "Dialogue sketchs";
+		return (needsSaving() ? "*" : "")+"Dialogue sketchs";
 	}
 
 	@Override
@@ -195,7 +195,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 	public List<SaveEvent> attemptSave() {
 		List<SaveEvent> events = new ArrayList<SaveEvent>();
 		for (WriterModeData data : writerModeDataList) {
-			if (data.state == State.created || data.state == State.modified) {
+			if (data.needsSaving()) {
 				events.add(new SaveEvent(SaveEvent.Type.alsoSave, data));
 			}
 		}
@@ -261,6 +261,15 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 		node.parent = this;
 		if (higherEmptyParent != null) higherEmptyParent.notifyCreated();
 		else node.notifyCreated();
+	}
+	
+
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : writerModeDataList) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 
 }

@@ -49,7 +49,7 @@ public class Quest extends JSONElement {
 	
 	@Override
 	public String getDesc() {
-		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+name+" ("+id+")";
+		return (needsSaving() ? "*" : "")+name+" ("+id+")";
 	}
 
 	public static String getStaticDesc() {

@@ -53,5 +53,7 @@ public interface ProjectTreeNode extends TreeNode {
 	public GameSource.Type getDataType();
 	
 	public boolean isEmpty();
+	
+	public boolean needsSaving();
 
 }

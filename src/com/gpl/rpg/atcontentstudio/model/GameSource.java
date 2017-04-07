@@ -213,11 +213,11 @@ public class GameSource implements ProjectTreeNode, Serializable {
 	@Override
 	public String getDesc() {
 		switch(type) {
-		case altered: return "Altered data";
-		case created: return "Created data";
-		case referenced: return "Referenced data";
-		case source: return "AT Source"; //The fact that it is from "source" is already mentionned by its parent.
-		default: return "Game data";
+		case altered: return (needsSaving() ? "*" : "")+"Altered data";
+		case created: return (needsSaving() ? "*" : "")+"Created data";
+		case referenced: return (needsSaving() ? "*" : "")+"Referenced data";
+		case source: return (needsSaving() ? "*" : "")+"AT Source"; //The fact that it is from "source" is already mentionned by its parent.
+		default: return (needsSaving() ? "*" : "")+"Game data";
 		}
 	}
 	
@@ -282,5 +282,13 @@ public class GameSource implements ProjectTreeNode, Serializable {
 
 	public WorldmapSegment getWorldmapSegment(String id) {
 		return worldmap.getWorldmapSegment(id);
+	}
+	
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : v.getNonEmptyIterable()) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 }

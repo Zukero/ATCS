@@ -102,7 +102,7 @@ public class GameDataCategory<E extends JSONElement> extends ArrayList<E> implem
 	}
 	@Override
 	public String getDesc() {
-		return this.name;
+		return (needsSaving() ? "*" : "")+this.name;
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public class GameDataCategory<E extends JSONElement> extends ArrayList<E> implem
 					impactedCategory = getProject().createdContent.gameData.getCategory(node.getClass());
 					impactedFileName = node.getProjectFilename();
 				}
-			} else if (node.state == GameDataElement.State.modified) {
+			} else if (node.needsSaving()) {
 				events.add(new SaveEvent(SaveEvent.Type.alsoSave, node));
 			}
 			if (containedIds.containsKey(node.id)) {
@@ -242,5 +242,12 @@ public class GameDataCategory<E extends JSONElement> extends ArrayList<E> implem
 		return result;
 	}
 	
+	@Override
+	public boolean needsSaving() {
+		for (E node : this) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
+	}
 	
 }

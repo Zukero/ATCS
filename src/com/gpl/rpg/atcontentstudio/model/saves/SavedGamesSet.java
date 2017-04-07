@@ -128,7 +128,7 @@ public class SavedGamesSet implements ProjectTreeNode, Serializable {
 	}
 	@Override
 	public String getDesc() {
-		return "Saved games";
+		return (needsSaving() ? "*" : "")+"Saved games";
 	}
 
 	@Override
@@ -167,5 +167,14 @@ public class SavedGamesSet implements ProjectTreeNode, Serializable {
 	@Override
 	public boolean isEmpty() {
 		return saves.isEmpty();
+	}
+	
+
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : saves) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 }

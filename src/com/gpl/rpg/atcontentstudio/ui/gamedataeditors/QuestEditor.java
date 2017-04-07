@@ -314,10 +314,22 @@ public class QuestEditor extends JSONElementEditor {
 		public void valueChanged(JComponent source, Object value) {
 			Quest quest = (Quest) target;
 			if (source == idField) {
-				quest.id = (String) value;
-				QuestEditor.this.name = quest.getDesc();
-				quest.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(QuestEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					quest.id = (String) value;
+					QuestEditor.this.name = quest.getDesc();
+					quest.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(QuestEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == nameField) {
 				quest.name = (String) value;
 				QuestEditor.this.name = quest.getDesc();

@@ -87,10 +87,22 @@ public class ItemCategoryEditor extends JSONElementEditor {
 		public void valueChanged(JComponent source, Object value) {
 			ItemCategory ic = (ItemCategory)target;
 			if (source == idField) {
-				ic.id = (String) value;
-				ItemCategoryEditor.this.name = ic.getDesc();
-				ic.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(ItemCategoryEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					ic.id = (String) value;
+					ItemCategoryEditor.this.name = ic.getDesc();
+					ic.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(ItemCategoryEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == nameField) {
 				ic.name = (String) value;
 				ItemCategoryEditor.this.name = ic.getDesc();

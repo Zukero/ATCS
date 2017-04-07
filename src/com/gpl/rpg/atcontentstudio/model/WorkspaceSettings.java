@@ -63,20 +63,14 @@ public class WorkspaceSettings {
 			reader = new FileReader(f);
 			@SuppressWarnings("rawtypes")
 			Map jsonSettings = (Map) parser.parse(reader);
-			Integer version = (Integer) jsonSettings.get(VERSION_KEY);
+			Integer version = ((Number) jsonSettings.get(VERSION_KEY)).intValue();
 			if (version != null) {
 				if (version >= 1) {
 					loadv1(jsonSettings);
 				}
 			}
 			
-		} catch (FileNotFoundException e) {
-			Notification.addError("Error while parsing workspace settings: "+e.getMessage());
-			e.printStackTrace();
-		} catch (IOException e) {
-			Notification.addError("Error while parsing workspace settings: "+e.getMessage());
-			e.printStackTrace();
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			Notification.addError("Error while parsing workspace settings: "+e.getMessage());
 			e.printStackTrace();
 		} finally {

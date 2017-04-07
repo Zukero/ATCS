@@ -236,7 +236,7 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 	}
 	@Override
 	public String getDesc() {
-		return "JSON data";
+		return (needsSaving() ? "*" : "")+"JSON data";
 	}
 	
 
@@ -463,4 +463,11 @@ public class GameDataSet implements ProjectTreeNode, Serializable {
 		return null;
 	}
 	
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : v.getNonEmptyIterable()) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
+	}
 }

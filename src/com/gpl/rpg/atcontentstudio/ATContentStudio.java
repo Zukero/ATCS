@@ -5,6 +5,8 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,10 +24,13 @@ import com.gpl.rpg.atcontentstudio.ui.WorkspaceSelector;
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.5.3";
+	public static final String APP_VERSION = "v0.5.4";
 
 	public static boolean STARTED = false;
 	public static StudioFrame frame = null;
+
+	//Need to keep a strong reference to it, to avoid garbage collection that'll reset these loggers.
+	public static final List<Logger> configuredLoggers = new LinkedList<Logger>();
 	
 	/**
 	 * @param args
@@ -33,8 +38,6 @@ public class ATContentStudio {
 	public static void main(String[] args) {
 		
 		ConfigCache.init();
-		
-		Logger.getLogger(ExpressionParser.class.getName()).setLevel(Level.OFF);
 		
 		try {
 			String laf = ConfigCache.getFavoriteLaFClassName();
@@ -50,6 +53,10 @@ public class ATContentStudio {
 			e.printStackTrace();
 		}
 
+		//Need to keep a strong reference to it, to avoid garbage collection that'll reset this setting.
+		Logger l = Logger.getLogger(ExpressionParser.class.getName());
+		l.setLevel(Level.OFF);
+		configuredLoggers.add(l); 
 		
 		final WorkspaceSelector wsSelect = new WorkspaceSelector();
 		wsSelect.pack();
@@ -69,7 +76,7 @@ public class ATContentStudio {
 							Workspace.setActive(workspaceRoot);
 							frame = new StudioFrame(APP_NAME+" "+APP_VERSION);
 							frame.setVisible(true);
-							frame.setDefaultCloseOperation(StudioFrame.EXIT_ON_CLOSE);
+							frame.setDefaultCloseOperation(StudioFrame.DO_NOTHING_ON_CLOSE);
 						};
 					});
 					for (File f : ConfigCache.getKnownWorkspaces()) {

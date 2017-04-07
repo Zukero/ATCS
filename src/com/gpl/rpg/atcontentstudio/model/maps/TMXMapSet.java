@@ -187,7 +187,7 @@ public class TMXMapSet implements ProjectTreeNode {
 	}
 	@Override
 	public String getDesc() {
-		return "TMX Maps";
+		return (needsSaving() ? "*" : "")+"TMX Maps";
 	}
 	
 	@Override
@@ -260,6 +260,14 @@ public class TMXMapSet implements ProjectTreeNode {
 
 	public TMXMap get(int index) {
 		return tmxMaps.get(index);
+	}
+	
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : tmxMaps) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 	
 }

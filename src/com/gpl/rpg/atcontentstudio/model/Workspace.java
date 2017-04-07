@@ -140,8 +140,15 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	@Override
 	public void childrenChanged(List<ProjectTreeNode> path) {
 		path.add(0, this);
-		if (projectsTreeModel != null) projectsTreeModel.changeNode(new TreePath(path.toArray()));
-		ATContentStudio.frame.editorChanged(path.get(path.size() - 1));
+		ProjectTreeNode last = path.get(path.size() - 1);
+		if (projectsTreeModel != null) {
+			while (path.size() > 1) {
+				projectsTreeModel.changeNode(new TreePath(path.toArray()));
+				path.remove(path.size()-1);
+			}
+			
+		}
+		ATContentStudio.frame.editorChanged(last);
 	}
 
 	@Override
@@ -345,6 +352,15 @@ public class Workspace implements ProjectTreeNode, Serializable {
 	@Override
 	public boolean isEmpty() {
 		return projects.isEmpty();
+	}
+	
+
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : projects) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 
 }

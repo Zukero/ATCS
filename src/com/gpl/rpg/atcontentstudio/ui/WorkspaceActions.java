@@ -95,14 +95,14 @@ public class WorkspaceActions {
 		public void actionPerformed(ActionEvent e) {
 			if (!(selectedNode instanceof GameDataElement)) return;
 			final GameDataElement node = ((GameDataElement)selectedNode); 
-			if (node.state == GameDataElement.State.modified){
+			if (node.needsSaving()){
 				node.save();
 				ATContentStudio.frame.nodeChanged(node);
 			}
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			if (selectedNode instanceof GameDataElement) {
-				setEnabled(((GameDataElement)selectedNode).state == GameDataElement.State.modified);
+				setEnabled(((GameDataElement)selectedNode).needsSaving());
 			} else {
 				setEnabled(false);
 			}
@@ -330,8 +330,14 @@ public class WorkspaceActions {
 	
 	public ATCSAction exitATCS = new ATCSAction("Exit", "Closes the program"){
 		public void actionPerformed(ActionEvent e) {
-			//TODO ouch.
-			System.exit(0);
+			if (Workspace.activeWorkspace.needsSaving()) {
+				int answer = JOptionPane.showConfirmDialog(ATContentStudio.frame, "There are unsaved changes in your workspace.\nExiting ATCS will discard these changes.\nDo you really want to exit?", "Unsaved changes. Confirm exit.", JOptionPane.YES_NO_OPTION);
+				if (answer == JOptionPane.YES_OPTION) {
+					System.exit(0);
+				}
+			} else {
+				System.exit(0);
+			}
 		};
 	};
 	

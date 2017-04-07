@@ -52,7 +52,7 @@ public class WorldmapSegment extends GameDataElement {
 
 	@Override
 	public String getDesc() {
-		return id;
+		return (needsSaving() ? "*" : "")+id;
 	}
 
 	@Override

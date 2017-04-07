@@ -1075,10 +1075,22 @@ public class DialogueEditor extends JSONElementEditor {
 		public void valueChanged(JComponent source, Object value) {
 			Dialogue dialogue = (Dialogue) target;
 			if (source == idField) {
-				dialogue.id = (String) value;
-				DialogueEditor.this.name = dialogue.getDesc();
-				dialogue.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(DialogueEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					dialogue.id = (String) value;
+					DialogueEditor.this.name = dialogue.getDesc();
+					dialogue.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(DialogueEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == messageField) {
 				dialogue.message = (String) value;
 			} else if (source == switchToNpcBox) {

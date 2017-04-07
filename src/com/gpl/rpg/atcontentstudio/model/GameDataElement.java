@@ -176,6 +176,10 @@ public abstract class GameDataElement implements ProjectTreeNode, Serializable {
 		return false;
 	}
 	
+	public boolean needsSaving() {
+		return this.state == State.modified || this.state == State.created;
+	}
+	
 	public abstract String getProjectFilename();
 	
 	public abstract void save();

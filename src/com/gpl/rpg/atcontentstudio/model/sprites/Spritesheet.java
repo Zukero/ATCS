@@ -118,7 +118,7 @@ public class Spritesheet extends GameDataElement {
 	}
 	@Override
 	public String getDesc() {
-		return spritesheetFile.getName();
+		return (needsSaving() ? "*" : "")+spritesheetFile.getName();
 	}
 
 	@Override

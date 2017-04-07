@@ -116,4 +116,9 @@ public class ClosedProject implements ProjectTreeNode {
 		return true;
 	}
 	
+	@Override
+	public boolean needsSaving() {
+		return false;
+	}
+	
 }

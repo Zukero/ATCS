@@ -102,7 +102,7 @@ public class SpriteSheetSet implements ProjectTreeNode {
 	}
 	@Override
 	public String getDesc() {
-		return "Spritesheets";
+		return (needsSaving() ? "*" : "")+"Spritesheets";
 	}
 
 	@Override
@@ -150,5 +150,13 @@ public class SpriteSheetSet implements ProjectTreeNode {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : spritesheets) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
 	}
 }

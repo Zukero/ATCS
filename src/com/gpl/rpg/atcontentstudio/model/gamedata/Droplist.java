@@ -47,7 +47,7 @@ public class Droplist extends JSONElement {
 	
 	@Override
 	public String getDesc() {
-		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+id;
+		return (needsSaving() ? "*" : "")+id;
 	}
 
 	public static String getStaticDesc() {

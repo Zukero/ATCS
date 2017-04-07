@@ -147,10 +147,22 @@ public class ActorConditionEditor extends JSONElementEditor {
 		public void valueChanged(JComponent source, Object value) {
 			ActorCondition aCond = (ActorCondition)target;
 			if (source == idField) {
-				aCond.id = (String) value;
-				ActorConditionEditor.this.name = aCond.getDesc();
-				aCond.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(ActorConditionEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					aCond.id = (String) value;
+					ActorConditionEditor.this.name = aCond.getDesc();
+					aCond.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(ActorConditionEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == nameField) {
 				aCond.display_name = (String) value;
 				ActorConditionEditor.this.name = aCond.getDesc();

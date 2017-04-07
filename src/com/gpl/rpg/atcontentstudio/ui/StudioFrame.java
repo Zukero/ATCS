@@ -118,6 +118,7 @@ public class StudioFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				Workspace.saveActive();
+				actions.exitATCS.actionPerformed(null);
 			}
 		});
 	}

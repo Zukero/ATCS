@@ -173,7 +173,7 @@ public class Worldmap extends ArrayList<WorldmapSegment> implements ProjectTreeN
 
 	@Override
 	public String getDesc() {
-		return "Worldmap";
+		return (needsSaving() ? "*" : "")+"Worldmap";
 	}
 	@Override
 	public void notifyCreated() {
@@ -277,6 +277,13 @@ public class Worldmap extends ArrayList<WorldmapSegment> implements ProjectTreeN
 			e.printStackTrace();
 		}
 	}
-	
+
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : this) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
+	}
 	
 }

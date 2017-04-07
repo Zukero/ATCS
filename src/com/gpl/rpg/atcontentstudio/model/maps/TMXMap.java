@@ -62,7 +62,6 @@ public class TMXMap extends GameDataElement {
 	public Integer outside = null;
 	public ColorFilter colorFilter = null;
 
-	public boolean writable = false;
 	public boolean changedOnDisk = false;
 	public int dismissNextChangeNotif = 0;
 
@@ -129,6 +128,7 @@ public class TMXMap extends GameDataElement {
 						clone.groups = new ArrayList<MapObjectGroup>();
 					}
 					MapObjectGroup group = new MapObjectGroup((tiled.core.ObjectGroup) layer, this);
+					group.link();
 					clone.groups.add(group);
 				}
 			}
@@ -201,7 +201,7 @@ public class TMXMap extends GameDataElement {
 	}
 	@Override
 	public String getDesc() {
-		return ((this.state == State.modified || this.state == State.created) ? "*" : "")+id;
+		return (needsSaving() ? "*" : "")+id;
 	}
 	
 	@Override
@@ -315,7 +315,7 @@ public class TMXMap extends GameDataElement {
 		if (this.state == GameDataElement.State.init) {
 			parse();
 		}
-		if (this.state == GameDataElement.State.parsed || this.state == GameDataElement.State.created) {
+		if (this.state == GameDataElement.State.parsed) {
 			if (groups != null) {
 				for (MapObjectGroup group : groups) {
 					group.link();

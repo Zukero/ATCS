@@ -413,7 +413,7 @@ public class WriterModeData extends GameDataElement {
 	
 	@Override
 	public String getDesc() {
-		return (this.state == State.modified ? "*" : "")+id;
+		return (needsSaving() ? "*" : "")+id;
 	}
 	@Override
 	public Project getProject() {

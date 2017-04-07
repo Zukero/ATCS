@@ -63,7 +63,8 @@ public class WorldMapEditor extends Editor {
 	
 	public String mapBeingAddedID = null;
 	public String selectedLabel = null;
-
+	WorldMapView mapView = null;
+	
 	public WorldMapEditor(WorldmapSegment worldmap) {
 		target = worldmap;
 		this.name = worldmap.id;
@@ -114,7 +115,7 @@ public class WorldMapEditor extends Editor {
 		addLabelField(pane, "Worldmap File: ", ((Worldmap)worldmap.getParent()).worldmapFile.getAbsolutePath());
 		pane.add(createButtonPane(worldmap), JideBoxLayout.FIX);
 		
-		final WorldMapView mapView = new WorldMapView(worldmap);
+		mapView = new WorldMapView(worldmap);
 		JScrollPane mapScroller = new JScrollPane(mapView);
 		final JViewport vPort = mapScroller.getViewport();
 		
@@ -296,6 +297,7 @@ public class WorldMapEditor extends Editor {
 						for (String s : mapView.selected) {
 							map.labelledMaps.get(selectedLabel).add(s);
 						}
+						notifyModelModified();
 						mapView.revalidate();
 						mapView.repaint();
 					}
@@ -319,6 +321,7 @@ public class WorldMapEditor extends Editor {
 								worldmap.labels.put(created.id, created);
 								worldmap.labels.remove(selectedLabel);
 								selectedLabel = created.id;
+								notifyModelModified();
 								mapView.revalidate();
 								mapView.repaint();
 							}
@@ -334,6 +337,7 @@ public class WorldMapEditor extends Editor {
 					worldmap.labelledMaps.remove(selectedLabel);
 					worldmap.labels.remove(selectedLabel);
 					selectedLabel = null;
+					notifyModelModified();
 					mapView.revalidate();
 					mapView.repaint();
 				}
@@ -348,6 +352,7 @@ public class WorldMapEditor extends Editor {
 						public void labelCreated(NamedArea created) {
 							worldmap.labelledMaps.put(created.id, new ArrayList<String>());
 							worldmap.labelledMaps.get(created.id).addAll(mapView.selected);
+							notifyModelModified();
 							mapView.revalidate();
 							mapView.repaint();
 						}
@@ -436,11 +441,12 @@ public class WorldMapEditor extends Editor {
 					mapView.selected.remove(selectedMap);
 					mapSelectionChanged();
 					mapView.updateFromModel();
+					notifyModelModified();
 					update = true;
 				} else if (editMode == EditMode.addMap && mapBeingAddedID != null) {
 					if (e.getButton() == MouseEvent.BUTTON1) {
 						mapView.recomputeSize();
-						mapView.pushToModel();
+						pushToModel();
 					}
 					mapView.updateFromModel();
 					update = true;
@@ -463,7 +469,7 @@ public class WorldMapEditor extends Editor {
 			public void mouseReleased(MouseEvent e) {
 				dragStart = null;
 				if (editMode == EditMode.moveMaps) {
-					mapView.pushToModel();
+					pushToModel();
 				}
 			}
 			
@@ -712,5 +718,17 @@ public class WorldMapEditor extends Editor {
 		message.revalidate();
 		message.repaint();
 	}
+	
+	public void pushToModel() {
+		mapView.pushToModel();
+		notifyModelModified();
+	}
+	
+	public void notifyModelModified() {
+		target.state = GameDataElement.State.modified;
+		this.name = ((WorldmapSegment)target).getDesc();
+		target.childrenChanged(new ArrayList<ProjectTreeNode>());
+	}
+	
 	
 }

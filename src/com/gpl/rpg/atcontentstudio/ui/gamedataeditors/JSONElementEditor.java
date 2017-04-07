@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -26,10 +29,13 @@ import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
+import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
+import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
+import com.gpl.rpg.atcontentstudio.ui.IdChangeImpactWizard;
 import com.gpl.rpg.atcontentstudio.ui.SaveItemsWizard;
 import com.gpl.rpg.atcontentstudio.ui.sprites.SpriteChooser;
 import com.jidesoft.swing.JideBoxLayout;
@@ -274,5 +280,65 @@ public abstract class JSONElementEditor extends Editor {
 		}
 		message.revalidate();
 		message.repaint();
+	}
+	
+
+	public boolean idChanging() {
+		JSONElement node = (JSONElement) target;
+		List<GameDataElement> toModify = new LinkedList<GameDataElement>();
+		List<GameDataElement> toAlter = new LinkedList<GameDataElement>();
+		for (GameDataElement element : node.getBacklinks()) {
+			GameDataElement activeElement = element;
+			if (element instanceof JSONElement) {
+				activeElement = node.getProject().getGameDataElement((Class<? extends JSONElement>) element.getClass(), element.id);
+			} else if (element instanceof TMXMap) {
+				activeElement = node.getProject().getMap(element.id);
+			} else if (element instanceof WorldmapSegment) {
+				activeElement = node.getProject().getWorldmapSegment(element.id);
+			}
+			if (activeElement.writable) {
+				//No need to alter. Check if we flag a new modification.
+				if (!activeElement.needsSaving()) {
+					toModify.add(activeElement);
+				}
+			} else {
+				toAlter.add(activeElement);
+			}
+		}
+		if (!(toModify.isEmpty() && toAlter.isEmpty())) {
+			IdChangeImpactWizard.Result result = IdChangeImpactWizard.showIdChangeImapctWizard(target, toModify, toAlter);
+			if (result == IdChangeImpactWizard.Result.ok) {
+				for (GameDataElement element : toModify) {
+					element.state = GameDataElement.State.modified;
+					element.childrenChanged(new ArrayList<ProjectTreeNode>());
+				}
+				for (GameDataElement element : toAlter) {
+					if (element instanceof JSONElement) {
+						node.getProject().makeWritable((JSONElement)element);
+					} else if (element instanceof TMXMap) {
+						node.getProject().makeWritable((TMXMap)element);
+					} else if (element instanceof WorldmapSegment) {
+						node.getProject().makeWritable((WorldmapSegment)element);
+					}
+				}
+				return true;
+			}
+		} else {
+			return true;
+		}
+		return false;
+	}
+	
+	//setText in cancelIdEdit generates to edit events, one replacing the contents with the empty string, and one with the target.id. We want to skip the first one.
+	public boolean skipNext = false;
+	public void cancelIdEdit(final JTextField idField) {
+		Runnable revertField = new Runnable(){
+			@Override
+			public void run() {
+				skipNext = true;
+				idField.setText(target.id);
+			}
+		};
+		SwingUtilities.invokeLater(revertField);
 	}
 }

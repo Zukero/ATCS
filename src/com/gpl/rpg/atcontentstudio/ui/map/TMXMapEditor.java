@@ -1615,7 +1615,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			gdeIcon.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (map.state == GameDataElement.State.modified || map.state == GameDataElement.State.created) {
+					if (map.needsSaving()) {
 						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You have unsaved changes in ATCS.\nYou'd better save your changes in ATCS before opening this map with the external editor.\nDo you want to save before opening the file?", "Save before opening?", JOptionPane.YES_NO_CANCEL_OPTION);
 						if (confirm == JOptionPane.CANCEL_OPTION) return;
 						if (confirm == JOptionPane.YES_OPTION) {
@@ -1633,7 +1633,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (map.state == GameDataElement.State.modified) {
+					if (map.needsSaving()) {
 						int confirm = JOptionPane.showConfirmDialog(TMXMapEditor.this, "You modified this map in ATCS. All ATCS-made changes will be lost if you confirm.\n On the other hand, if you save using ATCS, all external changes will be lost.\n Do you want to reload?", "Confirm reload?", JOptionPane.OK_CANCEL_OPTION);
 						if (confirm == JOptionPane.CANCEL_OPTION) return;
 					}

@@ -120,6 +120,7 @@ public class Requirement extends JSONElement {
 			break;
 		}
 		if (this.required_obj != null) this.required_obj.addBacklink((GameDataElement) this.parent);
+		this.state = State.linked;
 	}
 	
 	@Override

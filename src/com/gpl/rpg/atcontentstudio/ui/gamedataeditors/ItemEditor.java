@@ -936,10 +936,22 @@ public class ItemEditor extends JSONElementEditor {
 			boolean updatePrice, updateEquip, updateHit, updateKill;
 			updatePrice = updateEquip = updateHit = updateKill = false;
 			if (source == idField) {
-				item.id = (String) value;
-				ItemEditor.this.name = item.getDesc();
-				item.childrenChanged(new ArrayList<ProjectTreeNode>());
-				ATContentStudio.frame.editorChanged(ItemEditor.this);
+				//Events caused by cancel an ID edition. Dismiss.
+				if (skipNext) {
+					skipNext = false;
+					return;
+				}
+				if (target.id.equals((String) value)) return;
+				
+				if (idChanging()) {
+					item.id = (String) value;
+					ItemEditor.this.name = item.getDesc();
+					item.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(ItemEditor.this);
+				} else {
+					cancelIdEdit(idField);
+					return;
+				}
 			} else if (source == nameField) {
 				item.name = (String) value;
 				ItemEditor.this.name = item.getDesc();

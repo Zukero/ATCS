@@ -191,7 +191,7 @@ public class Project implements ProjectTreeNode, Serializable {
 	}
 	@Override
 	public String getDesc() {
-		return name;
+		return (needsSaving() ? "*" : "")+name;
 	}
 
 
@@ -265,7 +265,7 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 		}
 		for (ProjectTreeNode node : baseContent.gameMaps.tmxMaps) {
-			((TMXMap)node).parse();
+			((TMXMap)node).link();
 		}
 		for (ProjectTreeNode node : alteredContent.gameData.v.getNonEmptyIterable()) {
 			if (node instanceof GameDataCategory<?>) {
@@ -275,7 +275,7 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 		}
 		for (ProjectTreeNode node : alteredContent.gameMaps.tmxMaps) {
-			((TMXMap)node).parse();
+			((TMXMap)node).link();
 		}
 		for (ProjectTreeNode node : createdContent.gameData.v.getNonEmptyIterable()) {
 			if (node instanceof GameDataCategory<?>) {
@@ -285,9 +285,6 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 		}
 		for (ProjectTreeNode node : createdContent.gameMaps.tmxMaps) {
-			((TMXMap)node).parse();
-		}
-		for (ProjectTreeNode node : baseContent.gameMaps.tmxMaps) {
 			((TMXMap)node).link();
 		}
 		
@@ -1131,6 +1128,13 @@ public class Project implements ProjectTreeNode, Serializable {
 	}
 
 
+	@Override
+	public boolean needsSaving() {
+		for (ProjectTreeNode node : v.getNonEmptyIterable()) {
+			if (node.needsSaving()) return true;
+		}
+		return false;
+	}
 
 	
 
