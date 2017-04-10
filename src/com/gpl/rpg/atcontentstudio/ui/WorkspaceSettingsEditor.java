@@ -6,7 +6,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -28,6 +31,9 @@ public class WorkspaceSettingsEditor extends JDialog {
 	JRadioButton useSystemDefaultImageViewerButton, useSystemDefaultImageEditorButton, useCustomImageEditorButton;
 	JTextField imageEditorCommandField;
 	
+	JCheckBox translatorModeBox;
+	JComboBox<String> translatorLanguagesBox; 
+	
 	
 	
 	public WorkspaceSettingsEditor(WorkspaceSettings settings) {
@@ -46,6 +52,7 @@ public class WorkspaceSettingsEditor extends JDialog {
 		
 		
 		pane.add(getExternalToolsPane(), JideBoxLayout.FIX);
+		pane.add(getTranslatorModePane(), JideBoxLayout.FIX);
 		pane.add(new JPanel(), JideBoxLayout.VARY);
 
 		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
@@ -147,6 +154,32 @@ public class WorkspaceSettingsEditor extends JDialog {
 		return pane;
 	}
 	
+	public JPanel getTranslatorModePane() {
+		CollapsiblePanel pane = new CollapsiblePanel("Translator options");
+		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS));
+		
+		translatorModeBox = new JCheckBox("Activate translator mode");
+		pane.add(translatorModeBox, JideBoxLayout.FIX);
+		
+		JPanel langPane = new JPanel();
+		langPane.setLayout(new JideBoxLayout(langPane, JideBoxLayout.LINE_AXIS));
+		langPane.add(new JLabel("Language code: "), JideBoxLayout.FIX);
+		translatorLanguagesBox = new JComboBox<String>(WorkspaceSettings.LANGUAGE_LIST);
+		langPane.add(translatorLanguagesBox);
+		pane.add(langPane, JideBoxLayout.FIX);
+		
+		translatorModeBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				translatorLanguagesBox.setEnabled(translatorModeBox.isSelected());
+			}
+		});
+		
+		pane.add(new JLabel("If your language isn't here, complain on the forums at https://andorstrail.com/"), JideBoxLayout.FIX);
+		
+		return pane;
+	}
+	
 	public void loadFromModel() {
 		//Tiled
 		useSystemDefaultMapEditorButton.setSelected(settings.useSystemDefaultMapEditor.getCurrentValue());
@@ -157,6 +190,14 @@ public class WorkspaceSettingsEditor extends JDialog {
 		useSystemDefaultImageEditorButton.setSelected(settings.useSystemDefaultImageEditor.getCurrentValue());
 		useCustomImageEditorButton.setSelected(!(settings.useSystemDefaultImageViewer.getCurrentValue() || settings.useSystemDefaultImageEditor.getCurrentValue()));
 		imageEditorCommandField.setText(settings.imageEditorCommand.getCurrentValue());
+		//Translator
+		if (settings.translatorLanguage.getCurrentValue() != null) {
+			translatorModeBox.setSelected(true);
+			translatorLanguagesBox.setSelectedItem(settings.translatorLanguage.getCurrentValue());
+		} else {
+			translatorModeBox.setSelected(false);
+			translatorLanguagesBox.setSelectedItem(null);
+		}
 	}
 	
 	public void pushToModel() {
@@ -167,7 +208,12 @@ public class WorkspaceSettingsEditor extends JDialog {
 		settings.useSystemDefaultImageViewer.setCurrentValue(useSystemDefaultImageViewerButton.isSelected());
 		settings.useSystemDefaultImageEditor.setCurrentValue(useSystemDefaultImageEditorButton.isSelected());
 		settings.imageEditorCommand.setCurrentValue(imageEditorCommandField.getText());
-		
+		//Translator
+		if (translatorModeBox.isSelected()) {
+			settings.translatorLanguage.setCurrentValue((String)translatorLanguagesBox.getSelectedItem());
+		} else {
+			settings.translatorLanguage.resetDefault();
+		}
 		settings.save();
 	}
 	

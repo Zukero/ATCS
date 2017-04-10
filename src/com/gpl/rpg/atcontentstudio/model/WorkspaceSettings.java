@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ComboBoxModel;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -39,7 +41,10 @@ public class WorkspaceSettings {
 	public static Boolean DEFAULT_USE_SYS_IMG_EDITOR = false;
 	public Setting<Boolean> useSystemDefaultImageEditor = new PrimitiveSetting<Boolean>("useSystemDefaultImageEditor", DEFAULT_USE_SYS_IMG_EDITOR);
 	public static String DEFAULT_IMG_EDITOR_COMMAND = "gimp";
+	public static String[] LANGUAGE_LIST = new String[]{null, "de", "ru", "pl", "fr", "it", "es", "nl", "uk", "ca", "sv", "pt", "pt_BR", "zh_Hant", "zh_Hans", "ja", "cs", "tr", "ko", "hu", "sl", "bg", "id", "fi", "th", "gl", "ms" ,"pa", "az"};
 	public Setting<String> imageEditorCommand = new PrimitiveSetting<String>("imageEditorCommand", DEFAULT_IMG_EDITOR_COMMAND);
+
+	public Setting<String> translatorLanguage = new NullDefaultPrimitiveSetting<String>("translatorLanguage");
 
 	public List<Setting<? extends Object>> settings = new ArrayList<Setting<? extends Object>>();
 	
@@ -50,6 +55,7 @@ public class WorkspaceSettings {
 		settings.add(useSystemDefaultImageViewer);
 		settings.add(useSystemDefaultImageEditor);
 		settings.add(imageEditorCommand);
+		settings.add(translatorLanguage);
 		file = new File(parent.baseFolder, FILENAME);
 		if (file.exists()) {
 			load(file);
@@ -172,6 +178,18 @@ public class WorkspaceSettings {
 		}
 		
 		
+	}
+	
+	public class NullDefaultPrimitiveSetting<X extends Object> extends PrimitiveSetting<X> {
+		
+		public NullDefaultPrimitiveSetting(String id) {
+			super(id, null);
+		}
+		
+		@Override
+		public void saveToJson(Map json) {
+			if (value != null) json.put(id,  value);
+		}
 	}
 	
 	public class ListSetting<X extends Object> extends Setting<List<X>> {

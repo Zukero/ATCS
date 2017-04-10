@@ -76,7 +76,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 		acIcon = createButtonPane(pane, ac.getProject(), ac, ActorCondition.class, ac.getImage(), Spritesheet.Category.actorcondition, listener);
 		
 		idField = addTextField(pane, "Internal ID: ", ac.id, ac.writable, listener);
-		nameField = addTextField(pane, "Display name: ", ac.display_name, ac.writable, listener);
+		nameField = addTranslatableTextField(pane, "Display name: ", ac.display_name, ac.writable, listener);
 		categoryBox = addEnumValueBox(pane, "Category: ", ActorCondition.ACCategory.values(), ac.category, ac.writable, listener);
 		positiveBox = addIntegerBasedCheckBox(pane, "Positive", ac.positive, ac.writable, listener);
 		stackingBox = addIntegerBasedCheckBox(pane, "Stacking", ac.stacking, ac.writable, listener);

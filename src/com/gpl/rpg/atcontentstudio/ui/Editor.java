@@ -2,6 +2,8 @@ package com.gpl.rpg.atcontentstudio.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -10,6 +12,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +53,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.Project;
 import com.gpl.rpg.atcontentstudio.model.ProjectElementListener;
+import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.ActorCondition;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Droplist;
@@ -57,6 +63,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
+import com.gpl.rpg.atcontentstudio.utils.HashUtils;
 import com.jidesoft.swing.ComboBoxSearchable;
 import com.jidesoft.swing.JideBoxLayout;
 
@@ -108,6 +115,58 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return addTextField(pane, label, value, false, nullListener);
 	}
 	
+	public static JTextField addTranslatableTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
+		final JTextField tfField = addTextField(pane, label, initialValue, editable, listener);
+		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
+			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
+			pane.add(translateLinkLabel, JideBoxLayout.FIX);
+			tfField.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+			});
+			translateLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			translateLinkLabel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						try {
+							Desktop.getDesktop().browse(new URI(getWeblateLabelURI(tfField.getText())));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						} catch (URISyntaxException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+		}
+		return tfField;
+	}
+	
+	public static String getWeblateLabelLink(String text) {
+		return "<html><a href=\""+getWeblateLabelURI(text)+"\">Translate on weblate</a></html>";
+	}
+	
+	public static String getWeblateLabelURI(String text) {
+		return "https://hosted.weblate.org/translate/andors-trail/game-content/"+Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue()+"/?checksum="+HashUtils.weblateHash(text, "");
+	}
+	
 	public static JTextField addTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
 		JPanel tfPane = new JPanel();
 		tfPane.setLayout(new JideBoxLayout(tfPane, JideBoxLayout.LINE_AXIS, 6));
@@ -149,6 +208,51 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 			}
 		});
 		return tfField;
+	}
+	
+	
+	public static JTextArea addTranslatableTextArea(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
+		final JTextArea tfArea = addTextArea(pane, label, initialValue, editable, listener);
+		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
+			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
+			pane.add(translateLinkLabel, JideBoxLayout.FIX);
+			tfArea.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+					translateLinkLabel.revalidate();
+					translateLinkLabel.repaint();
+				}
+			});
+			translateLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			translateLinkLabel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON1) {
+						try {
+							Desktop.getDesktop().browse(new URI(getWeblateLabelURI(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n")))));
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						} catch (URISyntaxException e1) {
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+		}
+		return tfArea;
 	}
 	
 	public static JTextArea addTextArea(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {

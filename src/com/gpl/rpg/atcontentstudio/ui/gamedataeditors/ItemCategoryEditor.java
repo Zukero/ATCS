@@ -52,7 +52,7 @@ public class ItemCategoryEditor extends JSONElementEditor {
 		
 		
 		idField = addTextField(pane, "Internal ID: ", ic.id, ic.writable, listener);
-		nameField = addTextField(pane, "Display name: ", ic.name, ic.writable, listener);
+		nameField = addTranslatableTextField(pane, "Display name: ", ic.name, ic.writable, listener);
 		typeBox = addEnumValueBox(pane, "Action type: ", ItemCategory.ActionType.values(), ic.action_type, ic.writable, listener);
 		slotBox = addEnumValueBox(pane, "Inventory slot: ", ItemCategory.InventorySlot.values(), ic.slot, ic.writable, listener);
 		sizeBox = addEnumValueBox(pane, "Item size: ", ItemCategory.Size.values(), ic.size, ic.writable, listener);

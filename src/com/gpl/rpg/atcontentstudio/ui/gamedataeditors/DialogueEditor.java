@@ -165,7 +165,7 @@ public class DialogueEditor extends JSONElementEditor {
 		createButtonPane(pane, dialogue.getProject(), dialogue, Dialogue.class, dialogue.getImage(), null, listener);
 		
 		idField = addTextField(pane, "Internal ID: ", dialogue.id, dialogue.writable, listener);
-		messageField = addTextArea(pane, "Message: ", dialogue.message, dialogue.writable, listener);
+		messageField = addTranslatableTextArea(pane, "Message: ", dialogue.message, dialogue.writable, listener);
 		switchToNpcBox = addNPCBox(pane, dialogue.getProject(), "Switch active NPC to: ", dialogue.switch_to_npc, dialogue.writable, listener);
 		
 		CollapsiblePanel rewards = new CollapsiblePanel("Reaching this phrase gives the following rewards: ");

@@ -69,7 +69,7 @@ public class QuestEditor extends JSONElementEditor {
 		
 
 		idField = addTextField(pane, "Internal ID: ", quest.id, quest.writable, listener);
-		nameField = addTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
+		nameField = addTranslatableTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
 		visibleBox = addIntegerBasedCheckBox(pane, "Visible in quest log", quest.visible_in_log, quest.writable, listener);
 
 		JPanel stagesPane = new JPanel();

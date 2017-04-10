@@ -171,7 +171,7 @@ public class NPCEditor extends JSONElementEditor {
 		npcIcon = createButtonPane(pane, npc.getProject(), npc, NPC.class, npc.getImage(), Spritesheet.Category.monster, listener);
 		
 		idField = addTextField(pane, "Internal ID: ", npc.id, npc.writable, listener);
-		nameField = addTextField(pane, "Display name: ", npc.name, npc.writable, listener);
+		nameField = addTranslatableTextField(pane, "Display name: ", npc.name, npc.writable, listener);
 		spawnGroupField = addTextField(pane, "Spawn group ID: ", npc.spawngroup_id, npc.writable, listener);
 		experienceField = addIntegerField(pane, "Experience reward: ", npc.getMonsterExperience(), false, false, listener);
 		dialogueBox = addDialogueBox(pane, npc.getProject(), "Initial phrase: ", npc.dialogue, npc.writable, listener);

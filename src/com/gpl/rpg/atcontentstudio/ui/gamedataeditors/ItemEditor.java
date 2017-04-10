@@ -149,8 +149,8 @@ public class ItemEditor extends JSONElementEditor {
 		itemIcon = createButtonPane(pane, item.getProject(), item, Item.class, item.getImage(), Spritesheet.Category.item, listener);
 		
 		idField = addTextField(pane, "Internal ID: ", item.id, item.writable, listener);
-		nameField = addTextField(pane, "Display name: ", item.name, item.writable, listener);
-		descriptionField = addTextField(pane, "Description: ", item.description, item.writable, listener);
+		nameField = addTranslatableTextField(pane, "Display name: ", item.name, item.writable, listener);
+		descriptionField = addTranslatableTextField(pane, "Description: ", item.description, item.writable, listener);
 		typeBox = addEnumValueBox(pane, "Type: ", Item.DisplayType.values(), item.display_type, item.writable, listener);
 		manualPriceBox = addIntegerBasedCheckBox(pane, "Has manual price", item.has_manual_price, item.writable, listener);
 		baseManualPrice = item.base_market_cost;
