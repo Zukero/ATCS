@@ -118,8 +118,12 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 	public static JTextField addTranslatableTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
 		final JTextField tfField = addTextField(pane, label, initialValue, editable, listener);
 		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
+			JPanel labelPane = new JPanel();
+			labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
 			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
-			pane.add(translateLinkLabel, JideBoxLayout.FIX);
+			labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
+			labelPane.add(new JPanel(), JideBoxLayout.VARY);
+			pane.add(labelPane, JideBoxLayout.FIX);
 			tfField.getDocument().addDocumentListener(new DocumentListener() {
 				@Override
 				public void removeUpdate(DocumentEvent e) {
@@ -214,8 +218,12 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 	public static JTextArea addTranslatableTextArea(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
 		final JTextArea tfArea = addTextArea(pane, label, initialValue, editable, listener);
 		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
+			JPanel labelPane = new JPanel();
+			labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
 			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
-			pane.add(translateLinkLabel, JideBoxLayout.FIX);
+			labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
+			labelPane.add(new JPanel(), JideBoxLayout.VARY);
+			pane.add(labelPane, JideBoxLayout.FIX);
 			tfArea.getDocument().addDocumentListener(new DocumentListener() {
 				@Override
 				public void removeUpdate(DocumentEvent e) {
