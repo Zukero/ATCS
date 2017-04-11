@@ -47,6 +47,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.text.DefaultFormatter;
+import javax.swing.text.JTextComponent;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
@@ -63,7 +64,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
-import com.gpl.rpg.atcontentstudio.utils.HashUtils;
+import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration;
 import com.jidesoft.swing.ComboBoxSearchable;
 import com.jidesoft.swing.JideBoxLayout;
 
@@ -115,60 +116,66 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return addTextField(pane, label, value, false, nullListener);
 	}
 	
-	public static JTextField addTranslatableTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
-		final JTextField tfField = addTextField(pane, label, initialValue, editable, listener);
-		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
-			JPanel labelPane = new JPanel();
-			labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
-			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
-			labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
-			labelPane.add(new JPanel(), JideBoxLayout.VARY);
-			pane.add(labelPane, JideBoxLayout.FIX);
-			tfField.getDocument().addDocumentListener(new DocumentListener() {
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfField.getText()));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-			});
-			translateLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			translateLinkLabel.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if (e.getButton() == MouseEvent.BUTTON1) {
-						try {
-							Desktop.getDesktop().browse(new URI(getWeblateLabelURI(tfField.getText())));
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						} catch (URISyntaxException e1) {
-							e1.printStackTrace();
-						}
+	public static void addTranslationPane(JPanel pane, final JTextComponent tfComponent, final String initialValue) {if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
+		JPanel labelPane = new JPanel();
+		labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
+		final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
+		labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
+		final JLabel translationStatus = new JLabel(" - Status: unknown - Retrieving...");
+		labelPane.add(translationStatus, JideBoxLayout.VARY);
+		new Thread() {
+			public void run() {
+				WeblateIntegration.WeblateTranslationUnit unit = WeblateIntegration.getTranslationUnit(initialValue);
+				translationStatus.setText(" - Status: "+unit.status.toString()+" - "+unit.translatedText);
+			};
+		}.start();
+		pane.add(labelPane, JideBoxLayout.FIX);
+		tfComponent.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				translateLinkLabel.setText(getWeblateLabelLink(tfComponent.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+				translateLinkLabel.revalidate();
+				translateLinkLabel.repaint();
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				translateLinkLabel.setText(getWeblateLabelLink(tfComponent.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+				translateLinkLabel.revalidate();
+				translateLinkLabel.repaint();
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				translateLinkLabel.setText(getWeblateLabelLink(tfComponent.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
+				translateLinkLabel.revalidate();
+				translateLinkLabel.repaint();
+			}
+		});
+		translateLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		translateLinkLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					try {
+						Desktop.getDesktop().browse(new URI(WeblateIntegration.getWeblateLabelURI(tfComponent.getText().replaceAll("\n", Matcher.quoteReplacement("\n")))));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (URISyntaxException e1) {
+						e1.printStackTrace();
 					}
 				}
-			});
-		}
+			}
+		});
+	}
+	}
+	
+	public static JTextField addTranslatableTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
+		final JTextField tfField = addTextField(pane, label, initialValue, editable, listener);
+		addTranslationPane(pane, tfField, initialValue);
 		return tfField;
 	}
 	
 	public static String getWeblateLabelLink(String text) {
-		return "<html><a href=\""+getWeblateLabelURI(text)+"\">Translate on weblate</a></html>";
-	}
-	
-	public static String getWeblateLabelURI(String text) {
-		return "https://hosted.weblate.org/translate/andors-trail/game-content/"+Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue()+"/?checksum="+HashUtils.weblateHash(text, "");
+		return "<html><a href=\""+WeblateIntegration.getWeblateLabelURI(text)+"\">Translate on weblate</a></html>";
 	}
 	
 	public static JTextField addTextField(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
@@ -217,49 +224,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 	
 	public static JTextArea addTranslatableTextArea(JPanel pane, String label, String initialValue, boolean editable, final FieldUpdateListener listener) {
 		final JTextArea tfArea = addTextArea(pane, label, initialValue, editable, listener);
-		if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
-			JPanel labelPane = new JPanel();
-			labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
-			final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
-			labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
-			labelPane.add(new JPanel(), JideBoxLayout.VARY);
-			pane.add(labelPane, JideBoxLayout.FIX);
-			tfArea.getDocument().addDocumentListener(new DocumentListener() {
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-					translateLinkLabel.setText(getWeblateLabelLink(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n"))));
-					translateLinkLabel.revalidate();
-					translateLinkLabel.repaint();
-				}
-			});
-			translateLinkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			translateLinkLabel.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					if (e.getButton() == MouseEvent.BUTTON1) {
-						try {
-							Desktop.getDesktop().browse(new URI(getWeblateLabelURI(tfArea.getText().replaceAll("\n", Matcher.quoteReplacement("\n")))));
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						} catch (URISyntaxException e1) {
-							e1.printStackTrace();
-						}
-					}
-				}
-			});
-		}
+		addTranslationPane(pane, tfArea, initialValue);
 		return tfArea;
 	}
 	
