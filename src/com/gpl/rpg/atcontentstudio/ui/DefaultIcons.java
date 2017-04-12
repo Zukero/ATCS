@@ -231,6 +231,27 @@ public class DefaultIcons {
 	public static Image getZoomImage() { return getImage(ZOOM_RES); }
 	public static Image getZoomIcon() { return getIcon(ZOOM_RES); }
 	
+	private static String STATUS_RED_RES = "/com/gpl/rpg/atcontentstudio/img/status_red.png";
+	public static Image getStatusRedImage() { return getImage(STATUS_RED_RES); }
+	public static Image getStatusRedIcon() { return getIcon(STATUS_RED_RES); }
+	
+	private static String STATUS_ORANGE_RES = "/com/gpl/rpg/atcontentstudio/img/status_orange.png";
+	public static Image getStatusOrangeImage() { return getImage(STATUS_ORANGE_RES); }
+	public static Image getStatusOrangeIcon() { return getIcon(STATUS_ORANGE_RES); }
+	
+	private static String STATUS_GREEN_RES = "/com/gpl/rpg/atcontentstudio/img/status_green.png";
+	public static Image getStatusGreenImage() { return getImage(STATUS_GREEN_RES); }
+	public static Image getStatusGreenIcon() { return getIcon(STATUS_GREEN_RES); }
+	
+	private static String STATUS_BLUE_RES = "/com/gpl/rpg/atcontentstudio/img/status_blue.png";
+	public static Image getStatusBlueImage() { return getImage(STATUS_BLUE_RES); }
+	public static Image getStatusBlueIcon() { return getIcon(STATUS_BLUE_RES); }
+	
+	private static String STATUS_UNKNOWN_RES = "/com/gpl/rpg/atcontentstudio/img/status_unknown.png";
+	public static Image getStatusUnknownImage() { return getImage(STATUS_UNKNOWN_RES); }
+	public static Image getStatusUnknownIcon() { return getIcon(STATUS_UNKNOWN_RES); }
+	
+	
 	private static Image getImage(String res) {
 		if (imageCache.get(res) == null) {
 			try {

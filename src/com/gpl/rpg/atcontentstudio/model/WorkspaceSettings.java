@@ -1,7 +1,6 @@
 package com.gpl.rpg.atcontentstudio.model;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,13 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.ComboBoxModel;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.io.JsonPrettyWriter;
 
@@ -41,10 +36,13 @@ public class WorkspaceSettings {
 	public static Boolean DEFAULT_USE_SYS_IMG_EDITOR = false;
 	public Setting<Boolean> useSystemDefaultImageEditor = new PrimitiveSetting<Boolean>("useSystemDefaultImageEditor", DEFAULT_USE_SYS_IMG_EDITOR);
 	public static String DEFAULT_IMG_EDITOR_COMMAND = "gimp";
-	public static String[] LANGUAGE_LIST = new String[]{null, "de", "ru", "pl", "fr", "it", "es", "nl", "uk", "ca", "sv", "pt", "pt_BR", "zh_Hant", "zh_Hans", "ja", "cs", "tr", "ko", "hu", "sl", "bg", "id", "fi", "th", "gl", "ms" ,"pa", "az"};
 	public Setting<String> imageEditorCommand = new PrimitiveSetting<String>("imageEditorCommand", DEFAULT_IMG_EDITOR_COMMAND);
 
+	public static String[] LANGUAGE_LIST = new String[]{null, "de", "ru", "pl", "fr", "it", "es", "nl", "uk", "ca", "sv", "pt", "pt_BR", "zh_Hant", "zh_Hans", "ja", "cs", "tr", "ko", "hu", "sl", "bg", "id", "fi", "th", "gl", "ms" ,"pa", "az"};
 	public Setting<String> translatorLanguage = new NullDefaultPrimitiveSetting<String>("translatorLanguage");
+	public static Boolean DEFAULT_ALLOW_INTERNET = true;
+	public Setting<Boolean> useInternet = new PrimitiveSetting<Boolean>("useInternet", DEFAULT_ALLOW_INTERNET);
+	
 
 	public List<Setting<? extends Object>> settings = new ArrayList<Setting<? extends Object>>();
 	
@@ -56,6 +54,7 @@ public class WorkspaceSettings {
 		settings.add(useSystemDefaultImageEditor);
 		settings.add(imageEditorCommand);
 		settings.add(translatorLanguage);
+		settings.add(useInternet);
 		file = new File(parent.baseFolder, FILENAME);
 		if (file.exists()) {
 			load(file);

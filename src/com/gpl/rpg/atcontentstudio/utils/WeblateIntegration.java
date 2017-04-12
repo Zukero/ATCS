@@ -45,51 +45,57 @@ public class WeblateIntegration {
 	public static String getWeblateLabelURI(String text) {
 		return "https://hosted.weblate.org/translate/andors-trail/game-content/"+Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue()+"/?checksum="+weblateHash(text, "");
 	}
-	
+
 	public static class WeblateTranslationUnit {
 		public enum Status {
-			absent, notTranslated, warning, fuzzy, done
+			notAllowed, error, absent, notTranslated, warning, fuzzy, done
 		}
-		
+
 		public Status status;
 		public String translatedText;
 	}
-	
+
 	public static WeblateTranslationUnit getTranslationUnit(String text) {
 		WeblateTranslationUnit unit = new WeblateTranslationUnit();
-		unit.status = Status.absent;
-		unit.translatedText = "Cannot find this translated on weblate";
-		String hash = weblateHash(text, "");
-		try {
-			Document wlDoc = Jsoup.connect(getWeblateLabelURI(text)).get();
-			Element textArea = wlDoc.getElementById("id_"+hash+"_0");
-			if (textArea != null) {
-				String trans = textArea.text();
-				if (trans != null) {
-					unit.translatedText = trans.trim();
-					if (unit.translatedText.isEmpty()) {
-						unit.translatedText = "Not yet translated";
-						unit.status = Status.notTranslated;
+		if (!Workspace.activeWorkspace.settings.useInternet.getCurrentValue()) {
+			unit.status = Status.notAllowed;
+			unit.translatedText = "Allow internet connection in the workspace settings to get translation status";
+		} else {
+			unit.status = Status.absent;
+			unit.translatedText = "Cannot find this on weblate";
+			String hash = weblateHash(text, "");
+			try {
+				Document wlDoc = Jsoup.connect(getWeblateLabelURI(text)).get();
+				Element textArea = wlDoc.getElementById("id_"+hash+"_0");
+				if (textArea != null) {
+					String trans = textArea.text();
+					if (trans != null) {
+						unit.translatedText = trans.trim();
+						if (unit.translatedText.isEmpty()) {
+							unit.translatedText = "Not yet translated";
+							unit.status = Status.notTranslated;
+						} else {
+							unit.status = Status.done;
+						}
+					}
+					Element fuzzyBox = wlDoc.getElementById("id_"+hash+"_fuzzy");
+					if (fuzzyBox != null && fuzzyBox.hasAttr("checked")) {
+						if ("checked".equals(fuzzyBox.attr("checked"))) {
+							unit.status = Status.fuzzy;
+						}
 					} else {
-						unit.status = Status.done;
+						Elements dangerZone = wlDoc.getElementsByAttributeValue("class", "panel panel-danger");
+						if (dangerZone != null && !dangerZone.isEmpty()) {
+							unit.status = Status.warning;
+						}
 					}
 				}
-				Element fuzzyBox = wlDoc.getElementById("id_"+hash+"_fuzzy");
-				if (fuzzyBox != null && fuzzyBox.hasAttr("checked")) {
-					if ("checked".equals(fuzzyBox.attr("checked"))) {
-						unit.status = Status.fuzzy;
-					}
-				} else {
-					Elements dangerZone = wlDoc.getElementsByAttributeValue("class", "panel panel-danger");
-					if (dangerZone != null && !dangerZone.isEmpty()) {
-						unit.status = Status.warning;
-					}
-				}
+			} catch (IOException e) {
+				unit.status = Status.error;
+				unit.translatedText = "Cannot connect to weblate: "+e.getMessage();
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
-		
 		return unit;
 	}
 

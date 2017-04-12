@@ -121,12 +121,45 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
 		final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
 		labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
-		final JLabel translationStatus = new JLabel(" - Status: unknown - Retrieving...");
+		labelPane.add(new JLabel(" "), JideBoxLayout.FIX);
+		final JLabel translationStatus = new JLabel("Retrieving...");
+		translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusUnknownIcon()));
+		translationStatus.setToolTipText("Connecting to weblate...");
 		labelPane.add(translationStatus, JideBoxLayout.VARY);
 		new Thread() {
 			public void run() {
 				WeblateIntegration.WeblateTranslationUnit unit = WeblateIntegration.getTranslationUnit(initialValue);
-				translationStatus.setText(" - Status: "+unit.status.toString()+" - "+unit.translatedText);
+				switch (unit.status) {
+				case absent:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusRedIcon()));
+					translationStatus.setToolTipText("This string isn't managed by weblate (yet).");
+					break;
+				case done:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusGreenIcon()));
+					translationStatus.setToolTipText("This string is translated on weblate.");
+					break;
+				case fuzzy:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusOrangeIcon()));
+					translationStatus.setToolTipText("This string is translated on weblate, but needs a review.");
+					break;
+				case notTranslated:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusRedIcon()));
+					translationStatus.setToolTipText("This string isn't translated in your language on weblate yet.");
+					break;
+				case warning:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusOrangeIcon()));
+					translationStatus.setToolTipText("This string is translated on weblate, but triggered some weblate checks.");
+					break;
+				case error:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusRedIcon()));
+					translationStatus.setToolTipText("Cannot connect to weblate. Check internet connection and firewall settings.");
+					break;
+				case notAllowed:
+					translationStatus.setIcon(new ImageIcon(DefaultIcons.getStatusBlueIcon()));
+					translationStatus.setToolTipText("You have not allowed ATCS to access to internet. You can change this in the workspace settings.");
+					break;
+				}
+				translationStatus.setText(unit.translatedText);
 			};
 		}.start();
 		pane.add(labelPane, JideBoxLayout.FIX);

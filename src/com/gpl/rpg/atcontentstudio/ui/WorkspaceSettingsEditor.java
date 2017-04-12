@@ -33,6 +33,7 @@ public class WorkspaceSettingsEditor extends JDialog {
 	
 	JCheckBox translatorModeBox;
 	JComboBox<String> translatorLanguagesBox; 
+	JCheckBox useInternetBox;
 	
 	
 	
@@ -167,15 +168,20 @@ public class WorkspaceSettingsEditor extends JDialog {
 		translatorLanguagesBox = new JComboBox<String>(WorkspaceSettings.LANGUAGE_LIST);
 		langPane.add(translatorLanguagesBox);
 		pane.add(langPane, JideBoxLayout.FIX);
+
+		pane.add(new JLabel("If your language isn't here, complain on the forums at https://andorstrail.com/"), JideBoxLayout.FIX);
+		
+		useInternetBox = new JCheckBox("Allow connecting to internet to retrieve data from weblate.");
+		pane.add(useInternetBox, JideBoxLayout.FIX);
 		
 		translatorModeBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				translatorLanguagesBox.setEnabled(translatorModeBox.isSelected());
+				useInternetBox.setEnabled(translatorModeBox.isSelected());
 			}
 		});
 		
-		pane.add(new JLabel("If your language isn't here, complain on the forums at https://andorstrail.com/"), JideBoxLayout.FIX);
 		
 		return pane;
 	}
@@ -194,10 +200,15 @@ public class WorkspaceSettingsEditor extends JDialog {
 		if (settings.translatorLanguage.getCurrentValue() != null) {
 			translatorModeBox.setSelected(true);
 			translatorLanguagesBox.setSelectedItem(settings.translatorLanguage.getCurrentValue());
+			translatorLanguagesBox.setEnabled(true);
+			useInternetBox.setEnabled(true);
 		} else {
 			translatorModeBox.setSelected(false);
 			translatorLanguagesBox.setSelectedItem(null);
+			translatorLanguagesBox.setEnabled(false);
+			useInternetBox.setEnabled(false);
 		}
+		useInternetBox.setSelected(settings.useInternet.getCurrentValue());
 	}
 	
 	public void pushToModel() {
@@ -214,6 +225,7 @@ public class WorkspaceSettingsEditor extends JDialog {
 		} else {
 			settings.translatorLanguage.resetDefault();
 		}
+		settings.useInternet.setCurrentValue(useInternetBox.isSelected());
 		settings.save();
 	}
 	

@@ -3,14 +3,11 @@ package com.gpl.rpg.atcontentstudio.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -30,22 +27,13 @@ public class NotificationsPane extends JList {
 
 	private static final long serialVersionUID = -1100364214372392608L;
 
-	public static final String success_img_name = "/com/gpl/rpg/atcontentstudio/img/success.png";
-	public static final String info_img_name = "/com/gpl/rpg/atcontentstudio/img/info.png";
-	public static final String warn_img_name = "/com/gpl/rpg/atcontentstudio/img/warn.png";
-	public static final String error_img_name = "/com/gpl/rpg/atcontentstudio/img/error.png";
-	
 	public static final Map<Notification.Type, Icon> icons = new LinkedHashMap<Notification.Type, Icon>(Notification.Type.values().length);
 	
 	static {
-		try {
-			icons.put(Notification.Type.SUCCESS, new ImageIcon(ImageIO.read(NotificationsPane.class.getResourceAsStream(success_img_name))));
-			icons.put(Notification.Type.INFO, new ImageIcon(ImageIO.read(NotificationsPane.class.getResourceAsStream(info_img_name))));
-			icons.put(Notification.Type.WARN, new ImageIcon(ImageIO.read(NotificationsPane.class.getResourceAsStream(warn_img_name))));
-			icons.put(Notification.Type.ERROR, new ImageIcon(ImageIO.read(NotificationsPane.class.getResourceAsStream(error_img_name))));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		icons.put(Notification.Type.SUCCESS, new ImageIcon(DefaultIcons.getStatusGreenIcon()));
+		icons.put(Notification.Type.INFO, new ImageIcon(DefaultIcons.getStatusBlueIcon()));
+		icons.put(Notification.Type.WARN, new ImageIcon(DefaultIcons.getStatusOrangeIcon()));
+		icons.put(Notification.Type.ERROR, new ImageIcon(DefaultIcons.getStatusRedIcon()));
 	}
 	
 	

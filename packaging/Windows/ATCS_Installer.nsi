@@ -1,6 +1,6 @@
 !include MUI2.nsh
 
-!define VERSION "0.5.4"
+!define VERSION "0.6.0"
 !define TRAINER_VERSION "0.1.3"
 !define JAVA_BIN "javaw"
 
@@ -92,6 +92,7 @@ Section install
   file "rsyntaxtextarea.jar"
   file "prefuse.jar"
   file "bsh-2.0b4.jar"
+  file "jsoup-1.10.2.jar"
 
   SetOutPath $INSTDIR
   
@@ -120,6 +121,7 @@ Section uninstall
   Delete "$INSTDIR\lib\rsyntaxtextarea.jar"
   Delete "$INSTDIR\lib\prefuse.jar"
   Delete "$INSTDIR\lib\bsh-2.0b4.jar"
+  Delete "$INSTDIR\lib\jsoup-1.10.2.jar"
   RMDir "$INSTDIR\lib\"
   Delete "$INSTDIR\ATCS.ico"
   Delete "$INSTDIR\ATCS.cmd"

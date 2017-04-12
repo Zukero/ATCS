@@ -75,6 +75,9 @@ public class AboutEditor extends Editor {
 			"A slightly modified version of <a href=\"https://github.com/zackehh/siphash-java\">SipHash for Java</a> by Isaac Whitfield.<br/>" +
 			"License: <a href=\"https://github.com/zackehh/siphash-java/blob/master/LICENSE\">MIT License</a><br/>" +
 			"<br/>" +
+			"<a href=\"https://jsoup.org/\">jsoup</a> by Jonathan Hedley<br/>" +
+			"License: <a href=\"https://jsoup.org/license\">MIT License</a><br/>" +
+			"<br/>" +
 			"See the tabs below to find the full license text for each of these.<br/>" +
 			"<br/>" +
 			"The Windows installer was created with:<br/>" +
@@ -125,6 +128,7 @@ public class AboutEditor extends Editor {
 		editorTabsHolder.add("prefuse License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/license-prefuse.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("BeanShell License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.LGPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("SipHash for Java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.siphash-zackehh.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
+		editorTabsHolder.add("jsoup License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.jsoup.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("ATCS License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		
 	}

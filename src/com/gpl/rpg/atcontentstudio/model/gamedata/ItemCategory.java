@@ -17,7 +17,6 @@ import org.json.simple.parser.ParseException;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
-import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 
 public class ItemCategory extends JSONElement {
 

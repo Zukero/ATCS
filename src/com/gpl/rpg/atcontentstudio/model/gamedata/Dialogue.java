@@ -18,7 +18,6 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.Project;
-import com.gpl.rpg.atcontentstudio.model.GameDataElement.State;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement.RequirementType;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;

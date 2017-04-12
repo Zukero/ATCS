@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="ATContentStudio/ATCS_v0.5.4.jar"/>
+    <jar path="ATContentStudio/ATCS_v0.6.0.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/ATContentStudio/ATCS_JAR.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -11,6 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ATContentStudio/siphash-zackehh\/src\/main\/java"/>
         <javaElement handleIdentifier="=ATContentStudio/res"/>
         <javaElement handleIdentifier="=ATContentStudio/src"/>
         <javaElement handleIdentifier="=ATContentStudio/hacked-libtiled"/>

@@ -19,14 +19,12 @@ import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.gpl.rpg.atcontentstudio.ui.WorkspaceSelector;
-import com.gpl.rpg.atcontentstudio.utils.HashUtils;
-import com.zackehh.siphash.SipHash;
 
 
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.5.4";
+	public static final String APP_VERSION = "v0.6.0";
 
 	public static boolean STARTED = false;
 	public static StudioFrame frame = null;
