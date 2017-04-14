@@ -30,22 +30,6 @@ public class Quest extends JSONElement {
 	public Integer visible_in_log = null;
 	public List<QuestStage> stages = null;
 	
-	public static class QuestStage implements Cloneable {
-		public Integer progress = null;
-		public String log_text = null;
-		public Integer exp_reward = null;
-		public Integer finishes_quest = null;
-		
-		public Object clone() {
-			try {
-				return super.clone();
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-	}
-	
 	@Override
 	public String getDesc() {
 		return (needsSaving() ? "*" : "")+name+" ("+id+")";
@@ -105,6 +89,8 @@ public class Quest extends JSONElement {
 		Quest quest = new Quest();
 		quest.id = (String) questJson.get("id");
 		quest.name = (String) questJson.get("name");
+		//Quests have to be parsed to have their stages initialized.
+		quest.parse(questJson);
 		return quest;
 	}
 
@@ -117,15 +103,12 @@ public class Quest extends JSONElement {
 			this.stages = new ArrayList<QuestStage>();
 			for (Object questStageJsonObj : questStagesJson) {
 				Map questStageJson = (Map)questStageJsonObj;
-				QuestStage questStage = new QuestStage();
-				questStage.progress = JSONElement.getInteger((Number) questStageJson.get("progress"));
-				questStage.log_text = (String) questStageJson.get("logText");
-				questStage.exp_reward = JSONElement.getInteger((Number) questStageJson.get("rewardExperience"));
-				questStage.finishes_quest = JSONElement.getInteger((Number) questStageJson.get("finishesQuest"));
+				QuestStage questStage = new QuestStage(this);
+				questStage.parse(questStageJson);
 				this.stages.add(questStage);
 			}
 		}
-	
+		this.state = State.parsed;
 	}
 	
 	@Override
@@ -142,6 +125,9 @@ public class Quest extends JSONElement {
 			return;
 		}
 		
+		for (QuestStage stage : stages) {
+			stage.link();
+		}
 		//Nothing to link to :D
 		this.state = State.linked;
 	}
@@ -164,9 +150,9 @@ public class Quest extends JSONElement {
 		clone.name = this.name;
 		clone.visible_in_log = this.visible_in_log;
 		if (this.stages != null) {
-			clone.stages = new ArrayList<Quest.QuestStage>();
+			clone.stages = new ArrayList<QuestStage>();
 			for (QuestStage stage : this.stages){
-				clone.stages.add((QuestStage) stage.clone());
+				clone.stages.add((QuestStage) stage.clone(clone));
 			}
 		}
 		return clone;
@@ -188,12 +174,7 @@ public class Quest extends JSONElement {
 			List stagesJson = new ArrayList();
 			questJson.put("stages", stagesJson);
 			for (QuestStage stage : this.stages) {
-				Map stageJson = new LinkedHashMap();
-				stagesJson.add(stageJson);
-				if (stage.progress != null) stageJson.put("progress", stage.progress);
-				if (stage.log_text != null) stageJson.put("logText", stage.log_text);
-				if (stage.exp_reward != null) stageJson.put("rewardExperience", stage.exp_reward);
-				if (stage.finishes_quest != null) stageJson.put("finishesQuest", stage.finishes_quest);
+				stagesJson.add(stage.toJson());
 			}
 		}
 		return questJson;
@@ -203,6 +184,15 @@ public class Quest extends JSONElement {
 	@Override
 	public String getProjectFilename() {
 		return "questlist_"+getProject().name+".json";
+	}
+
+	public QuestStage getStage(Integer stageId) {
+		for (QuestStage stage : stages) {
+			if (stage.progress.equals(stageId)) {
+				return stage;
+			}
+		}
+		return null;
 	}
 	
 }

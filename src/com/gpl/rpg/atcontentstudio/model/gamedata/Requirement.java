@@ -112,6 +112,12 @@ public class Requirement extends JSONElement {
 		case questLatestProgress:
 		case questProgress:
 			this.required_obj = proj.getQuest(required_obj_id);
+			if (this.required_obj != null && this.required_value != null) {
+				QuestStage stage = ((Quest)this.required_obj).getStage(this.required_value);
+				if (stage != null) {
+					stage.addBacklink((GameDataElement) this.parent);
+				}
+			}
 			break;
 		case consumedBonemeals:
 		case skillLevel:
@@ -149,6 +155,12 @@ public class Requirement extends JSONElement {
 			oldOne.removeBacklink((GameDataElement) this.parent);
 			this.required_obj = newOne;
 			if (newOne != null) newOne.addBacklink((GameDataElement) this.parent);
+		}
+		if (oldOne instanceof QuestStage) {
+			if (this.required_obj != null && this.required_obj.equals(oldOne.parent) && this.required_value != null && this.required_value.equals(((QuestStage) oldOne).progress)) {
+				oldOne.removeBacklink((GameDataElement) this.parent);
+				if (newOne != null) newOne.addBacklink((GameDataElement) this.parent);
+			}
 		}
 	}
 	@Override

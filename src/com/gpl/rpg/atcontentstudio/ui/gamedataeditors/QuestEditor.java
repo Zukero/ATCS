@@ -1,6 +1,5 @@
 package com.gpl.rpg.atcontentstudio.ui.gamedataeditors;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,27 +7,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
+import com.gpl.rpg.atcontentstudio.ui.CollapsiblePanel;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
@@ -43,15 +45,20 @@ public class QuestEditor extends JSONElementEditor {
 	private static final String form_view_id = "Form";
 	private static final String json_view_id = "JSON";
 	
+	private QuestStage selectedStage = null;
+	
 	private JTextField idField;
 	private JTextField nameField;
 	private IntegerBasedCheckBox visibleBox;
-	private QuestStageTableModel stagesModel;
-	private JTable stagesTable;
-	private JButton createStage;
-	private JButton deleteStage;
-	private JButton moveUp;
-	private JButton moveDown;
+	private StagesListModel stagesListModel;
+	private JList<QuestStage> stagesList;
+	
+//	private JPanel stagesParamPane;
+	private JSpinner progressField;
+	private JTextArea logTextField;
+	private JSpinner xpRewardField;
+	private IntegerBasedCheckBox finishQuestBox;
+	
 	
 	
 	public QuestEditor(Quest quest) {
@@ -72,241 +79,213 @@ public class QuestEditor extends JSONElementEditor {
 		nameField = addTranslatableTextField(pane, "Quest Name: ", quest.name, quest.writable, listener);
 		visibleBox = addIntegerBasedCheckBox(pane, "Visible in quest log", quest.visible_in_log, quest.writable, listener);
 
-		JPanel stagesPane = new JPanel();
-		stagesPane.setLayout(new JideBoxLayout(stagesPane, JideBoxLayout.PAGE_AXIS, 6));
-		stagesModel = new QuestStageTableModel(quest, listener);
-		stagesTable = new JTable(stagesModel);
-		stagesTable.getColumnModel().getColumn(0).setMinWidth(100);
-		stagesTable.getColumnModel().getColumn(0).setMaxWidth(100);
-//		stagesTable.getColumnModel().getColumn(1).setPreferredWidth(40);
-//		stagesTable.getColumnModel().getColumn(1).setPreferredWidth(40);
-		stagesTable.getColumnModel().getColumn(2).setMinWidth(100);
-		stagesTable.getColumnModel().getColumn(2).setMaxWidth(100);
-		stagesTable.getColumnModel().getColumn(3).setMinWidth(130);
-		stagesTable.getColumnModel().getColumn(3).setMaxWidth(130);
-		stagesTable.setCellSelectionEnabled(true);
-		stagesTable.getColumnModel().getColumn(1).setCellRenderer(new MultilineCellRenderer());
-		stagesPane.add(new JScrollPane(stagesTable), BorderLayout.CENTER);
-		if (quest.writable) {
-			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new JideBoxLayout(buttonPane, JideBoxLayout.LINE_AXIS, 6));
-			createStage = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
-			deleteStage = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
-			moveUp = new JButton(new ImageIcon(DefaultIcons.getArrowUpIcon()));
-			moveDown = new JButton(new ImageIcon(DefaultIcons.getArrowDownIcon()));
-			buttonPane.add(createStage, JideBoxLayout.FIX);
-			buttonPane.add(deleteStage, JideBoxLayout.FIX);
-			buttonPane.add(moveUp, JideBoxLayout.FIX);
-			buttonPane.add(moveDown, JideBoxLayout.FIX);
-			buttonPane.add(new JPanel(), JideBoxLayout.VARY);
-			deleteStage.setEnabled(false);
-			moveUp.setEnabled(false);
-			moveDown.setEnabled(false);
-			
-			stagesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-				
-				@Override
-				public void valueChanged(ListSelectionEvent e) {
-					updateTableButtons();
+		CollapsiblePanel stagesPane = new CollapsiblePanel("Quest stages: ");
+		stagesPane.setLayout(new JideBoxLayout(stagesPane, JideBoxLayout.PAGE_AXIS));
+		stagesListModel = new StagesListModel(quest);
+		stagesList = new JList<QuestStage>(stagesListModel);
+		stagesList.setCellRenderer(new StagesCellRenderer());
+		stagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		stagesPane.add(new JScrollPane(stagesList), JideBoxLayout.FIX);
+		final JPanel stagesEditorPane = new JPanel();
+		final JButton createStage = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
+		final JButton deleteStage = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		final JButton moveStageUp = new JButton(new ImageIcon(DefaultIcons.getArrowUpIcon()));
+		final JButton moveStageDown = new JButton(new ImageIcon(DefaultIcons.getArrowDownIcon()));
+		deleteStage.setEnabled(false);
+		moveStageUp.setEnabled(false);
+		moveStageDown.setEnabled(false);
+		stagesList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				selectedStage = (QuestStage) stagesList.getSelectedValue();
+				if (selectedStage != null) {
+					deleteStage.setEnabled(true);
+					moveStageUp.setEnabled(stagesList.getSelectedIndex() > 0);
+					moveStageDown.setEnabled(stagesList.getSelectedIndex() < (stagesListModel.getSize() - 1));
+				} else {
+					deleteStage.setEnabled(false);
+					moveStageUp.setEnabled(false);
+					moveStageDown.setEnabled(false);
 				}
-			});
-			
+				updateStageEditorPane(stagesEditorPane, selectedStage, listener);
+			}
+		});
+		if (quest.writable) {
+			JPanel listButtonsPane = new JPanel();
+			listButtonsPane.setLayout(new JideBoxLayout(listButtonsPane, JideBoxLayout.LINE_AXIS, 6));
 			createStage.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					stagesModel.createStage();
-					listener.valueChanged(stagesTable, null);
-					stagesTable.revalidate();
-					stagesTable.repaint();
+					QuestStage stage = new QuestStage(quest);
+					stagesListModel.addItem(stage);
+					stagesList.setSelectedValue(stage, true);
+					listener.valueChanged(new JLabel(), null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
 				}
 			});
 			deleteStage.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					stagesModel.deleteRow(stagesTable.getSelectedRow());
-					listener.valueChanged(stagesTable, null);
-					stagesTable.revalidate();
-					stagesTable.repaint();
-					updateTableButtons();
+					if (selectedStage != null) {
+						stagesListModel.removeItem(selectedStage);
+						selectedStage = null;
+						stagesList.clearSelection();
+						listener.valueChanged(new JLabel(), null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+					}
 				}
 			});
-			moveUp.addActionListener(new ActionListener() {
+			moveStageUp.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					stagesModel.moveRow(stagesTable.getSelectedRow(), true);
-					listener.valueChanged(stagesTable, null);
-					stagesTable.setRowSelectionInterval(stagesTable.getSelectedRow() - 1, stagesTable.getSelectedRow() - 1);
-					updateTableButtons();
+					if (selectedStage != null) {
+						stagesListModel.moveUp(selectedStage);
+						stagesList.setSelectedValue(selectedStage, true);
+						listener.valueChanged(new JLabel(), null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+					}
 				}
 			});
-			moveDown.addActionListener(new ActionListener() {
+			moveStageDown.addActionListener(new ActionListener() {
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					stagesModel.moveRow(stagesTable.getSelectedRow(), false);
-					listener.valueChanged(stagesTable, null);
-					stagesTable.setRowSelectionInterval(stagesTable.getSelectedRow() + 1, stagesTable.getSelectedRow() + 1);
-					updateTableButtons();
+					if (selectedStage != null) {
+						stagesListModel.moveDown(selectedStage);
+						stagesList.setSelectedValue(selectedStage, true);
+						listener.valueChanged(new JLabel(), null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+					}
 				}
 			});
-			stagesPane.add(buttonPane, JideBoxLayout.FIX);
+			listButtonsPane.add(createStage, JideBoxLayout.FIX);
+			listButtonsPane.add(deleteStage, JideBoxLayout.FIX);
+			listButtonsPane.add(moveStageUp, JideBoxLayout.FIX);
+			listButtonsPane.add(moveStageDown, JideBoxLayout.FIX);
+			listButtonsPane.add(new JPanel(), JideBoxLayout.VARY);
+			stagesPane.add(listButtonsPane, JideBoxLayout.FIX);
 		}
+		if (quest.stages == null || quest.stages.isEmpty()) {
+			stagesPane.collapse();
+		}
+		stagesEditorPane.setLayout(new JideBoxLayout(stagesEditorPane, JideBoxLayout.PAGE_AXIS));
+		stagesPane.add(stagesEditorPane, JideBoxLayout.FIX);
 		pane.add(stagesPane, JideBoxLayout.FIX);
 
 	}
 	
-	public void updateTableButtons() {
+	public void updateStageEditorPane(JPanel pane, QuestStage selectedStage, FieldUpdateListener listener) {
+		pane.removeAll();
+		if (selectedStage != null) {
+			boolean writable = ((Quest)target).writable;
+			progressField = addIntegerField(pane, "Progress ID: ", selectedStage.progress, false, writable, listener);
+			logTextField = addTranslatableTextArea(pane, "Log text: ", selectedStage.log_text, writable, listener);
+			xpRewardField = addIntegerField(pane, "XP Reward: ", selectedStage.exp_reward, false, writable, listener);
+			finishQuestBox = addIntegerBasedCheckBox(pane, "Finishes quest", selectedStage.finishes_quest, writable, listener);
+			addBacklinksList(pane, selectedStage, "Elements linking to this quest stage");
 
-		if (stagesTable.getSelectedRow() >= 0 && stagesTable.getSelectedRow() < stagesModel.getRowCount()) {
-			deleteStage.setEnabled(true);
-			if (stagesTable.getSelectedRow() == 0) {
-				moveUp.setEnabled(false);
-			} else {
-				moveUp.setEnabled(true);
-			}
-			if (stagesTable.getSelectedRow() >= stagesModel.getRowCount() - 1) {
-				moveDown.setEnabled(false);
-			} else {
-				moveDown.setEnabled(true);
-			}
-		} else {
-			deleteStage.setEnabled(false);
-			moveUp.setEnabled(false);
-			moveDown.setEnabled(false);
 		}
-	
+		pane.revalidate();
+		pane.repaint();
 	}
 	
-	public class QuestStageTableModel implements TableModel {
+	public static class StagesListModel implements ListModel<QuestStage> {
 
-		Quest quest;
-		FieldUpdateListener listener;
+		Quest source;
+
+		public StagesListModel(Quest quest) {
+			this.source = quest;
+		}
+
 		
-		public QuestStageTableModel(Quest q, FieldUpdateListener listener) {
-			this.quest = q;
-			this.listener = listener;
+		@Override
+		public int getSize() {
+			if (source.stages == null) return 0;
+			return source.stages.size();
+		}
+
+		@Override
+		public QuestStage getElementAt(int index) {
+			if (source.stages == null) return null;
+			return source.stages.get(index);
 		}
 		
-		@Override
-		public int getRowCount() {
-			if (quest.stages == null) return 0;
-			return quest.stages.size();
-		}
-
-		@Override
-		public int getColumnCount() {
-			return 4;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return "Progress ID";
-			case 1:
-				return "Log text";
-			case 2:
-				return "XP reward";
-			case 3:
-				return "Finishes quest";
-			default:
-				return "???";
+		public void addItem(QuestStage item) {
+			if (source.stages == null) {
+				source.stages = new ArrayList<QuestStage>();
 			}
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return Integer.class;
-			case 1:
-				return String.class;
-			case 2:
-				return Integer.class;
-			case 3:
-				return Boolean.class;
-			default:
-				return null;
-			}
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return quest.writable;
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				return quest.stages.get(rowIndex).progress;
-			case 1:
-				return quest.stages.get(rowIndex).log_text;
-			case 2:
-				return quest.stages.get(rowIndex).exp_reward;
-			case 3:
-				return quest.stages.get(rowIndex).finishes_quest != null && quest.stages.get(rowIndex).finishes_quest.equals(1);
-			default:
-				return null;
-			}
-		}
-
-		@Override
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			switch (columnIndex) {
-			case 0:
-				quest.stages.get(rowIndex).progress = (Integer)aValue;
-				break;
-			case 1:
-				quest.stages.get(rowIndex).log_text = (String)aValue;
-				break;
-			case 2:
-				quest.stages.get(rowIndex).exp_reward = (Integer)aValue;
-				break;
-			case 3:
-				quest.stages.get(rowIndex).finishes_quest = ((Boolean)aValue) ? one : null;
-				break;
-			}
-			listener.valueChanged(stagesTable, aValue);
-		}
-
-		public void createStage() {
-			if (quest.stages == null) quest.stages = new ArrayList<Quest.QuestStage>();
-			quest.stages.add(new Quest.QuestStage());
-			for (TableModelListener l: listeners) {
-				l.tableChanged(new TableModelEvent(this, quest.stages.size() - 1));
+			source.stages.add(item);
+			int index = source.stages.indexOf(item);
+			for (ListDataListener l : listeners) {
+				l.intervalAdded(new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index, index));
 			}
 		}
 		
-		public void moveRow(int rowNumber, boolean moveUp) {
-			Quest.QuestStage stage = quest.stages.get(rowNumber);
-			quest.stages.remove(stage);
-			quest.stages.add(rowNumber + (moveUp ? -1 : 1), stage);
-			for (TableModelListener l : listeners) {
-				l.tableChanged(new TableModelEvent(this, rowNumber + (moveUp ? -1 : 0), rowNumber + (moveUp ? 0 : 1)));
+		public void removeItem(QuestStage item) {
+			int index = source.stages.indexOf(item);
+			source.stages.remove(item);
+			if (source.stages.isEmpty()) {
+				source.stages = null;
+			}
+			for (ListDataListener l : listeners) {
+				l.intervalRemoved(new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index, index));
+			}
+		}
+
+		public void itemChanged(QuestStage item) {
+			int index = source.stages.indexOf(item);
+			for (ListDataListener l : listeners) {
+				l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index));
 			}
 		}
 		
-		public void deleteRow(int rowNumber) {
-			quest.stages.remove(rowNumber);
-			for (TableModelListener l: listeners) {
-				l.tableChanged(new TableModelEvent(this, rowNumber, quest.stages.size()));
+		public void moveUp(QuestStage item) {
+			int index = source.stages.indexOf(item);
+			QuestStage exchanged = source.stages.get(index - 1);
+			source.stages.set(index, exchanged);
+			source.stages.set(index - 1, item);
+			for (ListDataListener l : listeners) {
+				l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index - 1, index));
 			}
-			if (quest.stages.isEmpty()) quest.stages = null;
 		}
-		
-		public List<TableModelListener> listeners = new CopyOnWriteArrayList<TableModelListener>();
-		
+
+		public void moveDown(QuestStage item) {
+			int index = source.stages.indexOf(item);
+			QuestStage exchanged = source.stages.get(index + 1);
+			source.stages.set(index, exchanged);
+			source.stages.set(index + 1, item);
+			for (ListDataListener l : listeners) {
+				l.contentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index, index + 1));
+			}
+		}
+
+
+		List<ListDataListener> listeners = new CopyOnWriteArrayList<ListDataListener>();
+
 		@Override
-		public void addTableModelListener(TableModelListener l) {
+		public void addListDataListener(ListDataListener l) {
 			listeners.add(l);
 		}
 
 		@Override
-		public void removeTableModelListener(TableModelListener l) {
+		public void removeListDataListener(ListDataListener l) {
 			listeners.remove(l);
 		}
-		
 	}
+	
+	
+	public static class StagesCellRenderer extends DefaultListCellRenderer {
+		private static final long serialVersionUID = 7987880146189575234L;
+
+		@Override
+		public Component getListCellRendererComponent(@SuppressWarnings("rawtypes") JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			if (c instanceof JLabel) {
+				JLabel label = ((JLabel)c);
+				label.setText(((QuestStage)value).getDesc());
+				label.setIcon(new ImageIcon(((QuestStage)value).getIcon()));
+			}
+			return c;
+		}
+	}
+	
 	
 	public class QuestFieldUpdater implements FieldUpdateListener {
 
@@ -337,6 +316,18 @@ public class QuestEditor extends JSONElementEditor {
 				ATContentStudio.frame.editorChanged(QuestEditor.this);
 			} else if (source == visibleBox) {
 				quest.visible_in_log = (Integer) value;
+			} else if (source == progressField) {
+				selectedStage.progress = (Integer) value;
+				stagesListModel.itemChanged(selectedStage);
+			} else if (source == logTextField) {
+				selectedStage.log_text = (String) value;
+				stagesListModel.itemChanged(selectedStage);
+			} else if (source == xpRewardField) {
+				selectedStage.exp_reward = (Integer) value;
+				stagesListModel.itemChanged(selectedStage);
+			} else if (source == finishQuestBox) {
+				selectedStage.finishes_quest = (Integer) value;
+				stagesListModel.itemChanged(selectedStage);
 			}
 			
 
@@ -350,47 +341,6 @@ public class QuestEditor extends JSONElementEditor {
 		}
 		
 		
-	}
-
-	public class MultilineCellRenderer extends JTextArea implements TableCellRenderer {
-		private static final long serialVersionUID = 6539816623608859506L;
-		
-		public MultilineCellRenderer() {
-			setLineWrap(true);
-			setWrapStyleWord(true);
-			//setOpaque(true);
-		}
-		
-		@Override
-		public Component getTableCellRendererComponent(JTable table,
-				Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			if (isSelected) {
-				setForeground(stagesTable.getSelectionForeground());
-				setBackground(stagesTable.getSelectionBackground());
-			} else {
-				setForeground(stagesTable.getForeground());
-				setBackground(stagesTable.getBackground());
-			}
-			setFont(stagesTable.getFont());
-			if (hasFocus) {
-				setBorder(UIManager.getBorder("Table.focusCellHighlightBorder"));
-				if (stagesTable.isCellEditable(row, column)) {
-					setForeground(UIManager.getColor("Table.focusCellForeground"));
-					setBackground(UIManager.getColor("Table.focusCellBackground"));
-				}
-			} else {
-				setBorder(BorderFactory.createLineBorder(getBackground(), 1)); 
-			}
-			setText((value == null ? "" : value.toString()));
-			
-			int fh = getFontMetrics(getFont()).getHeight();
-//			int tl = getText().length();
-			setSize(stagesTable.getWidth(), fh);
-			stagesTable.setRowHeight(row, getPreferredSize().height);
-			
-			return this;
-		}
 	}
 	
 

@@ -81,6 +81,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.Item;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.model.maps.ContainerArea;
 import com.gpl.rpg.atcontentstudio.model.maps.KeyArea;
@@ -172,7 +173,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	@SuppressWarnings("rawtypes")
 	private JComboBox requirementObj;
 	private JTextField requirementObjId;
-	private JSpinner requirementValue;
+	private JComponent requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
 	@SuppressWarnings("rawtypes")
@@ -642,7 +643,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			case questProgress:
 				requirementObj = addQuestBox(pane, project, "Quest: ", (Quest) requirement.required_obj, writable, listener);
 				requirementObjId = null;
-				requirementValue = addIntegerField(pane, "Quest stage: ", requirement.required_value, false, writable, listener);
+				requirementValue = addQuestStageBox(pane, project, "Quest stage: ", requirement.required_value, writable, listener, (Quest) requirement.required_obj, requirementObj);
 				break;
 			case skillLevel:
 				requirementObj = null;
@@ -1949,11 +1950,37 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			} else if (source == requirementValue) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
+					Quest quest = null;
+					QuestStage stage = null;
+					if (requirementValue instanceof JComboBox<?>) {
+						quest = ((Quest)area.requirement.required_obj);
+						if (quest != null && area.requirement.required_value != null) {
+							stage = quest.getStage(area.requirement.required_value);
+							if (stage != null) stage.removeBacklink(map);
+						}
+					}
 					area.requirement.required_value = (Integer) value;
+					if (quest != null) {
+						stage = quest.getStage(area.requirement.required_value);
+						if (stage != null) stage.addBacklink(map);
+					}
 					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
+					Quest quest = null;
+					QuestStage stage = null;
+					if (requirementValue instanceof JComboBox<?>) {
+						quest = ((Quest)area.requirement.required_obj);
+						if (quest != null && area.requirement.required_value != null) {
+							stage = quest.getStage(area.requirement.required_value);
+							if (stage != null) stage.removeBacklink(map);
+						}
+					}
 					area.requirement.required_value = (Integer) value;
+					if (quest != null) {
+						stage = quest.getStage(area.requirement.required_value);
+						if (stage != null) stage.addBacklink(map);
+					}
 					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
 				}
 			} else if (source == requirementNegated) {

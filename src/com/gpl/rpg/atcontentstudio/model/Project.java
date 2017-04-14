@@ -39,6 +39,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.ItemCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
@@ -758,6 +759,15 @@ public class Project implements ProjectTreeNode, Serializable {
 		} else {
 			if (type == GameSource.Type.source) {
 				JSONElement clone = (JSONElement) node.clone();
+				if (node instanceof Quest) {
+					for (QuestStage oldStage : ((Quest) node).stages) {
+						QuestStage newStage = ((Quest) clone).getStage(oldStage.progress);
+						for (GameDataElement backlink : oldStage.getBacklinks()) {
+							backlink.elementChanged(oldStage, newStage);
+						}
+						oldStage.getBacklinks().clear();
+					}
+				}
 				for (GameDataElement backlink : node.getBacklinks()) {
 					backlink.elementChanged(node, clone);
 				}

@@ -265,6 +265,12 @@ public class Dialogue extends JSONElement {
 						break;
 					case questProgress:
 						reward.reward_obj = proj.getQuest(reward.reward_obj_id);
+						if (reward.reward_obj != null && reward.reward_value != null) {
+							QuestStage stage = ((Quest)reward.reward_obj).getStage(reward.reward_value);
+							if (stage != null) {
+								stage.addBacklink(this);
+							}
+						}
 						break;
 					case skillIncrease:
 						//Nothing to do (yet ?).
@@ -361,11 +367,7 @@ public class Dialogue extends JSONElement {
 					}
 					if (r.requirements != null) {
 						for (Requirement req : r.requirements) {
-							if (req.required_obj == oldOne) {
-								oldOne.removeBacklink(this);
-								req.required_obj = newOne;
-								if (newOne != null) newOne.addBacklink(this);
-							}
+							req.elementChanged(oldOne, newOne);
 						}
 					}
 				}
@@ -376,6 +378,12 @@ public class Dialogue extends JSONElement {
 						oldOne.removeBacklink(this);
 						r.reward_obj = newOne;
 						if (newOne != null) newOne.addBacklink(this);
+					}
+					if (oldOne instanceof QuestStage) {
+						if (r.reward_obj != null && r.reward_obj.equals(oldOne.parent) && r.reward_value != null && r.reward_value.equals(((QuestStage) oldOne).progress)) {
+							oldOne.removeBacklink((GameDataElement) this);
+							if (newOne != null) newOne.addBacklink((GameDataElement) this);
+						}
 					}
 				}
 			}

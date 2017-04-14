@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
@@ -29,6 +30,8 @@ import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.sprites.Spritesheet;
@@ -37,8 +40,11 @@ import com.gpl.rpg.atcontentstudio.ui.Editor;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IdChangeImpactWizard;
 import com.gpl.rpg.atcontentstudio.ui.SaveItemsWizard;
+import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
+import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel.ScrollableSizeHint;
 import com.gpl.rpg.atcontentstudio.ui.sprites.SpriteChooser;
 import com.jidesoft.swing.JideBoxLayout;
+import com.jidesoft.swing.JideScrollPane;
 import com.jidesoft.swing.JideTabbedPane;
 
 public abstract class JSONElementEditor extends Editor {
@@ -65,7 +71,11 @@ public abstract class JSONElementEditor extends Editor {
 	}
 	
 	public void addEditorTab(String id, JPanel editor) {
-		JScrollPane scroller = new JScrollPane(editor);
+		ScrollablePanel view = new ScrollablePanel(new BorderLayout());
+		view.setScrollableWidth(ScrollableSizeHint.FIT);
+		view.setScrollableHeight(ScrollableSizeHint.STRETCH);
+		view.add(editor, BorderLayout.CENTER);
+		JScrollPane scroller = new JScrollPane(view, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scroller.getVerticalScrollBar().setUnitIncrement(16);
 		editorTabsHolder.addTab(id, scroller);
 		editorTabs.put(id, editor);
@@ -178,8 +188,17 @@ public abstract class JSONElementEditor extends Editor {
 					if (node.getParent() instanceof GameDataCategory<?>) {
 						((GameDataCategory<?>)node.getParent()).remove(node);
 						node.save();
+						GameDataElement newOne = proj.getGameDataElement(node.getClass(), node.id);
+						if (node instanceof Quest) {
+							for (QuestStage oldStage : ((Quest) node).stages) {
+								QuestStage newStage = newOne != null ? ((Quest) newOne).getStage(oldStage.progress) : null;
+								for (GameDataElement backlink : oldStage.getBacklinks()) {
+									backlink.elementChanged(oldStage, newStage);
+								}
+							}
+						}
 						for (GameDataElement backlink : node.getBacklinks()) {
-							backlink.elementChanged(node, proj.getGameDataElement(node.getClass(), node.id));
+							backlink.elementChanged(node, newOne);
 						}
 					}
 				}

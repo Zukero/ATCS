@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
+import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import prefuse.Display;
@@ -68,6 +69,7 @@ public class DialogueGraphView extends Display {
     public static final String ICON = "icon";
     public static final String TARGET = "target";
     public static final String REPLY = "reply";
+    public static final String HIDDEN_REPLY = "hidden_reply";
     public static final String HAS_REQS = "has_reqs";
     
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema(); 
@@ -174,6 +176,7 @@ public class DialogueGraphView extends Display {
 		graph.addColumn(ICON, Image.class, DefaultIcons.getNullifyIcon());
 		graph.addColumn(TARGET, GameDataElement.class, null);
 		graph.addColumn(REPLY, Dialogue.Reply.class, null);
+		graph.addColumn(HIDDEN_REPLY, Dialogue.Reply.class, null);
 		graph.addColumn(HAS_REQS, boolean.class, false);
 		addDialogue(dialogue, npcIcon);
 	}
@@ -224,6 +227,8 @@ public class DialogueGraphView extends Display {
 		} else if (r.next_phrase != null) {
 			//Go directly to next phrase
 			rNode = addDialogue(r.next_phrase, npcIcon);
+			//Add a pointer to the hidden reply, in order to fetch requirements later.
+			rNode.set(HIDDEN_REPLY, r);
 		} else if (Dialogue.Reply.KEY_PHRASE_ID.contains(r.next_phrase_id)) {
 			//Go directly to key phrase
 			rNode = addKeyPhraseNode(d, r.next_phrase_id);
@@ -499,27 +504,32 @@ public class DialogueGraphView extends Display {
     				label = new JLabel(new ImageIcon(DefaultIcons.getDialogueIcon()));
     				label.setText(d.id);
     				content.add(label, JideBoxLayout.FIX);
-    				if (tooltippedItem.get(REPLY) == null) {
-    					if (d.rewards != null && !d.rewards.isEmpty()) {
-    						for (Dialogue.Reward r : d.rewards) {
-    							label = new JLabel();
-    							DialogueEditor.decorateRewardJLabel(label, r);
+    				Object replObj = tooltippedItem.get(REPLY);
+    				if (replObj == null) {
+    					replObj = tooltippedItem.get(HIDDEN_REPLY);
+    				}
+    				if (replObj != null && replObj instanceof Dialogue.Reply) {
+    					Dialogue.Reply r = (Dialogue.Reply) replObj;
+    					if (r.requirements != null && !r.requirements.isEmpty()) {
+    						JLabel reqTitle = new JLabel("--Requirements--", SwingConstants.CENTER);
+    						content.add(reqTitle, JideBoxLayout.FIX);
+    						for (Requirement req : r.requirements) {
+    							label = new JLabel("", SwingConstants.CENTER);
+    							DialogueEditor.decorateRequirementJLabel(label, req);
     							content.add(label, JideBoxLayout.FIX);
     						}
     					}
-    				} else { 
-    					Object replObj = tooltippedItem.get(REPLY);
-    					if (replObj instanceof Dialogue.Reply) {
-    						Dialogue.Reply r = (Dialogue.Reply) replObj;
-    						if (r.requirements != null && !r.requirements.isEmpty()) {
-    							for (Requirement req : r.requirements) {
-    								label = new JLabel();
-    								DialogueEditor.decorateRequirementJLabel(label, req);
-        							content.add(label, JideBoxLayout.FIX);
-    							}
-    						}
-    					}
     				}
+    				if (d.rewards != null && !d.rewards.isEmpty()) {
+						JLabel rewTitle = new JLabel("--Rewards--", SwingConstants.CENTER);
+						rewTitle.setAlignmentY(CENTER_ALIGNMENT);
+						content.add(rewTitle, JideBoxLayout.FIX);
+						for (Dialogue.Reward r : d.rewards) {
+							label = new JLabel("", SwingConstants.CENTER);
+							DialogueEditor.decorateRewardJLabel(label, r);
+							content.add(label, JideBoxLayout.FIX);
+						}
+					}
     			}
     		}
     		

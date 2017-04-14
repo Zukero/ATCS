@@ -43,6 +43,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.Droplist;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Item;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.ui.BooleanBasedCheckBox;
@@ -94,7 +95,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JTextField rewardObjId;
 	private JComboBox rewardObjIdCombo;
 	private MyComboBox rewardObj;
-	private JSpinner rewardValue;
+	private JComponent rewardValue;
 	
 	private RepliesListModel repliesListModel;
 	@SuppressWarnings("rawtypes")
@@ -114,7 +115,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JPanel requirementParamsPane;
 	private MyComboBox requirementObj;
 	private JTextField requirementObjId;
-	private JSpinner requirementValue;
+	private JComponent requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
 	private DialogueGraphView dialogueGraphView;
@@ -421,7 +422,7 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObjId = null;
 				rewardObjIdCombo = null;
 				rewardObj = addQuestBox(pane, ((Dialogue)target).getProject(), "Quest: ", (Quest) reward.reward_obj, writable, listener);
-				rewardValue = addIntegerField(pane, "Step ID: ", reward.reward_value, false, writable, listener);
+				rewardValue = addQuestStageBox(pane, ((Dialogue)target).getProject(), "Quest stage: ", reward.reward_value, writable, listener, (Quest) reward.reward_obj, rewardObj);
 				break;
 			case skillIncrease:
 				rewardMap = null;
@@ -613,10 +614,10 @@ public class DialogueEditor extends JSONElementEditor {
 			replyText = null;
 			replyNextPhrase = addDialogueBox(pane, ((Dialogue)target).getProject(), "Next phrase: ", reply.next_phrase, writable, listener);
 		} else if (Dialogue.Reply.KEY_PHRASE_ID.contains(reply.next_phrase_id)) {
-			replyText = addTextField(pane, "Reply text: ", reply.text, writable, listener);
+			replyText = addTranslatableTextField(pane, "Reply text: ", reply.text, writable, listener);
 			replyNextPhrase = null;
 		} else {
-			replyText = addTextField(pane, "Reply text: ", reply.text, writable, listener);
+			replyText = addTranslatableTextField(pane, "Reply text: ", reply.text, writable, listener);
 			replyNextPhrase = addDialogueBox(pane, ((Dialogue)target).getProject(), "Next phrase: ", reply.next_phrase, writable, listener);
 		}
 		
@@ -679,7 +680,7 @@ public class DialogueEditor extends JSONElementEditor {
 			case questProgress:
 				requirementObj = addQuestBox(pane, project, "Quest: ", (Quest) requirement.required_obj, writable, listener);
 				requirementObjId = null;
-				requirementValue = addIntegerField(pane, "Quest stage: ", requirement.required_value, false, writable, listener);
+				requirementValue = addQuestStageBox(pane, project, "Quest stage: ", requirement.required_value, writable, listener, (Quest) requirement.required_obj, requirementObj);
 				break;
 			case skillLevel:
 				requirementObj = null;
@@ -1149,7 +1150,21 @@ public class DialogueEditor extends JSONElementEditor {
 				}
 				rewardsListModel.itemChanged(selectedReward);
 			} else if (source == rewardValue) {
+				//Backlink removal to quest stages when selecting another quest are handled in the addQuestStageBox() method. Too complex too handle here
+				Quest quest = null;
+				QuestStage stage = null;
+				if (rewardValue instanceof JComboBox<?>) {
+					quest = ((Quest)selectedReward.reward_obj);
+					if (quest != null && selectedReward.reward_value != null) {
+						stage = quest.getStage(selectedReward.reward_value);
+						if (stage != null) stage.removeBacklink(dialogue);
+					}
+				}
 				selectedReward.reward_value = (Integer) value;
+				if (quest != null) {
+					stage = quest.getStage(selectedReward.reward_value);
+					if (stage != null) stage.addBacklink(dialogue);
+				}
 				rewardsListModel.itemChanged(selectedReward);
 			} else if (source == replyTypeCombo) {
 				updateRepliesParamsEditorPane(repliesParamsPane, selectedReply, this);
@@ -1190,7 +1205,21 @@ public class DialogueEditor extends JSONElementEditor {
 				selectedRequirement.required_obj = null;
 				requirementsListModel.itemChanged(selectedRequirement);
 			} else if (source == requirementValue) {
+				//Backlink removal to quest stages when selecting another quest are handled in the addQuestStageBox() method. Too complex too handle here
+				Quest quest = null;
+				QuestStage stage = null;
+				if (requirementValue instanceof JComboBox<?>) {
+					quest = ((Quest)selectedRequirement.required_obj);
+					if (quest != null && selectedRequirement.required_value != null) {
+						stage = quest.getStage(selectedRequirement.required_value);
+						if (stage != null) stage.removeBacklink(dialogue);
+					}
+				}
 				selectedRequirement.required_value = (Integer) value;
+				if (quest != null) {
+					stage = quest.getStage(selectedRequirement.required_value);
+					if (stage != null) stage.addBacklink(dialogue);
+				}
 				requirementsListModel.itemChanged(selectedRequirement);
 			} else if (source == requirementNegated) {
 				selectedRequirement.negated = (Boolean) value;

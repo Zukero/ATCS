@@ -39,6 +39,7 @@ import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.Scrollable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -63,6 +64,7 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.ItemCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration;
 import com.jidesoft.swing.ComboBoxSearchable;
@@ -118,7 +120,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 	
 	public static void addTranslationPane(JPanel pane, final JTextComponent tfComponent, final String initialValue) {if (Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null) {
 		JPanel labelPane = new JPanel();
-		labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS));
+		labelPane.setLayout(new JideBoxLayout(labelPane, JideBoxLayout.LINE_AXIS, 6));
 		final JLabel translateLinkLabel = new JLabel(getWeblateLabelLink(initialValue));
 		labelPane.add(translateLinkLabel, JideBoxLayout.FIX);
 		labelPane.add(new JLabel(" "), JideBoxLayout.FIX);
@@ -270,6 +272,9 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		tfPane.add(tfLabel, JideBoxLayout.FIX);
 		final JTextArea tfArea = new JTextArea(text);
 		tfArea.setEditable(editable);
+		tfArea.setRows(2);
+		tfArea.setLineWrap(true);
+		tfArea.setWrapStyleWord(true);
 		tfPane.add(new JScrollPane(tfArea), JideBoxLayout.VARY);
 		JButton nullify = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
 		tfPane.add(nullify, JideBoxLayout.FIX);
@@ -644,8 +649,63 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return gdeBox;
 	}
 	
+	public JComboBox<QuestStage> addQuestStageBox(JPanel pane, Project proj, String label, Integer initialValue, boolean writable, final FieldUpdateListener listener, Quest quest, final JComboBox questSelectionBox) {
+		JPanel gdePane = new JPanel();
+		gdePane.setLayout(new JideBoxLayout(gdePane, JideBoxLayout.LINE_AXIS, 6));
+		JLabel gdeLabel = new JLabel(label);
+		gdePane.add(gdeLabel, JideBoxLayout.FIX);
+		
+		QuestStage initial = null;
+		if (quest != null) {
+			initial = quest.getStage(initialValue);
+		}
+		final QuestStageComboModel comboModel = new QuestStageComboModel(proj, initial, quest);
+		final JComboBox<QuestStage> combo = new JComboBox<QuestStage>(comboModel);
+		combo.setRenderer(new GDERenderer(false, writable));
+		new ComboBoxSearchable(combo){
+			@Override
+			protected String convertElementToString(Object object) {
+				if (object == null) return "none";
+				else return ((GameDataElement)object).getDesc();
+			}
+		};
+		questSelectionBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (comboModel.selected != null) {
+					Editor.this.target.removeBacklink(comboModel.selected);
+				}
+				Quest newQuest = (Quest) questSelectionBox.getSelectedItem();
+				comboModel.changeQuest(newQuest);
+				combo.revalidate();
+			}
+		});
+		combo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(combo, comboModel.selected == null ? null : comboModel.selected.progress);
+			}
+		});
+		
+		
+
+		combo.setEnabled(writable);
+		gdePane.add(combo, JideBoxLayout.VARY);
+		
+		pane.add(gdePane, JideBoxLayout.FIX);
+		
+		return combo;
+	}
+	
+	
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JList addBacklinksList(JPanel pane, GameDataElement gde) {
+		return addBacklinksList(pane, gde, "Elements linking to this one");
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public JList addBacklinksList(JPanel pane, GameDataElement gde, String title) {
 		final JList list = new JList(new GDEBacklinksListModel(gde));
 		list.addMouseListener(new MouseAdapter() {
 			@Override
@@ -666,7 +726,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 			}
 		});
 		list.setCellRenderer(new GDERenderer(true, false));
-		CollapsiblePanel colPane = new CollapsiblePanel("Elements linking to this one");
+		CollapsiblePanel colPane = new CollapsiblePanel(title);
 		colPane.setLayout(new JideBoxLayout(colPane, JideBoxLayout.PAGE_AXIS));
 		colPane.add(new JScrollPane(list), JideBoxLayout.FIX);
 		colPane.add(new JPanel(), JideBoxLayout.FIX);
@@ -744,9 +804,25 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 				label.setText("None"+(writable ? ". Click on the button to create one." : ""));
 			} else {
 				if (includeType && ((GameDataElement)value).getDataType() != null) {
-					label.setText(((GameDataElement)value).getDataType().toString()+"/"+((GameDataElement)value).getDesc());
+					if (value instanceof QuestStage) {
+						String text = ((GameDataElement)value).getDesc();
+						if (text.length() > 60) {
+							text = text.substring(0, 57)+"...";
+						}
+						label.setText(((GameDataElement)value).getDataType().toString()+"/"+((Quest)((QuestStage)value).parent).id+":"+text);
+					} else {
+						label.setText(((GameDataElement)value).getDataType().toString()+"/"+((GameDataElement)value).getDesc());
+					}
 				} else {
-					label.setText(((GameDataElement)value).getDesc());
+					if (value instanceof QuestStage) {
+						String text = ((GameDataElement)value).getDesc();
+						if (text.length() > 60) {
+							text = text.substring(0, 57)+"...";
+						}
+						label.setText(text);
+					} else {
+						label.setText(((GameDataElement)value).getDesc());
+					}
 				}
 				if (((GameDataElement)value).getIcon() == null) {
 					Notification.addError("Unable to find icon for "+((GameDataElement)value).getDesc());
@@ -758,6 +834,65 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		}
 		
 	}
+	
+	public static class QuestStageComboModel extends AbstractListModel<QuestStage> implements ComboBoxModel<QuestStage> {
+
+		private static final long serialVersionUID = -5854574666510314715L;
+		
+		public Project project;
+		public Quest currentQuest;
+		public QuestStage selected;
+		
+		public QuestStageComboModel(Project proj, QuestStage initial, Quest quest) {
+			this.project = proj;
+			this.currentQuest = quest;
+			this.selected = initial;
+		}
+		
+		@Override
+		public int getSize() {
+			if (currentQuest == null) return 1;
+			return currentQuest.stages.size()+1;
+		}
+
+		@Override
+		public QuestStage getElementAt(int index) {
+			if (index == 0) {
+				return null;
+			}
+			return currentQuest.stages.get(index - 1);
+		}
+		
+		@SuppressWarnings("unchecked")
+		@Override
+		public void setSelectedItem(Object anItem) {
+			selected = (QuestStage) anItem;
+		}
+
+		@Override
+		public Object getSelectedItem() {
+			return selected;
+		}
+		
+		public void itemAdded(QuestStage item, int index) {
+			fireIntervalAdded(this, index, index);
+		}
+		
+		public void itemRemoved(QuestStage item, int index) {
+			fireIntervalRemoved(this, index, index);
+		}
+		
+		public void changeQuest(Quest newQuest) {
+			int size = getSize();
+			currentQuest = null;
+			selected = null;
+			fireIntervalRemoved(this, 1, size);
+			currentQuest = newQuest;
+			fireIntervalAdded(this, 1, getSize());
+		}
+		
+	}
+	
 	
 	public static class GDEBacklinksListModel implements ListModel<GameDataElement> {
 		
@@ -892,7 +1027,5 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return null;
 	}
 
-
-	
 	
 }
