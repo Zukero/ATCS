@@ -670,7 +670,7 @@ public class Project implements ProjectTreeNode, Serializable {
 	public Spritesheet getSpritesheet(int index) {
 		if (index < createdContent.gameSprites.spritesheets.size()) {
 			return createdContent.gameSprites.spritesheets.get(index);
-		} else if (index < getQuestCount()){
+		} else if (index < getSpritesheetCount()){
 			return getSpritesheet(baseContent.gameSprites.spritesheets.get(index - createdContent.gameSprites.spritesheets.size()).id);
 		}
 		return null;
