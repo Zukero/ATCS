@@ -11,6 +11,9 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
@@ -20,8 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JComponent;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
 
 import tiled.view.MapRenderer;
@@ -46,26 +52,70 @@ public class WorldMapView extends JComponent implements Scrollable {
 	
 	
 	public Map<String, Rectangle> mapLocations = new LinkedHashMap<String, Rectangle>();
+
+	public ListSelectionModel selectedSelectionModel = null;
+	public ListModel<TMXMap> selectedListModel = null;
 	
-	public Set<String> selected = new HashSet<String>();
+	public ListModel<TMXMap> highlightedListModel = null;
 	
 	public float zoomLevel = 0.1f;
 	int sizeX = 0, sizeY = 0;
 	int offsetX = 0, offsetY = 0;
 	
+
+    
+    static final Color selectOutlineColor = new Color(255, 0, 0);
+    static final Stroke selectOutlineStroke = new BasicStroke(4f);
+    static final Color highlightOutlineColor = Color.CYAN;
+    static final Stroke highlightOutlineStroke = new BasicStroke(4f);
+    static final Color mapIdLabelOutlineColor = Color.BLACK;
+    static final Stroke thinLabelOutlineStroke = new BasicStroke(1.5f);
+    static final Stroke labelOutlineStroke = new BasicStroke(3f);
+	
 	public WorldMapView(WorldmapSegment worldmap) {
 		this.worldmap = worldmap;
 		this.proj = worldmap.getProject();
 		updateFromModel();
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String selectedMap = null;
+				boolean update = false;
+				int x = (int) (e.getX() / zoomLevel);
+				int y = (int) (e.getY() / zoomLevel);
+				for (String s : mapLocations.keySet()) {
+					if (mapLocations.get(s).contains(x, y)) {
+						selectedMap = s;
+						break;
+					}
+				}
+				if (selectedMap != null) {
+					mapClicked(e, WorldMapView.this.worldmap.getProject().getMap(selectedMap));
+				} else {
+					backgroundClicked(e);
+				}
+			}
+		});
 	}
 	
 	private void paintOnGraphics(Graphics2D g2) {
 		g2.setPaint(new Color(100, 100, 100));
         g2.fillRect(0, 0, sizeX, sizeY);
         
-        g2.setPaint(new Color(255, 0, 0));
-        g2.setStroke(new BasicStroke(4));
+        g2.setPaint(selectOutlineColor);
+        g2.setStroke(selectOutlineStroke);
+        
+        Font areaNameFont = g2.getFont();
+        areaNameFont = areaNameFont.deriveFont(70f).deriveFont(Font.BOLD);
+        
+        Font mapIdFont = g2.getFont();
+        mapIdFont = mapIdFont.deriveFont(50f).deriveFont(Font.BOLD);
 
+        g2.setFont(mapIdFont);
+        FontMetrics mifm = g2.getFontMetrics();
+        int mapIdLabelHeight = mifm.getHeight();
+        
         for (String s : mapLocations.keySet()) {
 
         	int x = mapLocations.get(s).x;
@@ -93,20 +143,23 @@ public class WorldMapView extends JComponent implements Scrollable {
         		MapColorFilters.applyColorfilter(map.colorFilter, g2);
         		g2.setClip(oldClip);
         	}
-        	if (selected.contains(s)) {
-        		g2.drawRect(0, 0, map.tmxMap.getWidth() * TILE_SIZE, map.tmxMap.getHeight() * TILE_SIZE);
-        	}
         	
         	g2.translate(-x, -y);
         	
         }
         
+        if (highlightedListModel != null) {
+        	outlineFromListModel(g2, highlightedListModel, null, highlightOutlineColor, highlightOutlineStroke, mapIdFont, mapIdLabelHeight);
+        }
         
-        Font f = g2.getFont();
-        f = f.deriveFont(70f).deriveFont(Font.BOLD);
-        g2.setFont(f);
-        g2.setStroke(new BasicStroke(3));
+        if (selectedListModel != null && selectedSelectionModel != null) {
+        	outlineFromListModel(g2, selectedListModel, selectedSelectionModel, selectOutlineColor, selectOutlineStroke, mapIdFont, mapIdLabelHeight);
+        }
+        
+        
+        g2.setStroke(labelOutlineStroke);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setFont(areaNameFont);
         FontMetrics fm = g2.getFontMetrics();
         FontRenderContext frc = g2.getFontRenderContext();
         
@@ -118,12 +171,51 @@ public class WorldMapView extends JComponent implements Scrollable {
         	}
         	
         	Rectangle2D stringBounds = fm.getStringBounds(label, g2);
-        	GlyphVector gv = f.createGlyphVector(frc, label);
+        	GlyphVector gv = areaNameFont.createGlyphVector(frc, label);
         	g2.setColor(Color.WHITE);
         	g2.fill(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
         	g2.setColor(Color.BLACK);
         	g2.draw(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
         }
+	}
+	
+	private void outlineFromListModel(Graphics2D g2, ListModel<TMXMap> listModel, ListSelectionModel selectionModel, Color outlineColor, Stroke outlineStroke, Font mapIdFont, int mapIdLabelHeight) {
+		for (int i =0; i<listModel.getSize(); i++) {
+			//No selection model ? We want to highlight the whole list.
+        	if (selectionModel == null || selectionModel.isSelectedIndex(i)) {
+        		TMXMap map = listModel.getElementAt(i);
+        		int x = mapLocations.get(map.id).x;
+            	int y = mapLocations.get(map.id).y;
+            	
+            	g2.translate(x, y);
+            	
+            	GlyphVector gv = mapIdFont.createGlyphVector(g2.getFontRenderContext(), map.id);
+            	g2.setStroke(outlineStroke);
+            	g2.setColor(outlineColor);
+            	g2.drawRect(0, 0, map.tmxMap.getWidth() * TILE_SIZE, map.tmxMap.getHeight() * TILE_SIZE);
+
+            	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            	g2.setStroke(thinLabelOutlineStroke);
+            	g2.fill(gv.getOutline(8, 8 + mapIdLabelHeight));
+            	g2.setColor(mapIdLabelOutlineColor);
+            	g2.draw(gv.getOutline(8, 8 + mapIdLabelHeight));
+
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                
+                g2.translate(-x, -y);
+        	}
+        }
+	}
+	
+	public List<String> getSelectedMapsIDs() {
+		List<String> result = new ArrayList<String>();
+		for (int i =0; i<selectedListModel.getSize(); i++) {
+        	if (selectedSelectionModel.isSelectedIndex(i)) {
+        		TMXMap map = selectedListModel.getElementAt(i);
+        		result.add(map.id);
+        	}
+		}
+		return result;
 	}
 	
 	@Override
@@ -138,6 +230,30 @@ public class WorldMapView extends JComponent implements Scrollable {
 			g2.dispose();
 		}
 		
+	}
+	
+	
+	public interface MapClickListener {
+		public void mapClicked(MouseEvent e, TMXMap m);
+		public void backgroundClicked(MouseEvent e);
+	}
+
+	private List<MapClickListener> listeners = new CopyOnWriteArrayList<MapClickListener>();
+	
+	public void addMapClickListener(MapClickListener l) {
+		listeners.add(l);
+	}
+	
+	public void removeMapClickListener(MapClickListener l) {
+		listeners.remove(l);
+	}
+	
+	private void mapClicked(MouseEvent e, TMXMap m) {
+		for (MapClickListener l : listeners) l.mapClicked(e, m);
+	}
+	
+	private void backgroundClicked(MouseEvent e) {
+		for (MapClickListener l : listeners) l.backgroundClicked(e);
 	}
 	
 //	private boolean paintObjectGroup(Graphics2D g2d, TMXMap map, tiled.core.ObjectGroup layer) {
