@@ -90,6 +90,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	ListModel<TMXMap> currentHighlightListModel = null;
 	
 	JList<TMXMap> mapsShown;
+	JList<WorldmapSegment.NamedArea> labelList;
 	
 	JTextField labelIdField;
 	JTextField labelNameField;
@@ -343,9 +344,6 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 //							mapView.selected.add(selectedMap);
 							update = true;
 						}
-						if (e.getClickCount() == 2) {
-							ATContentStudio.frame.openEditor(worldmap.getProject().getMap(selectedMap));
-						}
 					}
 				} else if (editMode == EditMode.addMap && mapBeingAddedID != null) {
 					if (e.getButton() == MouseEvent.BUTTON1) {
@@ -440,6 +438,26 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		mapView.addMouseListener(mouseListener);
 		mapView.addMouseMotionListener(mouseListener);
 		
+		mapView.addMapClickListener(new WorldMapView.MapClickListener() {
+			@Override
+			public void mapClicked(MouseEvent e, TMXMap m) {
+				if (e.getClickCount() == 2) {
+					ATContentStudio.frame.openEditor(m);
+				}
+			}
+			
+			@Override
+			public void mapChangeClicked(MouseEvent e, TMXMap m, TMXMap changeTarget) {
+				if (e.getClickCount() == 2) {
+					ATContentStudio.frame.openEditor(changeTarget);
+				}
+			}
+			
+			@Override
+			public void backgroundClicked(MouseEvent e) {
+			}
+		});
+		
 		return pane;
 	}
 	
@@ -496,13 +514,18 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		labelEditPane.add(new JLabel("Labels on the worldmap"), JideBoxLayout.FIX);
 		
 		mslListModel = new MapSegmentLabelsListModel(worldmap);
-		final JList<WorldmapSegment.NamedArea> labelList = new JList<WorldmapSegment.NamedArea>(mslListModel);
+		labelList = new JList<WorldmapSegment.NamedArea>(mslListModel);
 		labelList.setCellRenderer(new MapLabelCellRenderer());
 		labelList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		labelEditPane.add(new JScrollPane(labelList), JideBoxLayout.FLEXIBLE);
 		
 		JPanel labelListButtonsPane = new JPanel();
-		//TODO Add the buttons
+		labelListButtonsPane.setLayout(new JideBoxLayout(labelListButtonsPane, JideBoxLayout.LINE_AXIS));
+		final JButton createLabel = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
+		labelListButtonsPane.add(createLabel, JideBoxLayout.FIX);
+		final JButton deleteLabel = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		labelListButtonsPane.add(deleteLabel, JideBoxLayout.FIX);
+		labelListButtonsPane.add(new JPanel(), JideBoxLayout.VARY);
 		labelEditPane.add(labelListButtonsPane, JideBoxLayout.FIX);
 		
 		final JPanel labelParametersPane = new JPanel();
@@ -511,15 +534,39 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		labelList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (labelList.getSelectedValue() != null) {
-					selectedLabel = labelList.getSelectedValue();
-					updateLabelParamsPane(labelParametersPane, worldmap);
-					labelEditPane.revalidate();
-					labelEditPane.repaint();
-				}
+				selectedLabel = labelList.getSelectedValue();
+				updateLabelParamsPane(labelParametersPane, worldmap);
+				labelEditPane.revalidate();
+				labelEditPane.repaint();
 			}
 		});
 		
+		createLabel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				WorldmapSegment.NamedArea creation = new WorldmapSegment.NamedArea(null, null, null);
+				worldmap.labels.put(WorldmapSegment.TEMP_LABEL_KEY, creation);
+				worldmap.labelledMaps.put(WorldmapSegment.TEMP_LABEL_KEY, new ArrayList<String>());
+				mslListModel.listChanged();
+				labelList.setSelectedValue(creation, true);
+			}
+		});
+		
+		deleteLabel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (selectedLabel.id != null) {
+					worldmap.labelledMaps.remove(selectedLabel.id);
+					worldmap.labels.remove(selectedLabel.id);
+				} else {
+					worldmap.labelledMaps.remove(WorldmapSegment.TEMP_LABEL_KEY);
+					worldmap.labels.remove(WorldmapSegment.TEMP_LABEL_KEY);
+				}
+				labelList.clearSelection();
+				mslListModel.listChanged();
+				notifyModelModified();
+			}
+		});
 
 		
 		tabPane.addTab("Labels", labelEditPane);
@@ -530,6 +577,10 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	
 	private void updateLabelParamsPane(JPanel labelParametersPane, final WorldmapSegment worldmap) {
 		labelParametersPane.removeAll();
+		if (selectedLabel == null) {
+			setCurrentHighlightModel(null);
+			return;
+		}
 		labelParametersPane.setLayout(new JideBoxLayout(labelParametersPane, JideBoxLayout.PAGE_AXIS));
 		
 		labelIdField = addTextField(labelParametersPane, "Internal ID: ", selectedLabel.id, worldmap.writable, this);
@@ -553,7 +604,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		});
 		
 		JPanel labelCoverageButtonsPane = new JPanel();
-		//TODO Add the buttons.
+		labelCoverageButtonsPane.setLayout(new JideBoxLayout(labelCoverageButtonsPane, JideBoxLayout.LINE_AXIS));
 		JButton addCoverage = new JButton("Add on-map selection");
 		labelCoverageButtonsPane.add(addCoverage, JideBoxLayout.FIX);
 		JButton replaceCoverage = new JButton("Replace by on-map selection");
@@ -565,11 +616,14 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		addCoverage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (selectedLabel == null || selectedLabel.id == null) return;
-				List<String> currentCoverage = worldmap.labelledMaps.get(selectedLabel.id);
+				if (selectedLabel == null) return;
+				String labelId = selectedLabel.id;
+				if (labelId == null) labelId = WorldmapSegment.TEMP_LABEL_KEY;
+				
+				List<String> currentCoverage = worldmap.labelledMaps.get(labelId);
 				if (currentCoverage == null) {
-					worldmap.labelledMaps.put(selectedLabel.id, new ArrayList<String>());
-					currentCoverage = worldmap.labelledMaps.get(selectedLabel.id);
+					worldmap.labelledMaps.put(labelId, new ArrayList<String>());
+					currentCoverage = worldmap.labelledMaps.get(labelId);
 				}
 				for (int i = 0; i < msmListModel.getSize(); i++) {
 					if (msmListSelectionModel.isSelectedIndex(i)) {
@@ -586,11 +640,14 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		replaceCoverage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (selectedLabel == null || selectedLabel.id == null) return;
-				List<String> currentCoverage = worldmap.labelledMaps.get(selectedLabel.id);
+				if (selectedLabel == null) return;
+				String labelId = selectedLabel.id;
+				if (labelId == null) labelId = WorldmapSegment.TEMP_LABEL_KEY;
+				
+				List<String> currentCoverage = worldmap.labelledMaps.get(labelId);
 				if (currentCoverage == null) {
-					worldmap.labelledMaps.put(selectedLabel.id, new ArrayList<String>());
-					currentCoverage = worldmap.labelledMaps.get(selectedLabel.id);
+					worldmap.labelledMaps.put(labelId, new ArrayList<String>());
+					currentCoverage = worldmap.labelledMaps.get(labelId);
 				} else {
 					currentCoverage.clear();
 				}
@@ -609,16 +666,21 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		removeFromCoverage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (selectedLabel == null || selectedLabel.id == null) return;
-				List<String> currentCoverage = worldmap.labelledMaps.get(selectedLabel.id);
+				if (selectedLabel == null) return;
+				String labelId = selectedLabel.id;
+				if (labelId == null) labelId = WorldmapSegment.TEMP_LABEL_KEY;
+				
+				List<String> currentCoverage = worldmap.labelledMaps.get(labelId);
 				if (currentCoverage == null) return;
+				List<String> toRemove = new ArrayList<String>();
 				for (int i = 0; i < mslmListModel.getSize(); i++) {
 					if (mslmListSelectionModel.isSelectedIndex(i)) {
 						if (currentCoverage.contains(mslmListModel.getElementAt(i).id)) {
-							currentCoverage.remove(mslmListModel.getElementAt(i).id);
+							toRemove.add(mslmListModel.getElementAt(i).id);
 						}
 					}
 				}
+				currentCoverage.removeAll(toRemove);
 				mslmListModel.listChanged();
 				repaintMap();
 			}
@@ -679,11 +741,13 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		
 		@Override
 		public int getSize() {
+			if (area.id == null) return segment.labelledMaps.get(WorldmapSegment.TEMP_LABEL_KEY).size();
 			return segment.labelledMaps.get(area.id).size();
 		}
 
 		@Override
 		public TMXMap getElementAt(int index) {
+			if (area.id == null) return segment.getProject().getMap(segment.labelledMaps.get(WorldmapSegment.TEMP_LABEL_KEY).get(index));
 			return segment.getProject().getMap(segment.labelledMaps.get(area.id).get(index));
 		}
 
@@ -790,7 +854,13 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 				label.setText("None");
 			} else {
 				WorldmapSegment.NamedArea area = (WorldmapSegment.NamedArea) value;
-				label.setText(area.name+" ("+area.id+")");
+				if (area.id != null) {
+					label.setText(area.name+" ("+area.id+")");
+					label.setIcon(new ImageIcon(DefaultIcons.getLabelIcon()));
+				} else {
+					label.setText("Incomplete Label. Enter an ID.");
+					label.setIcon(new ImageIcon(DefaultIcons.getNullifyIcon()));
+				}
 			}
 			return label;
 		}
@@ -1012,12 +1082,20 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		WorldmapSegment worldmap = (WorldmapSegment)target;
 		boolean changed = false;
 		if (source == labelIdField) {
-			List<String> coverage = worldmap.labelledMaps.get(selectedLabel.id);
-			worldmap.labelledMaps.remove(selectedLabel.id);
-			worldmap.labels.remove(selectedLabel.id);
+			List<String> coverage;
+			if (selectedLabel.id != null) {
+				coverage = worldmap.labelledMaps.get(selectedLabel.id);
+				worldmap.labelledMaps.remove(selectedLabel.id);
+				worldmap.labels.remove(selectedLabel.id);
+			} else {
+				coverage = worldmap.labelledMaps.get(WorldmapSegment.TEMP_LABEL_KEY);
+				worldmap.labels.remove(WorldmapSegment.TEMP_LABEL_KEY);
+			}
 			selectedLabel.id = (String) value;
-			worldmap.labelledMaps.put(selectedLabel.id, coverage);
-			worldmap.labels.put(selectedLabel.id, selectedLabel);
+			if (value != null) {
+				worldmap.labelledMaps.put(selectedLabel.id, coverage);
+				worldmap.labels.put(selectedLabel.id, selectedLabel);
+			}
 			mslListModel.listChanged();
 			changed = true;
 		} else if (source == labelNameField) {

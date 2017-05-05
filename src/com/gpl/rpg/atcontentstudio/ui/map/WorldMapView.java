@@ -7,6 +7,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -29,11 +30,15 @@ import javax.swing.JComponent;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.Scrollable;
+import javax.swing.ToolTipManager;
 
 import tiled.view.MapRenderer;
 import tiled.view.OrthogonalRenderer;
 
 import com.gpl.rpg.atcontentstudio.model.Project;
+import com.gpl.rpg.atcontentstudio.model.maps.MapChange;
+import com.gpl.rpg.atcontentstudio.model.maps.MapObject;
+import com.gpl.rpg.atcontentstudio.model.maps.MapObjectGroup;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 
@@ -91,12 +96,82 @@ public class WorldMapView extends JComponent implements Scrollable {
 					}
 				}
 				if (selectedMap != null) {
-					mapClicked(e, WorldMapView.this.worldmap.getProject().getMap(selectedMap));
+					x = x - mapLocations.get(selectedMap).x;
+					y = y - mapLocations.get(selectedMap).y;
+					//Look for a mapchange there
+					TMXMap map = proj.getMap(selectedMap);
+					
+					boolean mapchangeFound = false;
+					for (MapObjectGroup group : map.groups) {
+						for (MapObject obj : group.mapObjects) {
+							if (obj instanceof MapChange) {
+								if (x >= obj.x && x < obj.x + obj.w && y >= obj.y && y < obj.y + obj.h) {
+									String mapId = ((MapChange)obj).map != null ? ((MapChange)obj).map.id : ((MapChange)obj).map_id;
+									mapChangeClicked(e, proj.getMap(selectedMap), proj.getMap(mapId));
+									mapchangeFound = true;
+								}
+							}
+						}
+					}
+										
+					if (!mapchangeFound) {
+						mapClicked(e, WorldMapView.this.worldmap.getProject().getMap(selectedMap));
+					}
 				} else {
 					backgroundClicked(e);
 				}
 			}
 		});
+		
+		addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				String selectedMap = null;
+				int x = (int) (e.getX() / zoomLevel);
+				int y = (int) (e.getY() / zoomLevel);
+				for (String s : mapLocations.keySet()) {
+					if (mapLocations.get(s).contains(x, y)) {
+						selectedMap = s;
+						break;
+					}
+				}
+				if (selectedMap != null) {
+					//Reuse x,y to indicate to tile-within-the-map coordinates.
+					x = x - mapLocations.get(selectedMap).x;
+					y = y - mapLocations.get(selectedMap).y;
+					//Look for a mapchange there
+					TMXMap map = proj.getMap(selectedMap);
+					
+					boolean mapchangeFound = false;
+					for (MapObjectGroup group : map.groups) {
+						for (MapObject obj : group.mapObjects) {
+							if (obj instanceof MapChange) {
+								if (x >= obj.x && x < obj.x + obj.w && y >= obj.y && y < obj.y + obj.h) {
+									String mapId = ((MapChange)obj).map != null ? ((MapChange)obj).map.id : ((MapChange)obj).map_id;
+									setToolTipText(selectedMap+"->"+mapId);
+									mapchangeFound = true;
+								}
+							}
+						}
+					}
+										
+					if (!mapchangeFound) {
+						setToolTipText(selectedMap);
+					}
+					ToolTipManager.sharedInstance().registerComponent(WorldMapView.this);
+    				ToolTipManager.sharedInstance().setEnabled(true);
+				} else {
+    				ToolTipManager.sharedInstance().setEnabled(false);
+					ToolTipManager.sharedInstance().unregisterComponent(WorldMapView.this);
+					setToolTipText(null);
+				}
+			}
+		});
+	}
+	
+	@Override
+	public Point getToolTipLocation(MouseEvent event) {
+		return event.getPoint();
 	}
 	
 	private void paintOnGraphics(Graphics2D g2) {
@@ -133,8 +208,8 @@ public class WorldMapView extends JComponent implements Scrollable {
         		if (layer instanceof tiled.core.TileLayer && layer.isVisible()) {
         			if (layer.getName().equalsIgnoreCase("walkable")) continue;
         			renderer.paintTileLayer(g2, (tiled.core.TileLayer) layer);
-        		} else if (layer instanceof tiled.core.ObjectGroup && layer.isVisible()) {
-//        			paintObjectGroup(g2, map, (tiled.core.ObjectGroup) layer);
+        		} else if (layer instanceof tiled.core.ObjectGroup) {
+        			paintObjectGroup(g2, map, (tiled.core.ObjectGroup) layer);
         		}
         	}
         	if (map.colorFilter != null) {
@@ -165,19 +240,57 @@ public class WorldMapView extends JComponent implements Scrollable {
         
         for (String s : worldmap.labels.keySet()) {
         	String label = worldmap.labels.get(s).name;
-        	Rectangle areaCovered = new Rectangle(0, 0, -1, -1);
-        	for (String map : worldmap.labelledMaps.get(s)) {
-        		areaCovered.add(mapLocations.get(map));
+        	if (label != null) {
+        		Rectangle areaCovered = new Rectangle(0, 0, -1, -1);
+        		for (String map : worldmap.labelledMaps.get(s)) {
+        			areaCovered.add(mapLocations.get(map));
+        		}
+
+        		Rectangle2D stringBounds = fm.getStringBounds(label, g2);
+        		GlyphVector gv = areaNameFont.createGlyphVector(frc, label);
+        		g2.setColor(Color.WHITE);
+        		g2.fill(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
+        		g2.setColor(Color.BLACK);
+        		g2.draw(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
         	}
-        	
-        	Rectangle2D stringBounds = fm.getStringBounds(label, g2);
-        	GlyphVector gv = areaNameFont.createGlyphVector(frc, label);
-        	g2.setColor(Color.WHITE);
-        	g2.fill(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
-        	g2.setColor(Color.BLACK);
-        	g2.draw(gv.getOutline((int)(areaCovered.getCenterX() - stringBounds.getCenterX()), (int)(areaCovered.getCenterY() - stringBounds.getCenterY())));
         }
 	}
+	
+	private void paintObjectGroup(Graphics2D g2d, TMXMap map, tiled.core.ObjectGroup layer) {
+    	for (MapObjectGroup group : map.groups) {
+			if (group.tmxGroup == layer) {
+				for (MapObject object : group.mapObjects) {
+					if (object instanceof MapChange) {
+//						Only show mapchange areas pointing to maps not shown in this worldmap
+						if (((MapChange)object).map != null && !mapLocations.containsKey(((MapChange)object).map.id)) {
+							drawObject(object, g2d, new Color(20, 20, 190));
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	private void drawObject(MapObject object, Graphics2D g2d, Color color) {
+    	g2d.setPaint(color);
+		g2d.drawRect(object.x+1, object.y+1, object.w-3, object.h-3);
+		g2d.drawRect(object.x+2, object.y+2, object.w-5, object.h-5);
+		g2d.setPaint(color.darker().darker());
+		g2d.drawLine(object.x, object.y + object.h - 1, object.x + object.w - 1, object.y + object.h - 1);
+		g2d.drawLine(object.x + object.w - 1, object.y, object.x + object.w - 1, object.y + object.h - 1);
+		g2d.drawLine(object.x + 3, object.y + 3, object.x + object.w - 4, object.y + 3);
+		g2d.drawLine(object.x + 3, object.y + 3, object.x + 3, object.y + object.h - 4);
+		g2d.setPaint(color.brighter().brighter().brighter());
+		g2d.drawLine(object.x, object.y, object.x + object.w - 1, object.y);
+		g2d.drawLine(object.x, object.y, object.x, object.y + object.h - 1);
+		g2d.drawLine(object.x + 3, object.y + object.h - 4, object.x + object.w - 4, object.y + object.h - 4);
+		g2d.drawLine(object.x + object.w - 4, object.y + 3, object.x + object.w - 4, object.y + object.h - 4);
+		Image img = object.getIcon();
+		g2d.setColor(new Color(255, 255, 255, 120));
+		g2d.fillRect(object.x + 2, object.y + 2, img.getWidth(null), img.getHeight(null));
+		g2d.drawImage(object.getIcon(), object.x + 2, object.y + 2, null);
+    }
 	
 	private void outlineFromListModel(Graphics2D g2, ListModel<TMXMap> listModel, ListSelectionModel selectionModel, Color outlineColor, Stroke outlineStroke, Font mapIdFont, int mapIdLabelHeight) {
 		for (int i =0; i<listModel.getSize(); i++) {
@@ -235,6 +348,7 @@ public class WorldMapView extends JComponent implements Scrollable {
 	
 	public interface MapClickListener {
 		public void mapClicked(MouseEvent e, TMXMap m);
+		public void mapChangeClicked(MouseEvent e, TMXMap m, TMXMap changeTarget);
 		public void backgroundClicked(MouseEvent e);
 	}
 
@@ -250,6 +364,10 @@ public class WorldMapView extends JComponent implements Scrollable {
 	
 	private void mapClicked(MouseEvent e, TMXMap m) {
 		for (MapClickListener l : listeners) l.mapClicked(e, m);
+	}
+	
+	private void mapChangeClicked(MouseEvent e, TMXMap m, TMXMap changeTarget) {
+		for (MapClickListener l : listeners) l.mapChangeClicked(e, m, changeTarget);
 	}
 	
 	private void backgroundClicked(MouseEvent e) {

@@ -227,6 +227,10 @@ public class DefaultIcons {
 	public static Image getCreateTileLayerImage() { return getImage(CREATE_TILE_LAYER_RES); }
 	public static Image getCreateTileLayerIcon() { return getIcon(CREATE_TILE_LAYER_RES); }
 
+	private static String LABEL_RES = "/com/gpl/rpg/atcontentstudio/img/label.png";
+	public static Image getLabelImage() { return getImage(LABEL_RES); }
+	public static Image getLabelIcon() { return getIcon(LABEL_RES); }
+
 	private static String ZOOM_RES = "/com/gpl/rpg/atcontentstudio/img/zoom.png";
 	public static Image getZoomImage() { return getImage(ZOOM_RES); }
 	public static Image getZoomIcon() { return getIcon(ZOOM_RES); }

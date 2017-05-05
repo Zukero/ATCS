@@ -32,6 +32,8 @@ public class WorldmapSegment extends GameDataElement {
 
 	private static final long serialVersionUID = 2658610076889592723L;
 	
+	public static final String TEMP_LABEL_KEY = "ATCS_INTERNAL_TEMPORARY_KEY_FOR_LABEL";
+	
 	public int segmentX;
 	public int segmentY;
 	public Map<String, Point> mapLocations = new LinkedHashMap<String, Point>();
@@ -154,6 +156,7 @@ public class WorldmapSegment extends GameDataElement {
 			map.setAttribute("x", Integer.toString(mapLocations.get(s).x + segmentX));
 			map.setAttribute("y", Integer.toString(mapLocations.get(s).y + segmentY));
 			for (String label : labelledMaps.keySet()) {
+				if (TEMP_LABEL_KEY.equals(label)) continue;
 				if (labelledMaps.get(label).contains(s)) {
 					map.setAttribute("area", label);
 				}
@@ -161,7 +164,9 @@ public class WorldmapSegment extends GameDataElement {
 			element.appendChild(map);
 		}
 		
-		for (NamedArea area : labels.values()) {
+		for (String key : labels.keySet()) {
+			if (TEMP_LABEL_KEY.equals(key)) continue;
+			NamedArea area = labels.get(key);
 			Element namedArea = doc.createElement("namedarea");
 			namedArea.setAttribute("id", area.id);
 			namedArea.setAttribute("name", area.name);
