@@ -496,12 +496,19 @@ public class WorldMapView extends JComponent implements Scrollable {
 	public void pushToModel() {
 		worldmap.segmentX = offsetX / TILE_SIZE;
 		worldmap.segmentY = offsetY / TILE_SIZE;
+		for (String id : worldmap.mapLocations.keySet()) {
+			worldmap.getProject().getMap(id).removeBacklink(worldmap);
+		}
 		worldmap.mapLocations.clear();
 		for (String s : mapLocations.keySet()) {
 			int x = mapLocations.get(s).x / TILE_SIZE;
 			int y = mapLocations.get(s).y / TILE_SIZE;
 			
 			worldmap.mapLocations.put(s, new Point(x, y));
+		}
+		
+		for (String id : worldmap.mapLocations.keySet()) {
+			worldmap.getProject().getMap(id).addBacklink(worldmap);
 		}
 		
 		List<String> toRemove = new ArrayList<String>();

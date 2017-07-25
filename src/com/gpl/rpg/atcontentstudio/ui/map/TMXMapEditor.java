@@ -1593,6 +1593,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	public void targetUpdated() {
 		this.name = ((TMXMap)target).getDesc();
 		updateMessage();
+		updateXmlViewText(((TMXMap)target).toXml());
+		tmxViewer.repaint();
+		tmxViewer.revalidate();
 	}
 	
 	
@@ -1682,6 +1685,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					ATContentStudio.frame.closeEditor(map);
 					map.childrenRemoved(new ArrayList<ProjectTreeNode>());
 					map.delete();
+					GameDataElement newOne = map.getProject().getMap(map.id);
+					for (GameDataElement backlink : map.getBacklinks()) {
+						backlink.elementChanged(map, newOne);
+					}
 				}
 			});
 			savePane.add(delete, JideBoxLayout.FIX);
@@ -2005,11 +2012,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			if (modified) {
 				if (map.state != GameDataElement.State.modified) {
 					map.state = GameDataElement.State.modified;
-					TMXMapEditor.this.name = map.getDesc();
 					map.childrenChanged(new ArrayList<ProjectTreeNode>());
 					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
 				}
-				updateXmlViewText(map.toXml());
 			}
 		}
 	}

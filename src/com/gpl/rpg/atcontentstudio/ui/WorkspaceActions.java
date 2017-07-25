@@ -150,6 +150,10 @@ public class WorkspaceActions {
 						}
 					} else if (element instanceof TMXMap) {
 						((TMXMap)element).delete();
+						GameDataElement newOne = element.getProject().getMap(element.id);
+						for (GameDataElement backlink : element.getBacklinks()) {
+							backlink.elementChanged(element, newOne);
+						}
 					} else if (element instanceof WriterModeData) {
 						WriterModeDataSet parent = (WriterModeDataSet) element.getParent();
 						parent.writerModeDataList.remove(element);
@@ -222,6 +226,10 @@ public class WorkspaceActions {
 //							}
 						} else if (node instanceof TMXMap) {
 							((TMXMap)node).delete();
+							GameDataElement newOne = node.getProject().getMap(node.id);
+							for (GameDataElement backlink : node.getBacklinks()) {
+								backlink.elementChanged(node, newOne);
+							}
 						} else if (node instanceof WriterModeData) {
 							WriterModeDataSet parent = (WriterModeDataSet) node.getParent();
 							parent.writerModeDataList.remove(node);

@@ -119,6 +119,8 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	public void targetUpdated() {
 		this.name = ((GameDataElement)target).getDesc();
 		updateMessage();
+		updateXmlViewText(((WorldmapSegment)target).toXml());
+		mapView.updateFromModel();
 	}
 
 	public JPanel getXmlEditorPane() {
@@ -1016,7 +1018,6 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	
 	public void notifyModelModified() {
 		target.state = GameDataElement.State.modified;
-		this.name = ((WorldmapSegment)target).getDesc();
 		target.childrenChanged(new ArrayList<ProjectTreeNode>());
 	}
 	

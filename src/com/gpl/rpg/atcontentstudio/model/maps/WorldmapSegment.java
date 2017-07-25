@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
@@ -104,8 +105,28 @@ public class WorldmapSegment extends GameDataElement {
 
 	@Override
 	public void elementChanged(GameDataElement oldOne, GameDataElement newOne) {
+		boolean modified = false;
+		if (newOne == null && writable) {
+			//A referenced map may have been deleted.
+			if (mapLocations.containsKey(oldOne.id)) {
+				mapLocations.remove(oldOne.id);
+				modified = true;
+			}
+			for (String label : labelledMaps.keySet()) { 
+				if (labelledMaps.get(label).contains(oldOne.id)) {
+					labelledMaps.get(label).remove(oldOne.id);
+					modified = true;
+				}
+			}
+		}
+		
 		oldOne.removeBacklink(this);
 		if(newOne != null) newOne.addBacklink(this);
+		
+		if (modified) {
+			this.state = GameDataElement.State.modified;
+			childrenChanged(new ArrayList<ProjectTreeNode>());
+		}
 	}
 
 	@Override
