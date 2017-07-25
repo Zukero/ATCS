@@ -35,6 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
 import com.gpl.rpg.atcontentstudio.model.Project;
@@ -222,6 +223,7 @@ public class Worldmap extends ArrayList<WorldmapSegment> implements ProjectTreeN
 
 			for (WorldmapSegment segment : this) {
 				root.appendChild(segment.toXmlElement(doc));
+				segment.state = GameDataElement.State.saved;
 			}
 
 			saveDocToFile(doc, worldmapFile);

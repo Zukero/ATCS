@@ -98,7 +98,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	
 	public WorldMapEditor(WorldmapSegment worldmap) {
 		target = worldmap;
-		this.name = worldmap.id;
+		this.name = worldmap.getDesc();
 		this.icon = new ImageIcon(worldmap.getIcon());
 		setLayout(new BorderLayout());
 		
@@ -117,8 +117,8 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 	
 	@Override
 	public void targetUpdated() {
-		// TODO Auto-generated method stub
-
+		this.name = ((GameDataElement)target).getDesc();
+		updateMessage();
 	}
 
 	public JPanel getXmlEditorPane() {

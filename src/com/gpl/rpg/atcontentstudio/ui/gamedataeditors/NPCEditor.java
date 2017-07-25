@@ -606,7 +606,7 @@ public class NPCEditor extends JSONElementEditor {
 				hitEffect.ap_boost_max = (Integer) value;
 				updateHit = true;
 			} else if (source == hitSourceConditionsList) {
-				//TODO
+				updateHit = true;
 			} else if (source == sourceConditionBox) {
 				if (selectedHitEffectSourceCondition.condition != null) {
 					selectedHitEffectSourceCondition.condition.removeBacklink(npc);
@@ -629,7 +629,7 @@ public class NPCEditor extends JSONElementEditor {
 				selectedHitEffectSourceCondition.chance = (Double) value;
 				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
 			} else if (source == hitTargetConditionsList) {
-				//TODO
+				updateHit = true;
 			} else if (source == targetConditionBox) {
 				if (selectedHitEffectTargetCondition.condition != null) {
 					selectedHitEffectTargetCondition.condition.removeBacklink(npc);

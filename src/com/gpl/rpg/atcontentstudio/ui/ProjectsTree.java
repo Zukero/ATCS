@@ -140,14 +140,14 @@ public class ProjectsTree extends JPanel {
 		projectsTree.addTreeSelectionListener(new TreeSelectionListener() {
 			@Override
 			public void valueChanged(TreeSelectionEvent e) {
-				List<TreePath> newPaths = new ArrayList<TreePath>();
-				for (TreePath path : e.getPaths()) {
-					if (e.isAddedPath(path)) newPaths.add(path);
-				}
+//				List<TreePath> newPaths = new ArrayList<TreePath>();
+//				for (TreePath path : e.getPaths()) {
+//					if (e.isAddedPath(path)) newPaths.add(path);
+//				}
 				if (e.getPath() == null) {
-					ATContentStudio.frame.actions.selectionChanged(null, newPaths.toArray(new TreePath[newPaths.size()]));
+					ATContentStudio.frame.actions.selectionChanged(null, projectsTree.getSelectionPaths());
 				} else {
-					ATContentStudio.frame.actions.selectionChanged((ProjectTreeNode) e.getPath().getLastPathComponent(), newPaths.toArray(new TreePath[newPaths.size()]));
+					ATContentStudio.frame.actions.selectionChanged((ProjectTreeNode) e.getPath().getLastPathComponent(), projectsTree.getSelectionPaths());
 				}
 			}
 		});

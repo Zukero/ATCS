@@ -31,8 +31,12 @@ import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataCategory;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
+import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
+import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
+import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
+import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeDataSet;
@@ -122,19 +126,41 @@ public class WorkspaceActions {
 					ATContentStudio.frame.closeEditor(element);
 					element.childrenRemoved(new ArrayList<ProjectTreeNode>());
 					if (element instanceof JSONElement) {
-						@SuppressWarnings("unchecked")
-						GameDataCategory<JSONElement> category = (GameDataCategory<JSONElement>) element.getParent();
-						category.remove(element);
-						if (impactedCategories.get(category) == null) {
-							impactedCategories.put(category, new HashSet<File>());
+						if (element.getParent() instanceof GameDataCategory<?>) {
+							@SuppressWarnings("unchecked")
+							GameDataCategory<JSONElement> category = (GameDataCategory<JSONElement>) element.getParent();
+							category.remove(element);
+							if (impactedCategories.get(category) == null) {
+								impactedCategories.put(category, new HashSet<File>());
+							}
+							
+							GameDataElement newOne = element.getProject().getGameDataElement(((JSONElement)element).getClass(), element.id);
+							if (element instanceof Quest) {
+								for (QuestStage oldStage : ((Quest) element).stages) {
+									QuestStage newStage = newOne != null ? ((Quest) newOne).getStage(oldStage.progress) : null;
+									for (GameDataElement backlink : oldStage.getBacklinks()) {
+										backlink.elementChanged(oldStage, newStage);
+									}
+								}
+							}
+							for (GameDataElement backlink : element.getBacklinks()) {
+								backlink.elementChanged(element, newOne);
+							}
+							impactedCategories.get(category).add(((JSONElement) element).jsonFile);
 						}
-						impactedCategories.get(category).add(((JSONElement) element).jsonFile);
 					} else if (element instanceof TMXMap) {
-						TMXMapSet parent = (TMXMapSet) element.getParent();
-						parent.tmxMaps.remove(element);
+						((TMXMap)element).delete();
 					} else if (element instanceof WriterModeData) {
 						WriterModeDataSet parent = (WriterModeDataSet) element.getParent();
 						parent.writerModeDataList.remove(element);
+					} else if (element instanceof WorldmapSegment) {
+						if (element.getParent() instanceof Worldmap) {
+							((Worldmap)element.getParent()).remove(element);
+							element.save();
+							for (GameDataElement backlink : element.getBacklinks()) {
+								backlink.elementChanged(element, element.getProject().getWorldmapSegment(element.id));
+							}
+						}
 					}
 				}
 				new Thread() {
@@ -165,20 +191,48 @@ public class WorkspaceActions {
 					@Override
 					public void run() {
 						node.childrenRemoved(new ArrayList<ProjectTreeNode>());
-						if (node.getParent() instanceof GameDataCategory<?>) {
-							((GameDataCategory<?>)node.getParent()).remove(node);
-							List<SaveEvent> events = node.attemptSave();
-							if (events == null || events.isEmpty()) {
-								node.save();
-							} else {
-								new SaveItemsWizard(events, null).setVisible(true);
+						if (node instanceof JSONElement) {
+							if (node.getParent() instanceof GameDataCategory<?>) {
+								((GameDataCategory<?>)node.getParent()).remove(node);
+								List<SaveEvent> events = node.attemptSave();
+								if (events == null || events.isEmpty()) {
+									node.save();
+								} else {
+									new SaveItemsWizard(events, null).setVisible(true);
+								}
+								GameDataElement newOne = node.getProject().getGameDataElement(((JSONElement)node).getClass(), node.id);
+								if (node instanceof Quest) {
+									for (QuestStage oldStage : ((Quest) node).stages) {
+										QuestStage newStage = newOne != null ? ((Quest) newOne).getStage(oldStage.progress) : null;
+										for (GameDataElement backlink : oldStage.getBacklinks()) {
+											backlink.elementChanged(oldStage, newStage);
+										}
+									}
+								}
+								for (GameDataElement backlink : node.getBacklinks()) {
+									backlink.elementChanged(node, newOne);
+								}
 							}
+//							((GameDataCategory<?>)node.getParent()).remove(node);
+//							List<SaveEvent> events = node.attemptSave();
+//							if (events == null || events.isEmpty()) {
+//								node.save();
+//							} else {
+//								new SaveItemsWizard(events, null).setVisible(true);
+//							}
 						} else if (node instanceof TMXMap) {
-							TMXMapSet parent = (TMXMapSet) node.getParent();
-							parent.tmxMaps.remove(node);
+							((TMXMap)node).delete();
 						} else if (node instanceof WriterModeData) {
 							WriterModeDataSet parent = (WriterModeDataSet) node.getParent();
 							parent.writerModeDataList.remove(node);
+						} else if (node instanceof WorldmapSegment) {
+							if (node.getParent() instanceof Worldmap) {
+								((Worldmap)node.getParent()).remove(node);
+								node.save();
+								for (GameDataElement backlink : node.getBacklinks()) {
+									backlink.elementChanged(node, node.getProject().getWorldmapSegment(node.id));
+								}
+							}
 						}
 					}
 				}.start();
@@ -192,12 +246,9 @@ public class WorkspaceActions {
 				for (TreePath selected : selectedPaths) {
 					if (selected.getLastPathComponent() instanceof GameDataElement && ((GameDataElement)selected.getLastPathComponent()).writable) {
 						elementsToDelete.add((GameDataElement) selected.getLastPathComponent());
-						multiMode = true;
-					} else {
-						multiMode = false;
-						break;
 					}
 				}
+				multiMode = elementsToDelete.size() > 1;
 				putValue(Action.NAME, "Delete all selected elements");
 				setEnabled(multiMode);
 			} else if (selectedNode instanceof GameDataElement && ((GameDataElement)selectedNode).writable) {
