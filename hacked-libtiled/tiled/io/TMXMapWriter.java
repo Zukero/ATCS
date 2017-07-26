@@ -181,7 +181,12 @@ public class TMXMapWriter
             firstgid += tileset.getMaxTileId() + 1;
         }
 
-        for (MapLayer layer : map) {
+        for (MapLayer layer : map.getTileLayers()) {
+            writeMapLayer(layer, w, wp);
+        }
+
+        for (MapLayer layer : map.getObjectGroup()) {
+        	if (map.getTileLayers().contains(layer)) continue;
             writeMapLayer(layer, w, wp);
         }
         firstGidPerTileset = null;

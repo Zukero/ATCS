@@ -12,7 +12,7 @@ import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 public class ReplaceArea extends MapObject {
 
 	public Requirement requirement = null;
-	public boolean oldSchoolRequirement = true;
+	public boolean oldSchoolRequirement = false;
 	
 	public List<ReplaceArea.Replacement> replacements = null;
 
@@ -26,14 +26,12 @@ public class ReplaceArea extends MapObject {
 //				requireType = Requirement.RequirementType.questProgress.toString();
 				requireValue = fields[1];
 				requireId = fields[0];
+				oldSchoolRequirement = true;
 			} /*else if (fields.length == 3) {
 				requireValue = fields[2];
 				requireType = fields[0];
 				requireId = fields[1];
 			}*/
-			oldSchoolRequirement = true;
-		} else {
-			oldSchoolRequirement = false;
 		}
 		requirement = new Requirement();
 		//Replace areas only support questProgress requirements ATM
@@ -45,6 +43,7 @@ public class ReplaceArea extends MapObject {
 		
 		
 		for (Object s : obj.getProperties().keySet()) {
+			if (!TMXMap.isPaintedLayerName(s.toString())) continue;
 			if (replacements == null) replacements = new ArrayList<ReplaceArea.Replacement>();
 			replacements.add(new Replacement(s.toString(), obj.getProperties().getProperty(s.toString())));
 		}

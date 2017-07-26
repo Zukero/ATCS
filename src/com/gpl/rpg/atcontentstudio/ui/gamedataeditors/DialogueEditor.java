@@ -417,6 +417,7 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObj = addItemBox(pane, ((Dialogue)target).getProject(), "Item: ", (Item) reward.reward_obj, writable, listener);
 				rewardValue = addIntegerField(pane, "Quantity: ", reward.reward_value, false, writable, listener);
 				break;
+			case removeQuestProgress:
 			case questProgress:
 				rewardMap = null;
 				rewardObjId = null;
@@ -824,6 +825,10 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case questProgress:
 				label.setText("Give quest progress "+rewardObjDesc+":"+reward.reward_value);
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case removeQuestProgress:
+				label.setText("Removes quest progress "+rewardObjDesc+":"+reward.reward_value);
 				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
 				break;
 			case removeSpawnArea:

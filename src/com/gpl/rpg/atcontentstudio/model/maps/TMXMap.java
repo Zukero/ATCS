@@ -273,11 +273,12 @@ public class TMXMap extends GameDataElement {
 
 	public void save() {
 		if (writable) {
+			String xml = toXml();
 			try {
 				//TODO: check in fileutils, to test the workspace's filesystem once at startup, and figure out how many of these can occur, instead of hard-coded '2'
 				dismissNextChangeNotif += 2;
 				FileWriter w = new FileWriter(tmxFile);
-				w.write(toXml());
+				w.write(xml);
 				w.close();
 				this.state = State.saved;
 				changedOnDisk = false;

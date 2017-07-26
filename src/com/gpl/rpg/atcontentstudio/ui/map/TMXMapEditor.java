@@ -260,7 +260,12 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		addTileLayer.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				layerListModel.addObject(new tiled.core.TileLayer());
+				tiled.core.TileLayer layer = new tiled.core.TileLayer(map.tmxMap.getWidth(), map.tmxMap.getHeight());
+				layerListModel.addObject(layer);
+				map.state = GameDataElement.State.modified;
+				map.childrenChanged(new ArrayList<ProjectTreeNode>());
+				ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+				targetUpdated();
 			}
 		});
 		addObjectGroup = new JButton(new ImageIcon(DefaultIcons.getCreateObjectGroupIcon()));
@@ -270,6 +275,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				layerListModel.addObject(new tiled.core.ObjectGroup());
+				map.state = GameDataElement.State.modified;
+				map.childrenChanged(new ArrayList<ProjectTreeNode>());
+				ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+				targetUpdated();
 			}
 		});
 		deleteLayer = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
@@ -279,6 +288,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				layerListModel.removeObject(selectedLayer);
+				map.state = GameDataElement.State.modified;
+				map.childrenChanged(new ArrayList<ProjectTreeNode>());
+				ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+				targetUpdated();
 			}
 		});
 		JPanel layersButtonsPane = new JPanel();
@@ -363,6 +376,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newMapchange(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addSpawn = new JButton(new ImageIcon(DefaultIcons.getCreateSpawnareaIcon()));
@@ -372,6 +389,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newSpawnArea(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addRest = new JButton(new ImageIcon(DefaultIcons.getCreateRestIcon()));
@@ -381,6 +402,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newRest(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addKey = new JButton(new ImageIcon(DefaultIcons.getCreateKeyIcon()));
@@ -390,6 +415,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newKey(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addReplace = new JButton(new ImageIcon(DefaultIcons.getCreateReplaceIcon()));
@@ -399,6 +428,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newReplace(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addScript = new JButton(new ImageIcon(DefaultIcons.getCreateScriptIcon()));
@@ -408,6 +441,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newScript(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addContainer = new JButton(new ImageIcon(DefaultIcons.getCreateContainerIcon()));
@@ -417,6 +454,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newContainer(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			addSign = new JButton(new ImageIcon(DefaultIcons.getCreateSignIcon()));
@@ -426,6 +467,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.addObject(MapObject.newSign(new tiled.core.MapObject(0, 0, 32, 32), map));
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 			deleteObject = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
@@ -435,6 +480,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					groupObjectsListModel.removeObject(selectedMapObject);
+					map.state = GameDataElement.State.modified;
+					map.childrenChanged(new ArrayList<ProjectTreeNode>());
+					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
+					targetUpdated();
 				}
 			});
 
@@ -514,6 +563,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		} else if (selected instanceof ReplaceArea) {
 			//Replace areas only use questProgress requirements ATM
 			//requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), ((ReplaceArea)selected).requirement.type, ((TMXMap)target).writable, listener);
+			areaField = addTextField(pane, "Area ID: ", ((ReplaceArea)selected).name, ((TMXMap)target).writable, listener);
 			requirementParamsPane = new JPanel();
 			requirementParamsPane.setLayout(new JideBoxLayout(requirementParamsPane, JideBoxLayout.PAGE_AXIS, 6));
 			pane.add(requirementParamsPane, JideBoxLayout.FIX);

@@ -111,11 +111,14 @@ public class Map implements Iterable<MapLayer>
 
     public MapLayer addLayer(MapLayer layer) {
         layer.setMap(this);
-        layers.add(layer);
         if (layer instanceof TileLayer) {
         	tileLayers.add((TileLayer) layer);
+        	layers.add(layer);
         } else if (layer instanceof ObjectGroup) {
+        	layers.insertElementAt(layer, objectGroups.size());
         	objectGroups.add((ObjectGroup) layer);
+        } else {
+        	layers.add(layer);
         }
         return layer;
     }

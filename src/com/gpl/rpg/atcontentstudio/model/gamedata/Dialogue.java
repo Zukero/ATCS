@@ -54,6 +54,7 @@ public class Dialogue extends JSONElement {
 		
 		public enum RewardType {
 			questProgress,
+			removeQuestProgress,
 			dropList,
 			skillIncrease,
 			actorCondition,
@@ -264,6 +265,7 @@ public class Dialogue extends JSONElement {
 						reward.reward_obj = proj.getItem(reward.reward_obj_id);
 						break;
 					case questProgress:
+					case removeQuestProgress:
 						reward.reward_obj = proj.getQuest(reward.reward_obj_id);
 						if (reward.reward_obj != null && reward.reward_value != null) {
 							QuestStage stage = ((Quest)reward.reward_obj).getStage(reward.reward_value);
