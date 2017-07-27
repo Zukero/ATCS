@@ -167,6 +167,9 @@ public class WriterModeData extends GameDataElement {
 			this.id = (String) json.get("id");
 			this.index = ((Number)json.get("index")).intValue();
 			this.id_prefix = (String) json.get("id_prefix");
+			if (threadsNextIndex.get(id_prefix) == null || threadsNextIndex.get(id_prefix) <= index) {
+				threadsNextIndex.put(id_prefix, index+1);
+			}
 			this.text = (String) json.get("text");
 			this.dialogue_id = (String) json.get("dialogue");
 			if (json.get("begin") != null && ((Boolean)json.get("begin"))) begin = this;
@@ -541,6 +544,7 @@ public class WriterModeData extends GameDataElement {
 				nodesById.put(dialogue.getID(), dialogue);
 			}
 		}
+		
 		this.state = State.parsed;
 	}
 	
@@ -557,6 +561,11 @@ public class WriterModeData extends GameDataElement {
 			this.parse();
 		} 
 		if (this.state == State.parsed) {
+			for (String prefix : threadsNextIndex.keySet()) {
+				while (getProject().getDialogue(prefix+threadsNextIndex.get(prefix)) != null) {
+					threadsNextIndex.put(prefix, threadsNextIndex.get(prefix)+1);
+				}
+			}
 			for (WriterDialogue dialogue : nodesById.values()) {
 				if (dialogue.dialogue_id != null) {
 					dialogue.dialogue = getProject().getDialogue(dialogue.dialogue_id);
@@ -571,32 +580,34 @@ public class WriterModeData extends GameDataElement {
 						}
 					}
 					//TODO Seriously, this is failure-prone by design. Can't do much better though...
-					List<Dialogue.Reply> linked = new ArrayList<Dialogue.Reply>(dialogue.dialogue.replies.size());
-					if (dialogue.dialogue != null && dialogue.dialogue.replies != null) {
-						//Try to hook to existing replies... not as easy when there's no ID.
-						Dialogue.Reply best = null;
-						int score, maxScore = 0;
-						for (Dialogue.Reply dReply : dialogue.dialogue.replies) {
-							//Never link twice to the same...
-							if (linked.contains(dReply)) continue;
-							score = 0;
-							//Arbitrary values... hopefully this gives good results.
-							//Same target gives good hope of preserving at least the structure.
-							if (dReply.next_phrase_id != null && dReply.next_phrase_id.equals(reply.next_dialogue_id)) score +=50;
-							//Same text is almost as good as an ID, but there may be duplicates due to requirements system...
-							if (dReply.text != null && dReply.text.equals(reply.text)) score +=40;
-							//Same slot in the list. That's not so bad if all else fails, and could help sort duplicates with same text.
-							if (dialogue.dialogue.replies.indexOf(dReply) == dialogue.replies.indexOf(reply)) score +=20;
-							//Both have null text. It's not much, but it's something....
-							if (dReply.text == null && reply.text == null) score += 10;
-							if (score > maxScore) {
-								maxScore = score;
-								best = dReply;
-							}							
-						}
-						if (maxScore > 0) {
-							reply.reply = best;
-							linked.add(best);
+					if (dialogue.dialogue != null) {
+						List<Dialogue.Reply> linked = new ArrayList<Dialogue.Reply>(dialogue.dialogue.replies.size());
+						if (dialogue.dialogue != null && dialogue.dialogue.replies != null) {
+							//Try to hook to existing replies... not as easy when there's no ID.
+							Dialogue.Reply best = null;
+							int score, maxScore = 0;
+							for (Dialogue.Reply dReply : dialogue.dialogue.replies) {
+								//Never link twice to the same...
+								if (linked.contains(dReply)) continue;
+								score = 0;
+								//Arbitrary values... hopefully this gives good results.
+								//Same target gives good hope of preserving at least the structure.
+								if (dReply.next_phrase_id != null && dReply.next_phrase_id.equals(reply.next_dialogue_id)) score +=50;
+								//Same text is almost as good as an ID, but there may be duplicates due to requirements system...
+								if (dReply.text != null && dReply.text.equals(reply.text)) score +=40;
+								//Same slot in the list. That's not so bad if all else fails, and could help sort duplicates with same text.
+								if (dialogue.dialogue.replies.indexOf(dReply) == dialogue.replies.indexOf(reply)) score +=20;
+								//Both have null text. It's not much, but it's something....
+								if (dReply.text == null && reply.text == null) score += 10;
+								if (score > maxScore) {
+									maxScore = score;
+									best = dReply;
+								}							
+							}
+							if (maxScore > 0) {
+								reply.reply = best;
+								linked.add(best);
+							}
 						}
 					}
 				}
