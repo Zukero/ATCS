@@ -60,6 +60,9 @@ public class WeblateIntegration {
 		if (!Workspace.activeWorkspace.settings.useInternet.getCurrentValue()) {
 			unit.status = Status.notAllowed;
 			unit.translatedText = "Allow internet connection in the workspace settings to get translation status";
+		} else if (Workspace.activeWorkspace.settings.translatorLanguage == null) {
+			unit.status = Status.notAllowed;
+			unit.translatedText = "Select a target language in the workspace settings to get translation status";
 		} else {
 			unit.status = Status.absent;
 			unit.translatedText = "Cannot find this on weblate";

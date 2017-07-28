@@ -38,7 +38,7 @@ import prefuse.data.expression.parser.ExpressionParser;
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.6.3";
+	public static final String APP_VERSION = "v0.6.4";
 	
 	public static final String CHECK_UPDATE_URL = "https://andorstrail.com/static/ATCS_latest";
 	public static final String DOWNLOAD_URL = "https://andorstrail.com/viewtopic.php?f=6&t=4806";
@@ -91,9 +91,11 @@ public class ATContentStudio {
 					WorkerDialog.showTaskMessage("Loading your workspace...", null, new Runnable(){
 						public void run() {
 							Workspace.setActive(workspaceRoot);
-							new Thread() {
-								public void run() {checkUpdate();}
-							}.start();
+							if (Workspace.activeWorkspace.settings.useInternet.getCurrentValue() && Workspace.activeWorkspace.settings.checkUpdates.getCurrentValue()) {
+								new Thread() {
+									public void run() {checkUpdate();}
+								}.start();
+							}
 							frame = new StudioFrame(APP_NAME+" "+APP_VERSION);
 							frame.setVisible(true);
 							frame.setDefaultCloseOperation(StudioFrame.DO_NOTHING_ON_CLOSE);

@@ -31,9 +31,10 @@ public class WorkspaceSettingsEditor extends JDialog {
 	JRadioButton useSystemDefaultImageViewerButton, useSystemDefaultImageEditorButton, useCustomImageEditorButton;
 	JTextField imageEditorCommandField;
 	
+	JCheckBox useInternetBox;
 	JCheckBox translatorModeBox;
 	JComboBox<String> translatorLanguagesBox; 
-	JCheckBox useInternetBox;
+	JCheckBox checkUpdatesBox;
 	
 	
 	
@@ -53,7 +54,7 @@ public class WorkspaceSettingsEditor extends JDialog {
 		
 		
 		pane.add(getExternalToolsPane(), JideBoxLayout.FIX);
-		pane.add(getTranslatorModePane(), JideBoxLayout.FIX);
+		pane.add(getInternetPane(), JideBoxLayout.FIX);
 		pane.add(new JPanel(), JideBoxLayout.VARY);
 
 		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
@@ -155,9 +156,13 @@ public class WorkspaceSettingsEditor extends JDialog {
 		return pane;
 	}
 	
-	public JPanel getTranslatorModePane() {
-		CollapsiblePanel pane = new CollapsiblePanel("Translator options");
+	public JPanel getInternetPane() {
+		
+		CollapsiblePanel pane = new CollapsiblePanel("Internet options");
 		pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.PAGE_AXIS));
+		
+		useInternetBox = new JCheckBox("Allow connecting to internet to retrieve data from weblate and check for updates.");
+		pane.add(useInternetBox, JideBoxLayout.FIX);
 		
 		translatorModeBox = new JCheckBox("Activate translator mode");
 		pane.add(translatorModeBox, JideBoxLayout.FIX);
@@ -171,14 +176,15 @@ public class WorkspaceSettingsEditor extends JDialog {
 
 		pane.add(new JLabel("If your language isn't here, complain on the forums at https://andorstrail.com/"), JideBoxLayout.FIX);
 		
-		useInternetBox = new JCheckBox("Allow connecting to internet to retrieve data from weblate.");
-		pane.add(useInternetBox, JideBoxLayout.FIX);
+		checkUpdatesBox = new JCheckBox("Check for ATCS updates at startup");
+		pane.add(checkUpdatesBox, JideBoxLayout.FIX);
 		
-		translatorModeBox.addActionListener(new ActionListener() {
+		useInternetBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				translatorLanguagesBox.setEnabled(translatorModeBox.isSelected());
-				useInternetBox.setEnabled(translatorModeBox.isSelected());
+				translatorLanguagesBox.setEnabled(useInternetBox.isSelected());
+				translatorModeBox.setEnabled(useInternetBox.isSelected());
+				checkUpdatesBox.setEnabled(useInternetBox.isSelected());
 			}
 		});
 		
@@ -196,19 +202,20 @@ public class WorkspaceSettingsEditor extends JDialog {
 		useSystemDefaultImageEditorButton.setSelected(settings.useSystemDefaultImageEditor.getCurrentValue());
 		useCustomImageEditorButton.setSelected(!(settings.useSystemDefaultImageViewer.getCurrentValue() || settings.useSystemDefaultImageEditor.getCurrentValue()));
 		imageEditorCommandField.setText(settings.imageEditorCommand.getCurrentValue());
-		//Translator
+		//Internet
+		useInternetBox.setSelected(settings.useInternet.getCurrentValue());
 		if (settings.translatorLanguage.getCurrentValue() != null) {
 			translatorModeBox.setSelected(true);
 			translatorLanguagesBox.setSelectedItem(settings.translatorLanguage.getCurrentValue());
-			translatorLanguagesBox.setEnabled(true);
-			useInternetBox.setEnabled(true);
+			translatorLanguagesBox.setEnabled(useInternetBox.isSelected());
 		} else {
 			translatorModeBox.setSelected(false);
 			translatorLanguagesBox.setSelectedItem(null);
 			translatorLanguagesBox.setEnabled(false);
-			useInternetBox.setEnabled(false);
 		}
-		useInternetBox.setSelected(settings.useInternet.getCurrentValue());
+		translatorModeBox.setEnabled(useInternetBox.isSelected());
+		checkUpdatesBox.setSelected(settings.checkUpdates.getCurrentValue());
+		checkUpdatesBox.setEnabled(useInternetBox.isSelected());
 	}
 	
 	public void pushToModel() {
@@ -219,13 +226,14 @@ public class WorkspaceSettingsEditor extends JDialog {
 		settings.useSystemDefaultImageViewer.setCurrentValue(useSystemDefaultImageViewerButton.isSelected());
 		settings.useSystemDefaultImageEditor.setCurrentValue(useSystemDefaultImageEditorButton.isSelected());
 		settings.imageEditorCommand.setCurrentValue(imageEditorCommandField.getText());
-		//Translator
+		//Internet
+		settings.useInternet.setCurrentValue(useInternetBox.isSelected());
 		if (translatorModeBox.isSelected()) {
 			settings.translatorLanguage.setCurrentValue((String)translatorLanguagesBox.getSelectedItem());
 		} else {
 			settings.translatorLanguage.resetDefault();
 		}
-		settings.useInternet.setCurrentValue(useInternetBox.isSelected());
+		settings.checkUpdates.setCurrentValue(checkUpdatesBox.isSelected());
 		settings.save();
 	}
 	

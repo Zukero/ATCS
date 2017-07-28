@@ -42,6 +42,8 @@ public class WorkspaceSettings {
 	public Setting<String> translatorLanguage = new NullDefaultPrimitiveSetting<String>("translatorLanguage");
 	public static Boolean DEFAULT_ALLOW_INTERNET = true;
 	public Setting<Boolean> useInternet = new PrimitiveSetting<Boolean>("useInternet", DEFAULT_ALLOW_INTERNET);
+	public static Boolean DEFAULT_CHECK_UPDATE = true;
+	public Setting<Boolean> checkUpdates = new PrimitiveSetting<Boolean>("checkUpdates", DEFAULT_CHECK_UPDATE);
 	
 
 	public List<Setting<? extends Object>> settings = new ArrayList<Setting<? extends Object>>();
@@ -55,6 +57,7 @@ public class WorkspaceSettings {
 		settings.add(imageEditorCommand);
 		settings.add(translatorLanguage);
 		settings.add(useInternet);
+		settings.add(checkUpdates);
 		file = new File(parent.baseFolder, FILENAME);
 		if (file.exists()) {
 			load(file);
