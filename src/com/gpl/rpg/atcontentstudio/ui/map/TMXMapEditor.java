@@ -206,11 +206,12 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		
 		JScrollPane tmxScroller = new JScrollPane(getTmxEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		JScrollPane xmlScroller = new JScrollPane(getXmlEditorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		JScrollPane replScroller = new JScrollPane(getReplacementSimulatorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		//JScrollPane replScroller = new JScrollPane(getReplacementSimulatorPane(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		xmlScroller.getVerticalScrollBar().setUnitIncrement(16);
 		editorTabsHolder.add("TMX", tmxScroller);
 		editorTabsHolder.add("XML", xmlScroller);
-		editorTabsHolder.add("Replacements", replScroller);
+		//editorTabsHolder.add("Replacements", replScroller);
+		editorTabsHolder.add("Replacements", getReplacementSimulatorPane());
 		
 	}
 	
@@ -785,7 +786,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		activateAndViewPane.setLayout(new JideBoxLayout(activateAndViewPane, JideBoxLayout.LINE_AXIS));
 		
 		activateAndViewPane.add(areasActivationPane, JideBoxLayout.FIX);
-		activateAndViewPane.add(viewer, JideBoxLayout.VARY);
+		activateAndViewPane.add(new JScrollPane(viewer), JideBoxLayout.VARY);
 
 		replacementSimulator.add(walkableVisibleBox, JideBoxLayout.FIX);
 		replacementSimulator.add(activateAndViewPane, JideBoxLayout.VARY);
