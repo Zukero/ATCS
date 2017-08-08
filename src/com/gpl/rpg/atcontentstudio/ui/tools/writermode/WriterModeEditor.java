@@ -10,6 +10,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,9 @@ import prefuse.visual.EdgeItem;
 import prefuse.visual.VisualItem;
 import prefuse.visual.expression.InGroupPredicate;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
+import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData;
 import com.gpl.rpg.atcontentstudio.model.tools.writermode.WriterModeData.EmptyReply;
@@ -93,6 +97,12 @@ public class WriterModeEditor extends Editor {
     }
     
     
+    public void dataAltered() {
+    	data.state = GameDataElement.State.modified;
+    	data.childrenChanged(new ArrayList<ProjectTreeNode>());
+		ATContentStudio.frame.editorChanged(this);
+    }
+    
     public JPanel createButtonPane() {
     	JPanel pane = new JPanel();
     	pane.setLayout(new JideBoxLayout(pane, JideBoxLayout.LINE_AXIS));
@@ -102,6 +112,8 @@ public class WriterModeEditor extends Editor {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				data.save();
+		    	data.childrenChanged(new ArrayList<ProjectTreeNode>());
+				ATContentStudio.frame.editorChanged(WriterModeEditor.this);
 			}
 		});
     	export.addActionListener(new ActionListener() {
@@ -111,6 +123,8 @@ public class WriterModeEditor extends Editor {
 				data.getProject().createElements(created);
 				//data.begin.dialogue.save();
 				data.save();
+		    	data.childrenChanged(new ArrayList<ProjectTreeNode>());
+				ATContentStudio.frame.editorChanged(WriterModeEditor.this);
 			}
 		});
     	pane.add(save, JideBoxLayout.FIX);
@@ -587,6 +601,7 @@ public class WriterModeEditor extends Editor {
     				addEdge(selected, target);
     			}
     		}
+			dataAltered();
     	}
     	
         static final String disposeEditorString = "disposeEditor";
@@ -612,6 +627,7 @@ public class WriterModeEditor extends Editor {
 				revalidate();
 				repaint();
 				disposeOverlay();
+				dataAltered();
 			}
 		}; 
 		
@@ -654,6 +670,7 @@ public class WriterModeEditor extends Editor {
 					revalidate();
 					repaint();
 				}
+				dataAltered();
 			}
 		};
 		
@@ -695,7 +712,7 @@ public class WriterModeEditor extends Editor {
 					revalidate();
 					repaint();
 				} 
-	            
+				dataAltered();
 			}
 		};
 		
@@ -721,7 +738,7 @@ public class WriterModeEditor extends Editor {
 					revalidate();
 					repaint();
 				} 
-	            
+				dataAltered();
 			}
 		};
 		
@@ -1081,8 +1098,8 @@ public class WriterModeEditor extends Editor {
 
 	@Override
 	public void targetUpdated() {
-		// TODO Auto-generated method stub
-		
+		this.icon = new ImageIcon(((GameDataElement)target).getIcon());
+		this.name = ((GameDataElement)target).getDesc();
 	}
     
 }

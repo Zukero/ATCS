@@ -109,7 +109,7 @@ public class WriterModeDataSet implements ProjectTreeNode, Serializable {
 
 	@Override
 	public String getDesc() {
-		return (needsSaving() ? "*" : "")+"Dialogue sketchs";
+		return (needsSaving() ? "*" : "")+"Dialogue sketches";
 	}
 
 	@Override
