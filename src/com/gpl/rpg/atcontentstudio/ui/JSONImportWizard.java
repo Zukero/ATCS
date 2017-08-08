@@ -338,6 +338,7 @@ public class JSONImportWizard extends JDialog {
 									} else if (existingNode.getDataType() == GameSource.Type.altered) {
 										errors.add("An item with id "+node.id+" is already altered in this project.");
 									} else {
+										node.jsonFile = existingNode.jsonFile;
 										warnings.add("An item with id "+node.id+" exists in the used game source. This one will be inserted as \"altered\"");
 									}
 									existingNode = null;
@@ -412,7 +413,7 @@ public class JSONImportWizard extends JDialog {
 				proj.createElements(created);
 				JSONElement lastNode = created.get(created.size() - 1);
 				if (lastNode != null) {
-					lastNode.save();
+					//	lastNode.save();
 					ATContentStudio.frame.selectInTree(lastNode);
 				}
 				JSONImportWizard.this.setVisible(false);
