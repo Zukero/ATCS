@@ -242,17 +242,17 @@ public class ProjectsTree extends JPanel {
 			addNextSeparator = false;
 		}
 		
-		if (actions.testWriter.isEnabled()) {
+		if (actions.createWriter.isEnabled()) {
 			addNextSeparator = true;
-			popupMenu.add(new JMenuItem(actions.testWriter));
+			popupMenu.add(new JMenuItem(actions.createWriter));
 		}
 //		if (actions.testCommitWriter.isEnabled()) {
 //			addNextSeparator = true;
 //			popupMenu.add(new JMenuItem(actions.testCommitWriter));
 //		}
-		if (actions.createWriter.isEnabled()) {
+		if (actions.generateWriter.isEnabled()) {
 			addNextSeparator = true;
-			popupMenu.add(new JMenuItem(actions.createWriter));
+			popupMenu.add(new JMenuItem(actions.generateWriter));
 		}
 		if (addNextSeparator) {
 			popupMenu.add(new JSeparator());

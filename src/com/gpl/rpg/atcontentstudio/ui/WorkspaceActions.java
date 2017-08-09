@@ -399,7 +399,7 @@ public class WorkspaceActions {
 		};
 	};
 	
-	public ATCSAction testWriter = new ATCSAction("Create dialogue sketch", "Create a dialogue sketch for fast dialogue edition"){
+	public ATCSAction createWriter = new ATCSAction("Create dialogue sketch", "Create a dialogue sketch for fast dialogue edition"){
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
 			new WriterSketchCreationWizard(selectedNode.getProject()).setVisible(true);
@@ -434,7 +434,7 @@ public class WorkspaceActions {
 		}
 	};*/
 	
-	public ATCSAction createWriter = new ATCSAction("Generate dialogue sketch", "Generates a dialogue sketch from this dialogue and its tree.") {
+	public ATCSAction generateWriter = new ATCSAction("Generate dialogue sketch", "Generates a dialogue sketch from this dialogue and its tree.") {
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null || !(selectedNode instanceof Dialogue)) return;
 			new WriterSketchCreationWizard(selectedNode.getProject(), (Dialogue)selectedNode).setVisible(true);
@@ -472,9 +472,9 @@ public class WorkspaceActions {
 		actions.add(exportProject);
 		actions.add(showAbout);
 		actions.add(exitATCS);
-		actions.add(testWriter);
-//		actions.add(testCommitWriter);
 		actions.add(createWriter);
+//		actions.add(testCommitWriter);
+		actions.add(generateWriter);
 		actions.add(editWorkspaceSettings);
 		selectionChanged(null, null);
 	}

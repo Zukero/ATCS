@@ -10,15 +10,18 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -75,8 +78,19 @@ import com.jidesoft.swing.JideBoxLayout;
 public class WriterModeEditor extends Editor {
 
 	private static final long serialVersionUID = -6591631891278528494L;
+	
+	private static final String HELP_TEXT = 
+			  "<html><body><table>"
+			+ "<tr><td valign=\"middle\">(Esc.)</td><td valign=\"middle\"> Cancel edition</td></tr>"
+			+ "<tr><td valign=\"middle\">(Ctrl+Enter)</td><td valign=\"middle\"> Confirm changes</td></tr>"
+			+ "<tr><td valign=\"middle\">(Shift+Enter)</td><td valign=\"middle\"> Create next of same kind</td></tr>"
+			+ "<tr><td valign=\"middle\">(Alt+Enter)</td><td valign=\"middle\"> Create next of other kind</td></tr>"
+			+ "</table></body></html>";
+	
+
 
 	private JComponent overlay = null;
+	private JComponent helpWindow = null;
     private Display view;
     
     final private WriterModeData data;
@@ -91,6 +105,7 @@ public class WriterModeEditor extends Editor {
     	selected = data.begin;
     	view = new WriterGraphView();
     	view.setLocation(0, 0);
+    	
     	setLayout(new BorderLayout());
     	add(createButtonPane(), BorderLayout.NORTH);
     	add(view, BorderLayout.CENTER);
@@ -149,6 +164,22 @@ public class WriterModeEditor extends Editor {
     }
 
 
+    private void createHelpWindow() {
+    	JInternalFrame window = new JInternalFrame("Help", true, true);
+    	window.setLayout(new BorderLayout());
+    	JEditorPane area = new JEditorPane();
+    	area.setContentType("text/html");
+    	area.setText(HELP_TEXT);
+    	area.setEditable(false);
+    	
+    	window.add(new JScrollPane(area));
+    	window.setSize(350, 250);
+    	window.setLocation(0, 0);
+		
+    	view.add(window);
+    	helpWindow = window;
+    }
+    
 	public static final String GRAPH = "graph";
     public static final String NODES = "graph.nodes";
     public static final String NULL_NODES = "graph.nullNodes";
@@ -742,6 +773,19 @@ public class WriterModeEditor extends Editor {
 			}
 		};
 		
+		static final String showHelpString = "showHelp";
+		final AbstractAction showHelp = new AbstractAction("Show help window") {
+			private static final long serialVersionUID = 1658086056088672748L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (helpWindow == null) {
+					createHelpWindow();
+				}
+				helpWindow.setVisible(true);
+			}
+		};
+		
 		class ScrollToSelectedAction extends Action {
     		
     		final boolean openEditor;
@@ -829,6 +873,8 @@ public class WriterModeEditor extends Editor {
         	area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.ALT_DOWN_MASK, true), commitAndCreateNextDefaultNodeString);
         	area.getActionMap().put(commitAndCreateNextDefaultNodeString, commitAndCreateNextDefaultNode);
         	
+        	area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0, true), showHelpString);
+        	area.getActionMap().put(showHelpString, showHelp);
         	
         	if (selected instanceof WriterDialogue) {
         		area.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK, true), createContinueTalkingNodeString);
