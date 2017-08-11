@@ -181,12 +181,12 @@ public class NPCEditor extends JSONElementEditor {
 		moveTypeBox = addEnumValueBox(pane, "Movement type: ", NPC.MovementType.values(), npc.movement_type, npc.writable, listener);
 		combatTraitPane = new CollapsiblePanel("Combat traits: ");
 		combatTraitPane.setLayout(new JideBoxLayout(combatTraitPane, JideBoxLayout.PAGE_AXIS, 6));
-		maxHP = addIntegerField(combatTraitPane, "Max HP: ", npc.max_hp, false, npc.writable, listener);
-		maxAP = addIntegerField(combatTraitPane, "Max AP: ", npc.max_ap, false, npc.writable, listener);
-		moveCost = addIntegerField(combatTraitPane, "Move cost: ", npc.move_cost, false, npc.writable, listener);
+		maxHP = addIntegerField(combatTraitPane, "Max HP: ", npc.max_hp, 1, false, npc.writable, listener);
+		maxAP = addIntegerField(combatTraitPane, "Max AP: ", npc.max_ap, 10, false, npc.writable, listener);
+		moveCost = addIntegerField(combatTraitPane, "Move cost: ", npc.move_cost, 10, false, npc.writable, listener);
 		atkDmgMin = addIntegerField(combatTraitPane, "Attack Damage min: ", npc.attack_damage_min, false, npc.writable, listener);
 		atkDmgMax = addIntegerField(combatTraitPane, "Attack Damage max: ", npc.attack_damage_max, false, npc.writable, listener);
-		atkCost = addIntegerField(combatTraitPane, "Attack cost: ", npc.attack_cost, false, npc.writable, listener);
+		atkCost = addIntegerField(combatTraitPane, "Attack cost: ", npc.attack_cost, 10, false, npc.writable, listener);
 		atkChance = addIntegerField(combatTraitPane, "Attack chance: ", npc.attack_chance, false, npc.writable, listener);
 		critSkill = addIntegerField(combatTraitPane, "Critical skill: ", npc.critical_skill, false, npc.writable, listener);
 		critMult = addDoubleField(combatTraitPane, "Critical multiplier: ", npc.critical_multiplier, npc.writable, listener);
@@ -323,7 +323,7 @@ public class NPCEditor extends JSONElementEditor {
 		Project proj = ((NPC)target).getProject();
 		
 		sourceConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		sourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
+		sourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, 1, false, writable, listener);
 		sourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		sourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
 
@@ -341,7 +341,7 @@ public class NPCEditor extends JSONElementEditor {
 		Project proj = ((NPC)target).getProject();
 		
 		targetConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		targetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
+		targetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, 1, false, writable, listener);
 		targetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		targetConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
 

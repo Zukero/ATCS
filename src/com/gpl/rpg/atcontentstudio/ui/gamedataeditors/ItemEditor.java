@@ -487,7 +487,7 @@ public class ItemEditor extends JSONElementEditor {
 		hitSourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
 		hitSourceConditionApply = new JRadioButton("Apply new condition");
 		pane.add(hitSourceConditionApply, JideBoxLayout.FIX);
-		hitSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		hitSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
 		hitSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		hitSourceConditionClear = new JRadioButton("Clear active condition");
 		pane.add(hitSourceConditionClear, JideBoxLayout.FIX);
@@ -543,7 +543,7 @@ public class ItemEditor extends JSONElementEditor {
 		hitTargetConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
 		hitTargetConditionApply = new JRadioButton("Apply new condition");
 		pane.add(hitTargetConditionApply, JideBoxLayout.FIX);
-		hitTargetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		hitTargetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
 		hitTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		hitTargetConditionClear = new JRadioButton("Clear active condition");
 		pane.add(hitTargetConditionClear, JideBoxLayout.FIX);
@@ -599,7 +599,7 @@ public class ItemEditor extends JSONElementEditor {
 		killSourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
 		killSourceConditionApply = new JRadioButton("Apply new condition");
 		pane.add(killSourceConditionApply, JideBoxLayout.FIX);
-		killSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, false, writable, listener);
+		killSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
 		killSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		killSourceConditionClear = new JRadioButton("Clear active condition");
 		pane.add(killSourceConditionClear, JideBoxLayout.FIX);
@@ -651,7 +651,7 @@ public class ItemEditor extends JSONElementEditor {
 		Project proj = ((Item)target).getProject();
 		
 		equipConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		equipConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, false, writable, listener);
+		equipConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, 1, false, writable, listener);
 
 		pane.revalidate();
 		pane.repaint();

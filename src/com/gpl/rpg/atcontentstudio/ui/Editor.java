@@ -316,11 +316,15 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 //	}
 	
 	public static JSpinner addIntegerField(JPanel pane, String label, Integer initialValue, boolean allowNegatives, boolean editable, final FieldUpdateListener listener) {
+		return addIntegerField(pane, label, initialValue, 0, allowNegatives, editable, listener);
+	}
+	
+	public static JSpinner addIntegerField(JPanel pane, String label, Integer initialValue, Integer defaultValue, boolean allowNegatives, boolean editable, final FieldUpdateListener listener) {
 		JPanel tfPane = new JPanel();
 		tfPane.setLayout(new JideBoxLayout(tfPane, JideBoxLayout.LINE_AXIS, 6));
 		JLabel tfLabel = new JLabel(label);
 		tfPane.add(tfLabel, JideBoxLayout.FIX);
-		final JSpinner spinner = new JSpinner(new SpinnerNumberModel(initialValue != null ? initialValue.intValue() : 0, allowNegatives ? Integer.MIN_VALUE : 0, Integer.MAX_VALUE, 1));
+		final JSpinner spinner = new JSpinner(new SpinnerNumberModel(initialValue != null ? initialValue.intValue() : defaultValue.intValue(), allowNegatives ? Integer.MIN_VALUE : 0, Integer.MAX_VALUE, 1));
 		((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.LEFT);
 		spinner.setEnabled(editable);
 		((DefaultFormatter)((NumberEditor)spinner.getEditor()).getTextField().getFormatter()).setCommitsOnValidEdit(true);
