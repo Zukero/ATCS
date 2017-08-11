@@ -128,13 +128,13 @@ public class FileUtils {
 				case Windows:
 					System.err.println("Trying the Windows way with mklink");
 					try {
-						Runtime.getRuntime().exec("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath());
+						Runtime.getRuntime().exec("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+"\""+linkFile.getAbsolutePath()+"\" \""+targetFile.getAbsolutePath()+"\"");
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-					System.err.println("Attempting UAC elevation through VBS script.");
 					if (!linkFile.exists()) {
-						runWithUac("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+linkFile.getAbsolutePath()+" "+targetFile.getAbsolutePath(), 3, linkFile);
+						System.err.println("Attempting UAC elevation through VBS script.");
+						runWithUac("cmd.exe /C mklink "+(targetFile.isDirectory() ? "/J " : "")+"\""+linkFile.getAbsolutePath()+"\" \""+targetFile.getAbsolutePath()+"\"", 3, linkFile);
 					}
 					break;
 				case MacOS:
