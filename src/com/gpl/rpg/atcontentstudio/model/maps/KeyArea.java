@@ -19,20 +19,20 @@ public class KeyArea extends MapObject {
 		String requireType = obj.getProperties().getProperty("requireType");
 		String requireId = obj.getProperties().getProperty("requireId");
 		String requireValue = obj.getProperties().getProperty("requireValue");
+		oldSchoolRequirement = false;
 		if (requireId == null) {
 			String[] fields = obj.getName().split(":");
 			if (fields.length == 2) {
 				requireType = Requirement.RequirementType.questProgress.toString();
 				requireValue = fields[1];
 				requireId = fields[0];
+				oldSchoolRequirement = true;
 			} else if (fields.length == 3) {
 				requireValue = fields[2];
 				requireType = fields[0];
 				requireId = fields[1];
+				oldSchoolRequirement = true;
 			}
-			oldSchoolRequirement = true;
-		} else {
-			oldSchoolRequirement = false;
 		}
 		requirement = new Requirement();
 		if (requireType != null) requirement.type = Requirement.RequirementType.valueOf(requireType);
