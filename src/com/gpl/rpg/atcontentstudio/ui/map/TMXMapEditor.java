@@ -524,6 +524,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		if (selected instanceof ContainerArea) {
 			droplistBox = addDroplistBox(pane, ((TMXMap)target).getProject(), "Droplist: ", ((ContainerArea)selected).droplist, ((TMXMap)target).writable, listener);
 		} else if (selected instanceof KeyArea) {
+			areaField = addTextField(pane, "Area ID: ", ((KeyArea)selected).name, ((TMXMap)target).writable, listener);
 			dialogueBox = addDialogueBox(pane, ((TMXMap)target).getProject(), "Message when locked: ", ((KeyArea)selected).dialogue, ((TMXMap)target).writable, listener);
 			requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), ((KeyArea)selected).requirement.type, ((TMXMap)target).writable, listener);
 			requirementParamsPane = new JPanel();
@@ -2063,9 +2064,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			if (modified) {
 				if (map.state != GameDataElement.State.modified) {
 					map.state = GameDataElement.State.modified;
-					map.childrenChanged(new ArrayList<ProjectTreeNode>());
 					ATContentStudio.frame.editorChanged(TMXMapEditor.this);
 				}
+				map.childrenChanged(new ArrayList<ProjectTreeNode>());
 			}
 		}
 	}
