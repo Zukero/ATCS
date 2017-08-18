@@ -99,8 +99,8 @@ public class Quest extends JSONElement {
 	public void parse(Map questJson) {
 		this.visible_in_log = JSONElement.getInteger((Number) questJson.get("showInLog"));
 		List questStagesJson = (List) questJson.get("stages");
+		this.stages = new ArrayList<QuestStage>();
 		if (questStagesJson != null && !questStagesJson.isEmpty()) {
-			this.stages = new ArrayList<QuestStage>();
 			for (Object questStageJsonObj : questStagesJson) {
 				Map questStageJson = (Map)questStageJsonObj;
 				QuestStage questStage = new QuestStage(this);
