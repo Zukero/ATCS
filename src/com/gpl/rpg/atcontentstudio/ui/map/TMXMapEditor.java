@@ -1813,6 +1813,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	}
 	
 	
+	private int skipAreaFieldEvents = 0;
 	
 	public class MapFieldUpdater implements FieldUpdateListener {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -1848,8 +1849,22 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				tmxViewer.revalidate();
 				tmxViewer.repaint();
 			} else if (source == areaField) {
-				selectedMapObject.name = (String) value;
-				groupObjectsListModel.objectChanged(selectedMapObject);
+				if (skipAreaFieldEvents > 0) skipAreaFieldEvents--;
+				else {
+					selectedMapObject.name = (String) value;
+					if (selectedMapObject instanceof KeyArea) {
+						KeyArea area = (KeyArea) selectedMapObject;
+						if (area.oldSchoolRequirement) {
+							area.oldSchoolRequirement = false;
+						}
+					} else if (selectedMapObject instanceof ReplaceArea) {
+						ReplaceArea area = (ReplaceArea) selectedMapObject;
+						if (area.oldSchoolRequirement) {
+							area.oldSchoolRequirement = false;
+						}
+					}
+					groupObjectsListModel.objectChanged(selectedMapObject);
+				}
 			} else if (source == spawngroupField) {
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea)selectedMapObject;
@@ -1973,12 +1988,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.changeType((Requirement.RequirementType)requirementTypeCombo.getSelectedItem());
 					updateRequirementParamsPane(requirementParamsPane, area.requirement, this);
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.changeType((Requirement.RequirementType)requirementTypeCombo.getSelectedItem());
 					updateRequirementParamsPane(requirementParamsPane, area.requirement, this);
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				}
 			} else if (source == requirementObj) {
 				if (selectedMapObject instanceof KeyArea) {
@@ -1989,7 +2012,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					} else {
 						area.requirement.required_obj_id = null;
 					}
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.required_obj = (GameDataElement) value;
@@ -1998,17 +2025,31 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					} else {
 						area.requirement.required_obj_id = null;
 					}
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				}
 			} else if (source == requirementObjId) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.required_obj_id = (String) value;
 					area.requirement.required_obj = null;
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.required_obj_id = (String) value;
 					area.requirement.required_obj = null;
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				}
 			} else if (source == requirementValue) {
 				if (selectedMapObject instanceof KeyArea) {
@@ -2027,7 +2068,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 						stage = quest.getStage(area.requirement.required_value);
 						if (stage != null) stage.addBacklink(map);
 					}
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					Quest quest = null;
@@ -2044,17 +2089,29 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 						stage = quest.getStage(area.requirement.required_value);
 						if (stage != null) stage.addBacklink(map);
 					}
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				}
 			} else if (source == requirementNegated) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
 					area.requirement.negated = (Boolean) value;
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.negated = (Boolean) value;
-					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+					if (area.oldSchoolRequirement) {
+						area.updateNameFromRequirementChange();
+						skipAreaFieldEvents+=2;
+						areaField.setText(area.name);
+					}
 				}
 			}  else if (source == sourceLayer) {
 				selectedReplacement.sourceLayer = (String)value;

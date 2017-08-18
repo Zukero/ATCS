@@ -20,7 +20,7 @@ public class KeyArea extends MapObject {
 		String requireId = obj.getProperties().getProperty("requireId");
 		String requireValue = obj.getProperties().getProperty("requireValue");
 		oldSchoolRequirement = false;
-		if (requireId == null) {
+		if (requireType == null) {
 			String[] fields = obj.getName().split(":");
 			if (fields.length == 2) {
 				requireType = Requirement.RequirementType.questProgress.toString();
@@ -76,7 +76,7 @@ public class KeyArea extends MapObject {
 		}
 		if (requirement != null) {
 			if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
-				tmxObject.setName(requirement.required_obj_id+":"+Integer.toString(requirement.required_value));
+				tmxObject.setName(requirement.required_obj_id+":"+((requirement.required_value == null) ? "" : Integer.toString(requirement.required_value)));
 			} else {
 				if (requirement.type != null) {
 					tmxObject.getProperties().setProperty("requireType", requirement.type.toString());
@@ -98,7 +98,7 @@ public class KeyArea extends MapObject {
 
 	public void updateNameFromRequirementChange() {
 		if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
-			name = requirement.required_obj_id+":"+Integer.toString(requirement.required_value);
+			name = requirement.required_obj_id+":"+((requirement.required_value == null) ? "" : Integer.toString(requirement.required_value));
 		} else if (oldSchoolRequirement) {
 			int i = 0;
 			String futureName = requirement.type.toString() + "#" + Integer.toString(i);
