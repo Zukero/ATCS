@@ -214,6 +214,9 @@ public class ActorCondition extends JSONElement {
 		}
 		if (this.icon_id != null) {
 			String spritesheetId = this.icon_id.split(":")[0];
+			if (getProject().getSpritesheet(spritesheetId) == null) {
+				System.out.println(this.id);
+			}
 			getProject().getSpritesheet(spritesheetId).addBacklink(this);
 		}
 		

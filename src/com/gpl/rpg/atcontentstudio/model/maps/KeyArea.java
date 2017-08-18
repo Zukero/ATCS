@@ -89,6 +89,9 @@ public class KeyArea extends MapObject {
 				if (requirement.required_value != null) {
 					tmxObject.getProperties().setProperty("requireValue", requirement.required_value.toString());
 				}
+				if (requirement.negated != null) {
+					tmxObject.getProperties().setProperty("requireNegation", Boolean.toString(requirement.negated));
+				}
 			}
 		}
 	}

@@ -563,9 +563,8 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			});
 			pane.add(tACPane, JideBoxLayout.FIX);
 		} else if (selected instanceof ReplaceArea) {
-			//Replace areas only use questProgress requirements ATM
-			//requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), ((ReplaceArea)selected).requirement.type, ((TMXMap)target).writable, listener);
 			areaField = addTextField(pane, "Area ID: ", ((ReplaceArea)selected).name, ((TMXMap)target).writable, listener);
+			requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), ((ReplaceArea)selected).requirement.type, ((TMXMap)target).writable, listener);
 			requirementParamsPane = new JPanel();
 			requirementParamsPane.setLayout(new JideBoxLayout(requirementParamsPane, JideBoxLayout.PAGE_AXIS, 6));
 			pane.add(requirementParamsPane, JideBoxLayout.FIX);
@@ -1972,6 +1971,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			} else if (source == requirementTypeCombo) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
+					area.requirement.changeType((Requirement.RequirementType)requirementTypeCombo.getSelectedItem());
+					updateRequirementParamsPane(requirementParamsPane, area.requirement, this);
+					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();
+				} else if (selectedMapObject instanceof ReplaceArea) {
+					ReplaceArea area = (ReplaceArea) selectedMapObject;
 					area.requirement.changeType((Requirement.RequirementType)requirementTypeCombo.getSelectedItem());
 					updateRequirementParamsPane(requirementParamsPane, area.requirement, this);
 					if (area.oldSchoolRequirement) area.updateNameFromRequirementChange();

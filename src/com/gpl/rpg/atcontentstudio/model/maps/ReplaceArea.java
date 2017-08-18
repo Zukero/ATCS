@@ -17,13 +17,13 @@ public class ReplaceArea extends MapObject {
 	public List<ReplaceArea.Replacement> replacements = null;
 
 	public ReplaceArea(tiled.core.MapObject obj) {
-//		String requireType = obj.getProperties().getProperty("requireType");
+		String requireType = obj.getProperties().getProperty("requireType");
 		String requireId = obj.getProperties().getProperty("requireId");
 		String requireValue = obj.getProperties().getProperty("requireValue");
 		if (requireId == null) {
 			String[] fields = obj.getName().split(":");
 			if (fields.length == 2) {
-//				requireType = Requirement.RequirementType.questProgress.toString();
+				requireType = Requirement.RequirementType.questProgress.toString();
 				requireValue = fields[1];
 				requireId = fields[0];
 				oldSchoolRequirement = true;
@@ -34,9 +34,7 @@ public class ReplaceArea extends MapObject {
 			}*/
 		}
 		requirement = new Requirement();
-		//Replace areas only support questProgress requirements ATM
-		//requirement.type = Requirement.RequirementType.valueOf(requireType);
-		requirement.type = Requirement.RequirementType.questProgress;
+		if (requireType != null) requirement.type = Requirement.RequirementType.valueOf(requireType);
 		requirement.required_obj_id = requireId;
 		if (requireValue != null) requirement.required_value = Integer.parseInt(requireValue);
 		requirement.state = GameDataElement.State.parsed;
@@ -103,6 +101,9 @@ public class ReplaceArea extends MapObject {
 				}
 				if (requirement.required_value != null) {
 					tmxObject.getProperties().setProperty("requireValue", requirement.required_value.toString());
+				}
+				if (requirement.negated != null) {
+					tmxObject.getProperties().setProperty("requireNegation", Boolean.toString(requirement.negated));
 				}
 			}
 		}
