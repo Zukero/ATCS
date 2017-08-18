@@ -38,7 +38,7 @@ import prefuse.data.expression.parser.ExpressionParser;
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.6.5";
+	public static final String APP_VERSION = "v0.6.6";
 	
 	public static final String CHECK_UPDATE_URL = "https://andorstrail.com/static/ATCS_latest";
 	public static final String DOWNLOAD_URL = "https://andorstrail.com/viewtopic.php?f=6&t=4806";
