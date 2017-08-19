@@ -114,6 +114,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JComboBox requirementTypeCombo;
 	private JPanel requirementParamsPane;
 	private MyComboBox requirementObj;
+	private JComboBox requirementSkill;
 	private JTextField requirementObjId;
 	private JComponent requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
@@ -684,8 +685,13 @@ public class DialogueEditor extends JSONElementEditor {
 				requirementValue = addQuestStageBox(pane, project, "Quest stage: ", requirement.required_value, writable, listener, (Quest) requirement.required_obj, requirementObj);
 				break;
 			case skillLevel:
+				Requirement.SkillID skillId = null;
+				try {
+					skillId = requirement.required_obj_id == null ? null : Requirement.SkillID.valueOf(requirement.required_obj_id);
+				} catch(IllegalArgumentException e) {}
 				requirementObj = null;
-				requirementObjId = addTextField(pane, "Skill ID:", requirement.required_obj_id, writable, listener);
+				requirementSkill = addEnumValueBox(pane, "Skill ID:", Requirement.SkillID.values(), skillId, writable, listener);
+				requirementObjId = null;//addTextField(pane, "Skill ID:", requirement.required_obj_id, writable, listener);
 				requirementValue = addIntegerField(pane, "Level: ", requirement.required_value, false, writable, listener);
 				break;
 			case timerElapsed:
@@ -1071,7 +1077,16 @@ public class DialogueEditor extends JSONElementEditor {
 			if (req.required_obj.getIcon() != null) {
 				label.setIcon(new ImageIcon(req.required_obj.getIcon()));
 			}
-		} if (req.type == null) {
+		} else if (req.type == Requirement.RequirementType.skillLevel) {
+			label.setIcon(new ImageIcon(DefaultIcons.getSkillIcon()));
+		} else if (req.type == Requirement.RequirementType.spentGold) {
+			label.setIcon(new ImageIcon(DefaultIcons.getGoldIcon()));
+		} else if (req.type == Requirement.RequirementType.consumedBonemeals) {
+			label.setIcon(new ImageIcon(DefaultIcons.getBonemealIcon()));
+		} else if (req.type == Requirement.RequirementType.timerElapsed) {
+			label.setIcon(new ImageIcon(DefaultIcons.getTimerIcon()));
+		}
+		if (req.type == null) {
 			label.setText("New, undefined requirement.");
 		}
 	}
@@ -1203,6 +1218,15 @@ public class DialogueEditor extends JSONElementEditor {
 					selectedRequirement.required_obj.addBacklink(dialogue);
 				} else {
 					selectedRequirement.required_obj_id = null;
+				}
+				requirementsListModel.itemChanged(selectedRequirement);
+			} else if (source == requirementSkill) {
+				if (selectedRequirement.required_obj != null) {
+					selectedRequirement.required_obj.removeBacklink(dialogue);
+					selectedRequirement.required_obj = null;
+				}
+				if (selectedRequirement.type == Requirement.RequirementType.skillLevel) {
+					selectedRequirement.required_obj_id = value == null ? null : value.toString();
 				}
 				requirementsListModel.itemChanged(selectedRequirement);
 			} else if (source == requirementObjId) {

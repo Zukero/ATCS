@@ -697,8 +697,12 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				requirementValue = addQuestStageBox(pane, project, "Quest stage: ", requirement.required_value, writable, listener, (Quest) requirement.required_obj, requirementObj);
 				break;
 			case skillLevel:
-				requirementObj = null;
-				requirementObjId = addTextField(pane, "Skill ID:", requirement.required_obj_id, writable, listener);
+				Requirement.SkillID skillId = null;
+				try {
+					skillId = requirement.required_obj_id == null ? null : Requirement.SkillID.valueOf(requirement.required_obj_id);
+				} catch(IllegalArgumentException e) {}
+				requirementObj = addEnumValueBox(pane, "Skill ID:", Requirement.SkillID.values(), skillId, writable, listener);
+				requirementObjId = null;//addTextField(pane, "Skill ID:", requirement.required_obj_id, writable, listener);
 				requirementValue = addIntegerField(pane, "Level: ", requirement.required_value, false, writable, listener);
 				break;
 			case timerElapsed:
@@ -2006,11 +2010,15 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			} else if (source == requirementObj) {
 				if (selectedMapObject instanceof KeyArea) {
 					KeyArea area = (KeyArea) selectedMapObject;
-					area.requirement.required_obj = (GameDataElement) value;
-					if (area.requirement.required_obj != null) {
-						area.requirement.required_obj_id = area.requirement.required_obj.id; 
+					if (area.requirement.type == Requirement.RequirementType.skillLevel) {
+						area.requirement.required_obj_id = value == null ? null : value.toString();
 					} else {
-						area.requirement.required_obj_id = null;
+						area.requirement.required_obj = (GameDataElement) value;
+						if (area.requirement.required_obj != null) {
+							area.requirement.required_obj_id = area.requirement.required_obj.id; 
+						} else {
+							area.requirement.required_obj_id = null;
+						}
 					}
 					if (area.oldSchoolRequirement) {
 						area.updateNameFromRequirementChange();
@@ -2019,11 +2027,15 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 					}
 				} else if (selectedMapObject instanceof ReplaceArea) {
 					ReplaceArea area = (ReplaceArea) selectedMapObject;
-					area.requirement.required_obj = (GameDataElement) value;
-					if (area.requirement.required_obj != null) {
-						area.requirement.required_obj_id = area.requirement.required_obj.id; 
+					if (area.requirement.type == Requirement.RequirementType.skillLevel) {
+						area.requirement.required_obj_id = value == null ? null : value.toString();
 					} else {
-						area.requirement.required_obj_id = null;
+						area.requirement.required_obj = (GameDataElement) value;
+						if (area.requirement.required_obj != null) {
+							area.requirement.required_obj_id = area.requirement.required_obj.id; 
+						} else {
+							area.requirement.required_obj_id = null;
+						}
 					}
 					if (area.oldSchoolRequirement) {
 						area.updateNameFromRequirementChange();

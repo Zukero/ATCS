@@ -18,7 +18,7 @@ public class DesktopIntegration {
 			}
 		} else {
 			try {
-				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.mapEditorCommand.getCurrentValue()+" "+f.getAbsolutePath());
+				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.mapEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\"");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -40,7 +40,7 @@ public class DesktopIntegration {
 			}
 		} else {
 			try {
-				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.imageEditorCommand.getCurrentValue()+" "+f.getAbsolutePath());
+				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.imageEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\"");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

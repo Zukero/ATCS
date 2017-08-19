@@ -107,6 +107,10 @@ public class DefaultIcons {
 	public static Image getNPCImage() { return getImage(NPC_RES); }
 	public static Image getNPCIcon() { return getIcon(NPC_RES); }
 	
+	private static String BONEMEAL_RES = "/com/gpl/rpg/atcontentstudio/img/bonemeal.png";
+	public static Image getBonemealImage() { return getImage(BONEMEAL_RES); }
+	public static Image getBonemealIcon() { return getIcon(BONEMEAL_RES); }
+	
 	private static String NPC_CLOSE_RES = "/com/gpl/rpg/atcontentstudio/img/npc_close.png";
 	public static Image getNPCCloseImage() { return getImage(NPC_CLOSE_RES); }
 	public static Image getNPCCloseIcon() { return getIcon(NPC_CLOSE_RES); }
@@ -130,6 +134,10 @@ public class DefaultIcons {
 	private static String GOLD_RES = "/com/gpl/rpg/atcontentstudio/img/ui_icon_coins.png";
 	public static Image getGoldImage() { return getImage(GOLD_RES); }
 	public static Image getGoldIcon() { return getIcon(GOLD_RES); }
+
+	private static String SKILL_RES = "/com/gpl/rpg/atcontentstudio/img/ui_icon_skill.png";
+	public static Image getSkillImage() { return getImage(SKILL_RES); }
+	public static Image getSkillIcon() { return getIcon(SKILL_RES); }
 	
 	private static String ITEM_CATEGORY_RES = "/com/gpl/rpg/atcontentstudio/img/equip_weapon.png";
 	public static Image getItemCategoryImage() { return getImage(ITEM_CATEGORY_RES); }
@@ -234,6 +242,10 @@ public class DefaultIcons {
 	private static String ZOOM_RES = "/com/gpl/rpg/atcontentstudio/img/zoom.png";
 	public static Image getZoomImage() { return getImage(ZOOM_RES); }
 	public static Image getZoomIcon() { return getIcon(ZOOM_RES); }
+	
+	private static String TIMER_RES = "/com/gpl/rpg/atcontentstudio/img/timer.png";
+	public static Image getTimerImage() { return getImage(TIMER_RES); }
+	public static Image getTimerIcon() { return getIcon(TIMER_RES); }
 	
 	private static String STATUS_RED_RES = "/com/gpl/rpg/atcontentstudio/img/status_red.png";
 	public static Image getStatusRedImage() { return getImage(STATUS_RED_RES); }
