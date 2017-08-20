@@ -710,6 +710,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				requirementObjId = addTextField(pane, "Timer ID:", requirement.required_obj_id, writable, listener);
 				requirementValue = addIntegerField(pane, "Timer value: ", requirement.required_value, false, writable, listener);
 				break;
+			case factionScore:
+				requirementObj = null;
+				requirementObjId = addTextField(pane, "Faction ID:", requirement.required_obj_id, writable, listener);
+				requirementValue = addIntegerField(pane, "Minimum score: ", requirement.required_value, true, writable, listener);
+				break;
 			case wear:
 				requirementObj = addItemBox(pane, project, "Item: ", (Item) requirement.required_obj, writable, listener);
 				requirementObjId = null;
