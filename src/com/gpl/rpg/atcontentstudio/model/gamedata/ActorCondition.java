@@ -43,9 +43,16 @@ public class ActorCondition extends JSONElement {
 		blood
 	}
 	
+	public static enum VisualEffectID {
+		redSplash
+		,blueSwirl
+		,greenSplash
+		,miss
+	}
+	
 	public static class RoundEffect implements Cloneable {
 		// Available from parsed state
-		public String visual_effect = null;
+		public VisualEffectID visual_effect = null;
 		public Integer hp_boost_min = null;
 		public Integer hp_boost_max = null;
 		public Integer ap_boost_min = null;
@@ -180,7 +187,13 @@ public class ActorCondition extends JSONElement {
 				this.round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("max")));
 				this.round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)roundEffect.get("increaseCurrentAP")).get("min")));
 			}
-			this.round_effect.visual_effect = (String) roundEffect.get("visualEffectID");
+			String vfx = (String) roundEffect.get("visualEffectID");
+			this.round_effect.visual_effect = null;
+			if (vfx != null) {
+				try {
+					this.round_effect.visual_effect = VisualEffectID.valueOf(vfx);
+				} catch(IllegalArgumentException e) {}
+			}
 		}
 		Map fullRoundEffect = (Map) aCondJson.get("fullRoundEffect");
 		if (fullRoundEffect != null) {
@@ -193,7 +206,13 @@ public class ActorCondition extends JSONElement {
 				this.full_round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("max")));
 				this.full_round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("min")));
 			}
-			this.full_round_effect.visual_effect = (String) fullRoundEffect.get("visualEffectID");
+			String vfx = (String) roundEffect.get("visualEffectID");
+			this.full_round_effect.visual_effect = null;
+			if (vfx != null) {
+				try {
+					this.full_round_effect.visual_effect = VisualEffectID.valueOf(vfx);
+				} catch(IllegalArgumentException e) {}
+			}
 		}
 		this.state = State.parsed;
 
@@ -278,7 +297,7 @@ public class ActorCondition extends JSONElement {
 		if (this.stacking != null && this.stacking == 1) jsonAC.put("isStacking", this.stacking);
 		if (this.round_effect != null) {
 			Map jsonRound = new LinkedHashMap();
-			if (this.round_effect.visual_effect != null) jsonRound.put("visualEffectID", this.round_effect.visual_effect);
+			if (this.round_effect.visual_effect != null) jsonRound.put("visualEffectID", this.round_effect.visual_effect.toString());
 			if (this.round_effect.hp_boost_min != null || this.round_effect.hp_boost_max != null) {
 				Map jsonHP = new LinkedHashMap();
 				if (this.round_effect.hp_boost_min != null) jsonHP.put("min", this.round_effect.hp_boost_min);
@@ -299,7 +318,7 @@ public class ActorCondition extends JSONElement {
 		}
 		if (this.full_round_effect != null) {
 			Map jsonFullRound = new LinkedHashMap();
-			if (this.full_round_effect.visual_effect != null) jsonFullRound.put("visualEffectID", this.full_round_effect.visual_effect);
+			if (this.full_round_effect.visual_effect != null) jsonFullRound.put("visualEffectID", this.full_round_effect.visual_effect.toString());
 			if (this.full_round_effect.hp_boost_min != null || this.full_round_effect.hp_boost_max != null) {
 				Map jsonHP = new LinkedHashMap();
 				if (this.full_round_effect.hp_boost_min != null) jsonHP.put("min", this.full_round_effect.hp_boost_min);

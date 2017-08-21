@@ -35,13 +35,15 @@ public class ActorConditionEditor extends JSONElementEditor {
 	private IntegerBasedCheckBox positiveBox;
 	private IntegerBasedCheckBox stackingBox;
 	
-	private JTextField roundVisualField;
+	//private JTextField roundVisualField;
+	private JComboBox roundVisualField;
 	private JSpinner roundHpMinField;
 	private JSpinner roundHpMaxField;
 	private JSpinner roundApMinField;
 	private JSpinner roundApMaxField;
 	
-	private JTextField fullRoundVisualField;
+	//private JTextField fullRoundVisualField;
+	private JComboBox fullRoundVisualField;
 	private JSpinner fullRoundHpMinField;
 	private JSpinner fullRoundHpMaxField;
 	private JSpinner fullRoundApMinField;
@@ -82,7 +84,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 		stackingBox = addIntegerBasedCheckBox(pane, "Stacking", ac.stacking, ac.writable, listener);
 		
 		
-		CollapsiblePanel roundEffectPane = new CollapsiblePanel("Effect every round (4s): ");
+		CollapsiblePanel roundEffectPane = new CollapsiblePanel("Effect every round (6s): ");
 		roundEffectPane.setLayout(new JideBoxLayout(roundEffectPane, JideBoxLayout.PAGE_AXIS));
 		final ActorCondition.RoundEffect roundEffect;
 		if (ac.round_effect != null) {
@@ -90,7 +92,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 		} else {
 			roundEffect = new ActorCondition.RoundEffect();
 		}
-		roundVisualField = addTextField(roundEffectPane, "Visual effect ID: ", roundEffect.visual_effect, ac.writable, listener);
+		roundVisualField = addEnumValueBox(roundEffectPane, "Visual effect ID:", ActorCondition.VisualEffectID.values(), roundEffect.visual_effect, ac.writable, listener);//addTextField(roundEffectPane, "Visual effect ID: ", roundEffect.visual_effect, ac.writable, listener);
 		roundHpMinField = addIntegerField(roundEffectPane, "HP Bonus Min: ", roundEffect.hp_boost_min, true, ac.writable, listener);
 		roundHpMaxField = addIntegerField(roundEffectPane, "HP Bonus Max: ", roundEffect.hp_boost_max, true, ac.writable, listener);
 		roundApMinField = addIntegerField(roundEffectPane, "AP Bonus Min: ", roundEffect.ap_boost_min, true, ac.writable, listener);
@@ -99,7 +101,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 		pane.add(roundEffectPane, JideBoxLayout.FIX);
 		
 		
-		CollapsiblePanel fullRoundEffectPane = new CollapsiblePanel("Effect every full round (20s): ");
+		CollapsiblePanel fullRoundEffectPane = new CollapsiblePanel("Effect every full round (25s): ");
 		fullRoundEffectPane.setLayout(new JideBoxLayout(fullRoundEffectPane, JideBoxLayout.PAGE_AXIS));
 		final ActorCondition.RoundEffect fullRoundEffect;
 		if (ac.full_round_effect != null) {
@@ -107,7 +109,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 		} else {
 			fullRoundEffect = new ActorCondition.RoundEffect();
 		}
-		fullRoundVisualField = addTextField(fullRoundEffectPane, "Visual effect ID: ", fullRoundEffect.visual_effect, ac.writable, listener);
+		fullRoundVisualField = addEnumValueBox(fullRoundEffectPane, "Visual effect ID:", ActorCondition.VisualEffectID.values(), fullRoundEffect.visual_effect, ac.writable, listener);//addTextField(fullRoundEffectPane, "Visual effect ID: ", fullRoundEffect.visual_effect, ac.writable, listener);
 		fullRoundHpMinField = addIntegerField(fullRoundEffectPane, "HP Bonus min: ", fullRoundEffect.hp_boost_min, true, ac.writable, listener);
 		fullRoundHpMaxField = addIntegerField(fullRoundEffectPane, "HP Bonus max: ", fullRoundEffect.hp_boost_max, true, ac.writable, listener);
 		fullRoundApMinField = addIntegerField(fullRoundEffectPane, "AP Bonus min: ", fullRoundEffect.ap_boost_min, true, ac.writable, listener);
@@ -194,7 +196,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 					if (aCond.round_effect == null) {
 						aCond.round_effect = new ActorCondition.RoundEffect();
 					}
-					aCond.round_effect.visual_effect = (String) value;
+					aCond.round_effect.visual_effect = (ActorCondition.VisualEffectID) value;
 				}
 			} else if (source == roundHpMinField) {
 				if (value == null) {
@@ -264,7 +266,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 					if (aCond.full_round_effect == null) {
 						aCond.full_round_effect = new ActorCondition.RoundEffect();
 					}
-					aCond.full_round_effect.visual_effect = (String) value;
+					aCond.full_round_effect.visual_effect = (ActorCondition.VisualEffectID) value;
 				}
 			} else if (source == fullRoundHpMinField) {
 				if (value == null) {

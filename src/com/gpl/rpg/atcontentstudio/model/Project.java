@@ -222,6 +222,8 @@ public class Project implements ProjectTreeNode, Serializable {
 	public void refreshTransients(Workspace w) {
 		this.parent = w;
 
+		projectElementListeners = new HashMap<Class<? extends GameDataElement>, List<ProjectElementListener>>();
+
 		try {
 			knownSpritesheetsProperties = new Properties();
 			knownSpritesheetsProperties.load(Project.class.getResourceAsStream("/spritesheets.properties"));
@@ -254,7 +256,6 @@ public class Project implements ProjectTreeNode, Serializable {
 
 		linkAll();
 		
-		projectElementListeners = new HashMap<Class<? extends GameDataElement>, List<ProjectElementListener>>();
 	}
 	
 	public void linkAll() {
