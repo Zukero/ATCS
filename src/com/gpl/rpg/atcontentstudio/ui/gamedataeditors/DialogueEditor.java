@@ -427,9 +427,13 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardValue = addQuestStageBox(pane, ((Dialogue)target).getProject(), "Quest stage: ", reward.reward_value, writable, listener, (Quest) reward.reward_obj, rewardObj);
 				break;
 			case skillIncrease:
+				Requirement.SkillID skillId = null;
+				try {
+					skillId = reward.reward_obj_id == null ? null : Requirement.SkillID.valueOf(reward.reward_obj_id);
+				} catch(IllegalArgumentException e) {}
 				rewardMap = null;
-				rewardObjId = addTextField(pane, "Skill ID: ", reward.reward_obj_id, writable, listener);
-				rewardObjIdCombo = null;
+				rewardObjId = null;// addTextField(pane, "Skill ID: ", reward.reward_obj_id, writable, listener);
+				rewardObjIdCombo = addEnumValueBox(pane, "Skill ID: ", Requirement.SkillID.values(), skillId, writable, listener);
 				rewardObj = null;
 				rewardValue = null;
 				break;
@@ -814,9 +818,11 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case alignmentChange:
 				label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
+				label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
 				break;
 			case createTimer:
 				label.setText("Create timer "+rewardObjDesc);
+				label.setIcon(new ImageIcon(DefaultIcons.getTimerIcon()));
 				break;
 			case deactivateMapObjectGroup:
 				label.setText("Deactivate map object group "+rewardObjDesc+" on map "+reward.map_name);
@@ -848,6 +854,7 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case skillIncrease:
 				label.setText("Increase skill "+rewardObjDesc+" level");
+				label.setIcon(new ImageIcon(DefaultIcons.getSkillIcon()));
 				break;
 			case spawnAll:
 				label.setText("Respawn all monsters in spawnarea area "+rewardObjDesc+" on map "+reward.map_name);
@@ -1090,6 +1097,8 @@ public class DialogueEditor extends JSONElementEditor {
 			label.setIcon(new ImageIcon(DefaultIcons.getBonemealIcon()));
 		} else if (req.type == Requirement.RequirementType.timerElapsed) {
 			label.setIcon(new ImageIcon(DefaultIcons.getTimerIcon()));
+		} else if (req.type == Requirement.RequirementType.factionScore) {
+			label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
 		}
 		if (req.type == null) {
 			label.setText("New, undefined requirement.");

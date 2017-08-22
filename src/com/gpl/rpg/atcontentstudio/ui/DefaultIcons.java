@@ -247,6 +247,10 @@ public class DefaultIcons {
 	public static Image getTimerImage() { return getImage(TIMER_RES); }
 	public static Image getTimerIcon() { return getIcon(TIMER_RES); }
 	
+	private static String ALIGNMENT_RES = "/com/gpl/rpg/atcontentstudio/img/alignment.png";
+	public static Image getAlignmentImage() { return getImage(ALIGNMENT_RES); }
+	public static Image getAlignmentIcon() { return getIcon(ALIGNMENT_RES); }
+	
 	private static String STATUS_RED_RES = "/com/gpl/rpg/atcontentstudio/img/status_red.png";
 	public static Image getStatusRedImage() { return getImage(STATUS_RED_RES); }
 	public static Image getStatusRedIcon() { return getIcon(STATUS_RED_RES); }
