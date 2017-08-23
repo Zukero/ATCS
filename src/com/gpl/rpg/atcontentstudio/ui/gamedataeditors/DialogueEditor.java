@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -96,6 +98,8 @@ public class DialogueEditor extends JSONElementEditor {
 	private JComboBox rewardObjIdCombo;
 	private MyComboBox rewardObj;
 	private JComponent rewardValue;
+	private JRadioButton rewardConditionTimed;
+	private JRadioButton rewardConditionForever;
 	
 	private RepliesListModel repliesListModel;
 	@SuppressWarnings("rawtypes")
@@ -385,11 +389,37 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardValue = null;
 				break;
 			case actorCondition:
+				
 				rewardMap = null;
 				rewardObjId = null;
 				rewardObjIdCombo = null;
 				rewardObj = addActorConditionBox(pane, ((Dialogue)target).getProject(), "Actor Condition: ", (ActorCondition) reward.reward_obj, writable, listener);
+				rewardConditionTimed = new JRadioButton("For a number of rounds");
+				pane.add(rewardConditionTimed, JideBoxLayout.FIX);
 				rewardValue = addIntegerField(pane, "Duration: ", reward.reward_value, false, writable, listener);
+				rewardConditionForever = new JRadioButton("Forever");
+				pane.add(rewardConditionForever, JideBoxLayout.FIX);
+
+				ButtonGroup radioGroup = new ButtonGroup();
+				radioGroup.add(rewardConditionTimed);
+				radioGroup.add(rewardConditionForever);
+				
+				rewardConditionTimed.setSelected(reward.reward_value == null || reward.reward_value != ActorCondition.FOREVER_DURATION);
+				rewardConditionForever.setSelected(!rewardConditionTimed.isSelected());
+				
+				rewardConditionTimed.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						listener.valueChanged(rewardConditionTimed, new Boolean(rewardConditionTimed.isSelected()));
+					}
+				});
+				rewardConditionForever.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						listener.valueChanged(rewardConditionForever, new Boolean(rewardConditionForever.isSelected()));
+					}
+				});
+				
 				break;
 			case alignmentChange:
 				rewardMap = null;
@@ -813,7 +843,8 @@ public class DialogueEditor extends JSONElementEditor {
 				label.setIcon(new ImageIcon(DefaultIcons.getObjectLayerIcon()));
 				break;
 			case actorCondition:
-				label.setText("Give actor condition "+rewardObjDesc+" for "+reward.reward_value+" turns");
+				boolean rewardForever = reward.reward_value != null && reward.reward_value == ActorCondition.FOREVER_DURATION;
+				label.setText("Give actor condition "+rewardObjDesc+(rewardForever ? " forever" : " for "+reward.reward_value+" turns"));
 				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
 				break;
 			case alignmentChange:
@@ -1199,6 +1230,14 @@ public class DialogueEditor extends JSONElementEditor {
 					stage = quest.getStage(selectedReward.reward_value);
 					if (stage != null) stage.addBacklink(dialogue);
 				}
+				rewardsListModel.itemChanged(selectedReward);
+			} else if (source == rewardConditionForever) {
+				selectedReward.reward_value = ActorCondition.FOREVER_DURATION;
+				rewardValue.setEnabled(false);
+				rewardsListModel.itemChanged(selectedReward);
+			}  else if (source == rewardConditionTimed) {
+				selectedReward.reward_value = (Integer) ((JSpinner)rewardValue).getValue();
+				rewardValue.setEnabled(true);
 				rewardsListModel.itemChanged(selectedReward);
 			} else if (source == replyTypeCombo) {
 				updateRepliesParamsEditorPane(repliesParamsPane, selectedReply, this);

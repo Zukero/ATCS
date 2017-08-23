@@ -22,6 +22,7 @@ public class ActorCondition extends JSONElement {
 	private static final long serialVersionUID = -3969824899972048507L;
 
 	public static final Integer CLEAR_AC_MAGNITUDE = -99;
+	public static final Integer FOREVER_DURATION = 999;
 	
 	// Available from init state
 	//public String id; inherited.

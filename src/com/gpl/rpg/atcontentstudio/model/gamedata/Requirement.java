@@ -104,7 +104,10 @@ public class Requirement extends JSONElement {
 	
 	@Override
 	public String getDesc() {
-		return ((negated != null && negated) ? "NOT " : "")+(type == null ? "" : type.toString()+":")+required_obj_id+(required_value == null ? "" : ":"+required_value.toString());
+		return ((negated != null && negated) ? "NOT " : "")
+				+(type == null ? "" : type.toString()+":")
+				+(required_obj_id == null ? "" : required_obj_id+":")
+				+(required_value == null ? "" : required_value.toString());
 	}
 
 	@Override
