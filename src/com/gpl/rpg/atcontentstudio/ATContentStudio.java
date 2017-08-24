@@ -14,18 +14,23 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.FontUIResource;
 
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
@@ -42,6 +47,8 @@ public class ATContentStudio {
 	
 	public static final String CHECK_UPDATE_URL = "https://andorstrail.com/static/ATCS_latest";
 	public static final String DOWNLOAD_URL = "https://andorstrail.com/viewtopic.php?f=6&t=4806";
+	
+	public static final String FONT_SCALE_ENV_VAR_NAME = "FONT_SCALE";
 
 	public static boolean STARTED = false;
 	public static StudioFrame frame = null;
@@ -69,6 +76,8 @@ public class ATContentStudio {
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+		
+		scaleUIFont();
 
 		//Need to keep a strong reference to it, to avoid garbage collection that'll reset this setting.
 		Logger l = Logger.getLogger(ExpressionParser.class.getName());
@@ -175,6 +184,40 @@ public class ATContentStudio {
 				if (in != null) in.close();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void scaleUIFont() {
+		String fontScaling = System.getProperty(FONT_SCALE_ENV_VAR_NAME);
+		Float fontScale = null;
+		if (fontScaling != null) {
+			try {
+				fontScale = Float.parseFloat(fontScaling);
+			} catch (NumberFormatException e) {
+				System.err.println("Failed to parse font scaling parameter. Using default.");
+				e.printStackTrace();
+			}
+			if (fontScale != null) {
+				System.out.println("Scaling fonts to "+fontScale);
+				UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+				Map<Object, Object> newDefaults = new HashMap<Object, Object>();
+				for (Enumeration<Object> e = defaults.keys(); e.hasMoreElements();) {
+					Object key = e.nextElement();
+					Object value = defaults.get(key);
+					if (value instanceof Font) {
+						Font font = (Font) value;
+						int newSize = (int)(font.getSize() * fontScale);
+						if (value instanceof FontUIResource) {
+							newDefaults.put(key, new FontUIResource(font.getName(), font.getStyle(), newSize));
+						} else {
+							newDefaults.put(key, new Font(font.getName(), font.getStyle(), newSize));
+						}
+					}
+				}
+				for (Object key : newDefaults.keySet()) {
+					defaults.put(key, newDefaults.get(key));
+				}
 			}
 		}
 	}

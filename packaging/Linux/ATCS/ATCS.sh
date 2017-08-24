@@ -3,7 +3,7 @@ ATCS_DIR=$(dirname $(readlink -f "$0" || greadlink -f "$0" || stat -f "$0"))
 MAX_MEM=512M
 CP=$(find ${ATCS_DIR}/lib/ -name '*.jar' | paste -sd: -)
 JAVA=java
-JAVA_OPTS=
+JAVA_OPTS=-DFONT_SCALE=1.0
 ENV_FILE=${ATCS_DIR}/ATCS.env
 MAIN_CLASS=com.gpl.rpg.atcontentstudio.ATContentStudio
 

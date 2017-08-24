@@ -165,6 +165,7 @@ public class StudioFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					try {
 						UIManager.setLookAndFeel(i.getClassName());
+						ATContentStudio.scaleUIFont();
 						SwingUtilities.updateComponentTreeUI(ATContentStudio.frame);
 						ConfigCache.setFavoriteLaFClassName(i.getClassName());
 					} catch (ClassNotFoundException e1) {
