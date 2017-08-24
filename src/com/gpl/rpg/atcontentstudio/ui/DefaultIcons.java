@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
 
 public class DefaultIcons {
@@ -287,7 +288,7 @@ public class DefaultIcons {
 	
 	private static Image getIcon(String res) {
 		if (iconCache.get(res) == null) {
-			Image icon = getImage(res).getScaledInstance(16, 16, Image.SCALE_SMOOTH);
+			Image icon = getImage(res).getScaledInstance((int)(16*ATContentStudio.SCALING), (int)(16*ATContentStudio.SCALING), Image.SCALE_SMOOTH);
 			iconCache.put(res, icon);
 		}
 		return iconCache.get(res);

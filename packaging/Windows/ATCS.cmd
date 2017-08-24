@@ -4,7 +4,7 @@ set "ATCS_DIR=%~dp0"
 set "MAX_MEM=512M"
 set "CP=%ATCS_DIR%lib\*"
 set "JAVA=javaw.exe"
-set "JAVA_OPTS=-DFONT_SCALE=1.0"
+set "JAVA_OPTS=-DFONT_SCALE=1.0 -Dswing.aatext=true"
 set "ENV_FILE=%ATCS_DIR%ATCS.env.bat"
 set "MAIN_CLASS=com.gpl.rpg.atcontentstudio.ATContentStudio"
 

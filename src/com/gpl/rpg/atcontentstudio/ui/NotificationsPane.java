@@ -18,6 +18,7 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.NotificationListener;
 
@@ -54,7 +55,7 @@ public class NotificationsPane extends JList {
 					label.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 //					label.setForeground(Color.WHITE);
 				}
-				f = f.deriveFont(10f);
+				f = f.deriveFont(10f*ATContentStudio.SCALING);
 				label.setFont(f);
 				return label;
 			}

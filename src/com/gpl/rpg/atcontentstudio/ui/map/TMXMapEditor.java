@@ -765,6 +765,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		editorPane.setText(((TMXMap)target).toXml());
 		editorPane.setEditable(false);
 		editorPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
+		editorPane.setFont(editorPane.getFont().deriveFont(ATContentStudio.SCALING * editorPane.getFont().getSize()));
 		pane.add(editorPane, JideBoxLayout.VARY);
 
 		return pane;

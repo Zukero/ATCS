@@ -40,7 +40,7 @@ public class StudioFrame extends JFrame {
 
 	private static final long serialVersionUID = -3391514100319186661L;
 	
-
+	
 	final ProjectsTree projectTree;
 	final EditorsArea editors;
 	

@@ -95,6 +95,7 @@ public abstract class JSONElementEditor extends Editor {
 		jsonEditorPane.setText(((JSONElement)target).toJsonString());
 		jsonEditorPane.setEditable(((JSONElement)target).writable);
 		jsonEditorPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+		jsonEditorPane.setFont(jsonEditorPane.getFont().deriveFont(ATContentStudio.SCALING * jsonEditorPane.getFont().getSize()));
 		JPanel result = new JPanel();
 		result.setLayout(new BorderLayout());
 		result.add(jsonEditorPane, BorderLayout.CENTER);

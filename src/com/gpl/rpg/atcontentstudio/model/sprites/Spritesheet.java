@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.tree.TreeNode;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
@@ -174,7 +175,7 @@ public class Spritesheet extends GameDataElement {
 		}
 		Image result = getImage(index);
 		if (result == null) return null;
-		result = result.getScaledInstance(16, 16, BufferedImage.SCALE_SMOOTH);
+		result = result.getScaledInstance((int)(16*ATContentStudio.SCALING), (int)(16*ATContentStudio.SCALING), Image.SCALE_SMOOTH);
 		cache_icon.put(index, result);
 		return result;
 	}

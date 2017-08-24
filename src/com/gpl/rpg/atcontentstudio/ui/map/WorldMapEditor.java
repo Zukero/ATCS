@@ -130,6 +130,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 		editorPane.setText(((WorldmapSegment)target).toXml());
 		editorPane.setEditable(false);
 		editorPane.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
+		editorPane.setFont(editorPane.getFont().deriveFont(ATContentStudio.SCALING * editorPane.getFont().getSize()));
 		pane.add(editorPane, JideBoxLayout.VARY);
 
 		return pane;

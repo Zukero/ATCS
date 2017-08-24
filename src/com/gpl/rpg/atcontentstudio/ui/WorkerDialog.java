@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.jidesoft.swing.JideBoxLayout;
 
 
@@ -19,7 +20,7 @@ private static final long serialVersionUID = 8239669104275145995L;
 		super(parent, "Loading...");
 		this.setIconImage(DefaultIcons.getMainIconImage());
 		this.getContentPane().setLayout(new JideBoxLayout(this.getContentPane(), JideBoxLayout.PAGE_AXIS, 6));
-		this.getContentPane().add(new JLabel("<html><font size=5>Please wait.<br/>"+message+"</font></html>"), JideBoxLayout.VARY);
+		this.getContentPane().add(new JLabel("<html><font size="+(int)(5 * ATContentStudio.SCALING)+">Please wait.<br/>"+message+"</font></html>"), JideBoxLayout.VARY);
 		JMovingIdler idler = new JMovingIdler();
 		idler.setBackground(Color.WHITE);
 		idler.setForeground(Color.GREEN);
@@ -46,7 +47,7 @@ private static final long serialVersionUID = 8239669104275145995L;
 				info.setVisible(true);
 				workload.run();
 				info.dispose();
-				if (showConfirm) JOptionPane.showMessageDialog(parent, "<html><font size=5>Done !</font></html>");
+				if (showConfirm) JOptionPane.showMessageDialog(parent, "<html><font size="+(int)(5 * ATContentStudio.SCALING)+">Done !</font></html>");
 			};
 		}.start();
 	}
