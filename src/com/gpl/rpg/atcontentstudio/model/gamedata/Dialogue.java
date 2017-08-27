@@ -58,6 +58,7 @@ public class Dialogue extends JSONElement {
 			dropList,
 			skillIncrease,
 			actorCondition,
+			actorConditionImmunity,
 			alignmentChange,
 			giveItem,
 			createTimer,
@@ -250,6 +251,7 @@ public class Dialogue extends JSONElement {
 						reward.map = reward.map_name != null ? proj.getMap(reward.map_name) : null;
 						break;
 					case actorCondition:
+					case actorConditionImmunity:
 						reward.reward_obj = proj.getActorCondition(reward.reward_obj_id);
 						break;
 					case alignmentChange:

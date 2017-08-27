@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -16,6 +17,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -90,17 +92,27 @@ public class NPCEditor extends JSONElementEditor {
 	@SuppressWarnings("rawtypes")
 	private JList hitSourceConditionsList;
 	private MyComboBox sourceConditionBox;
-	private JSpinner sourceConditionMagnitude;
-	private JSpinner sourceConditionDuration;
 	private JSpinner sourceConditionChance;
+	private JRadioButton sourceConditionClear;
+	private JRadioButton sourceConditionApply;
+	private JRadioButton sourceConditionImmunity;
+	private JSpinner sourceConditionMagnitude;
+	private JRadioButton sourceConditionTimed;
+	private JRadioButton sourceConditionForever;
+	private JSpinner sourceConditionDuration;
 	
 	private TargetTimedConditionsListModel hitTargetConditionsListModel;
 	@SuppressWarnings("rawtypes")
 	private JList hitTargetConditionsList;
 	private MyComboBox targetConditionBox;
-	private JSpinner targetConditionMagnitude;
-	private JSpinner targetConditionDuration;
 	private JSpinner targetConditionChance;
+	private JRadioButton targetConditionClear;
+	private JRadioButton targetConditionApply;
+	private JRadioButton targetConditionImmunity;
+	private JSpinner targetConditionMagnitude;
+	private JRadioButton targetConditionTimed;
+	private JRadioButton targetConditionForever;
+	private JSpinner targetConditionDuration;
 
 	private JPanel dialogueGraphPane;
 	private DialogueGraphView dialogueGraphView;
@@ -313,7 +325,7 @@ public class NPCEditor extends JSONElementEditor {
 		pane.add(combatTraitPane, JideBoxLayout.FIX);
 	}
 	
-	public void updateSourceTimedConditionEditorPane(JPanel pane, NPC.TimedConditionEffect condition, FieldUpdateListener listener) {
+	public void updateSourceTimedConditionEditorPane(JPanel pane, NPC.TimedConditionEffect condition, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (sourceConditionBox != null) {
 			removeElementListener(sourceConditionBox);
@@ -323,15 +335,88 @@ public class NPCEditor extends JSONElementEditor {
 		Project proj = ((NPC)target).getProject();
 		
 		sourceConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		sourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, 1, false, writable, listener);
-		sourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		sourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
-
+		
+		sourceConditionClear = new JRadioButton("Clear active condition");
+		pane.add(sourceConditionClear, JideBoxLayout.FIX);
+		sourceConditionApply = new JRadioButton("Apply condition with magnitude");
+		pane.add(sourceConditionApply, JideBoxLayout.FIX);
+		sourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
+		sourceConditionImmunity = new JRadioButton("Give immunity to condition");
+		pane.add(sourceConditionImmunity, JideBoxLayout.FIX);
+		
+		ButtonGroup radioEffectGroup = new ButtonGroup();
+		radioEffectGroup.add(sourceConditionApply);
+		radioEffectGroup.add(sourceConditionClear);
+		radioEffectGroup.add(sourceConditionImmunity);
+		
+		sourceConditionTimed = new JRadioButton("For a number of rounds");
+		pane.add(sourceConditionTimed, JideBoxLayout.FIX);
+		sourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		sourceConditionForever = new JRadioButton("Forever");
+		pane.add(sourceConditionForever, JideBoxLayout.FIX);
+		
+		ButtonGroup radioDurationGroup = new ButtonGroup();
+		radioDurationGroup.add(sourceConditionTimed);
+		radioDurationGroup.add(sourceConditionForever);
+		
+		updateSourceTimedConditionWidgets(condition);
+		
+		sourceConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceConditionClear, new Boolean(sourceConditionClear.isSelected()));
+			}
+		});
+		sourceConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceConditionApply, new Boolean(sourceConditionApply.isSelected()));
+			}
+		});
+		sourceConditionImmunity.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceConditionImmunity, new Boolean(sourceConditionImmunity.isSelected()));
+			}
+		});
+		
+		sourceConditionTimed.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceConditionTimed, new Boolean(sourceConditionTimed.isSelected()));
+			}
+		});
+		sourceConditionForever.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(sourceConditionForever, new Boolean(sourceConditionForever.isSelected()));
+			}
+		});
 		pane.revalidate();
 		pane.repaint();
 	}
 	
-	public void updateTargetTimedConditionEditorPane(JPanel pane, NPC.TimedConditionEffect condition, FieldUpdateListener listener) {
+	public void updateSourceTimedConditionWidgets(NPC.TimedConditionEffect condition) {
+
+		boolean immunity = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration != null && condition.duration > ActorCondition.DURATION_NONE);
+		boolean clear = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration == null || condition.duration == ActorCondition.DURATION_NONE);
+		boolean forever = condition.duration != null && condition.duration == ActorCondition.DURATION_FOREVER;
+		
+		sourceConditionClear.setSelected(clear);
+		sourceConditionApply.setSelected(!clear && !immunity);
+		sourceConditionMagnitude.setEnabled(!clear && !immunity);
+		sourceConditionImmunity.setSelected(immunity);
+		
+		sourceConditionTimed.setSelected(!forever);
+		sourceConditionTimed.setEnabled(!clear);
+		sourceConditionDuration.setEnabled(!clear && !forever);
+		sourceConditionForever.setSelected(forever);
+		sourceConditionForever.setEnabled(!clear);
+	}
+
+	
+	public void updateTargetTimedConditionEditorPane(JPanel pane, NPC.TimedConditionEffect condition, final FieldUpdateListener listener) {
 		pane.removeAll();
 		if (targetConditionBox != null) {
 			removeElementListener(targetConditionBox);
@@ -341,12 +426,83 @@ public class NPCEditor extends JSONElementEditor {
 		Project proj = ((NPC)target).getProject();
 		
 		targetConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
-		targetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude, 1, false, writable, listener);
-		targetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
 		targetConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
-
+		targetConditionClear = new JRadioButton("Clear active condition");
+		pane.add(targetConditionClear, JideBoxLayout.FIX);
+		targetConditionApply = new JRadioButton("Apply condition with magnitude");
+		pane.add(targetConditionApply, JideBoxLayout.FIX);
+		targetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
+		targetConditionImmunity = new JRadioButton("Give immunity to condition");
+		pane.add(targetConditionImmunity, JideBoxLayout.FIX);
+		
+		ButtonGroup radioEffectGroup = new ButtonGroup();
+		radioEffectGroup.add(targetConditionApply);
+		radioEffectGroup.add(targetConditionClear);
+		radioEffectGroup.add(targetConditionImmunity);
+		
+		targetConditionTimed = new JRadioButton("For a number of rounds");
+		pane.add(targetConditionTimed, JideBoxLayout.FIX);
+		targetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		targetConditionForever = new JRadioButton("Forever");
+		pane.add(targetConditionForever, JideBoxLayout.FIX);
+		
+		ButtonGroup radioDurationGroup = new ButtonGroup();
+		radioDurationGroup.add(targetConditionTimed);
+		radioDurationGroup.add(targetConditionForever);
+		
+		updateTargetTimedConditionWidgets(condition);
+		
+		targetConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetConditionClear, new Boolean(targetConditionClear.isSelected()));
+			}
+		});
+		targetConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetConditionApply, new Boolean(targetConditionApply.isSelected()));
+			}
+		});
+		targetConditionImmunity.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetConditionImmunity, new Boolean(targetConditionImmunity.isSelected()));
+			}
+		});
+		
+		targetConditionTimed.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetConditionTimed, new Boolean(targetConditionTimed.isSelected()));
+			}
+		});
+		targetConditionForever.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(targetConditionForever, new Boolean(targetConditionForever.isSelected()));
+			}
+		});
 		pane.revalidate();
 		pane.repaint();
+	}
+	
+	public void updateTargetTimedConditionWidgets(NPC.TimedConditionEffect condition) {
+
+		boolean immunity = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration != null && condition.duration > ActorCondition.DURATION_NONE);
+		boolean clear = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration == null || condition.duration == ActorCondition.DURATION_NONE);
+		boolean forever = condition.duration != null && condition.duration == ActorCondition.DURATION_FOREVER;
+		
+		targetConditionClear.setSelected(clear);
+		targetConditionApply.setSelected(!clear && !immunity);
+		targetConditionMagnitude.setEnabled(!clear && !immunity);
+		targetConditionImmunity.setSelected(immunity);
+		
+		targetConditionTimed.setSelected(!forever);
+		targetConditionTimed.setEnabled(!clear);
+		targetConditionDuration.setEnabled(!clear && !forever);
+		targetConditionForever.setSelected(forever);
+		targetConditionForever.setEnabled(!clear);
 	}
 	
 	public static class TargetTimedConditionsListModel implements ListModel<NPC.TimedConditionEffect> {
@@ -485,7 +641,18 @@ public class NPCEditor extends JSONElementEditor {
 				
 				if (effect.condition != null) {
 					label.setIcon(new ImageIcon(effect.condition.getIcon()));
-					label.setText(effect.chance+"% chances to give "+effect.duration+" rounds of "+effect.condition.getDesc()+" x"+effect.magnitude);
+
+					boolean immunity = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration != null && effect.duration > ActorCondition.DURATION_NONE);
+					boolean clear = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration == null || effect.duration == ActorCondition.DURATION_NONE);
+					boolean forever = effect.duration != null && effect.duration == ActorCondition.DURATION_FOREVER;
+					
+					if (clear) {
+						label.setText(effect.chance+"% chances to clear actor condition "+effect.condition.getDesc());
+					} else if (immunity) {
+						label.setText(effect.chance+"% chances to give immunity to "+effect.condition.getDesc()+(forever ? " forever" : " for "+effect.duration+" rounds"));
+					} else {
+						label.setText(effect.chance+"% chances to give actor condition "+effect.condition.getDesc()+" x"+effect.magnitude+(forever ? " forever" : " for "+effect.duration+" rounds"));
+					}
 				} else {
 					label.setText("New, undefined actor condition effect.");
 				}
@@ -619,12 +786,51 @@ public class NPCEditor extends JSONElementEditor {
 					selectedHitEffectSourceCondition.condition_id = null;
 				}
 				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+			} else if (source == sourceConditionClear && (Boolean) value) {
+				selectedHitEffectSourceCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitEffectSourceCondition.duration = null;
+				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
+				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
+			}  else if (source == sourceConditionApply && (Boolean) value) {
+				selectedHitEffectSourceCondition.magnitude = (Integer) sourceConditionMagnitude.getValue();
+				selectedHitEffectSourceCondition.duration = sourceConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) sourceConditionDuration.getValue();
+				if (selectedHitEffectSourceCondition.duration == null) {
+					selectedHitEffectSourceCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
+				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
+			} else if (source == sourceConditionImmunity && (Boolean) value) {
+				selectedHitEffectSourceCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitEffectSourceCondition.duration = sourceConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) sourceConditionDuration.getValue();
+				if (selectedHitEffectSourceCondition.duration == null || selectedHitEffectSourceCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitEffectSourceCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
+				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
 			} else if (source == sourceConditionMagnitude) {
 				selectedHitEffectSourceCondition.magnitude = (Integer) value;
 				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
+			} else if (source == sourceConditionTimed && (Boolean) value) {
+				selectedHitEffectSourceCondition.duration = (Integer) sourceConditionDuration.getValue();
+				if (selectedHitEffectSourceCondition.duration == null || selectedHitEffectSourceCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitEffectSourceCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
+				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
+			} else if (source == sourceConditionForever && (Boolean) value) {
+				selectedHitEffectSourceCondition.duration = ActorCondition.DURATION_FOREVER;
+				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
+				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
 			} else if (source == sourceConditionDuration) {
 				selectedHitEffectSourceCondition.duration = (Integer) value;
 				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
+				updateHit = true;
 			} else if (source == sourceConditionChance) {
 				selectedHitEffectSourceCondition.chance = (Double) value;
 				hitSourceConditionsListModel.itemChanged(selectedHitEffectSourceCondition);
@@ -642,12 +848,51 @@ public class NPCEditor extends JSONElementEditor {
 					selectedHitEffectTargetCondition.condition_id = null;
 				}
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+			} else if (source == targetConditionClear && (Boolean) value) {
+				selectedHitEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitEffectTargetCondition.duration = null;
+				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			}  else if (source == targetConditionApply && (Boolean) value) {
+				selectedHitEffectTargetCondition.magnitude = (Integer) targetConditionMagnitude.getValue();
+				selectedHitEffectTargetCondition.duration = targetConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) targetConditionDuration.getValue();
+				if (selectedHitEffectTargetCondition.duration == null) {
+					selectedHitEffectTargetCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			} else if (source == targetConditionImmunity && (Boolean) value) {
+				selectedHitEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitEffectTargetCondition.duration = targetConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) targetConditionDuration.getValue();
+				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitEffectTargetCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
 			} else if (source == targetConditionMagnitude) {
 				selectedHitEffectTargetCondition.magnitude = (Integer) value;
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			} else if (source == targetConditionTimed && (Boolean) value) {
+				selectedHitEffectTargetCondition.duration = (Integer) targetConditionDuration.getValue();
+				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitEffectTargetCondition.duration = 1;
+				}
+				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
+			} else if (source == targetConditionForever && (Boolean) value) {
+				selectedHitEffectTargetCondition.duration = ActorCondition.DURATION_FOREVER;
+				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
 			} else if (source == targetConditionDuration) {
 				selectedHitEffectTargetCondition.duration = (Integer) value;
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
+				updateHit = true;
 			} else if (source == targetConditionChance) {
 				selectedHitEffectTargetCondition.chance = (Double) value;
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);

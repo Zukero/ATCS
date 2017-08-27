@@ -100,6 +100,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JComponent rewardValue;
 	private JRadioButton rewardConditionTimed;
 	private JRadioButton rewardConditionForever;
+	private JRadioButton rewardConditionClear;
 	
 	private RepliesListModel repliesListModel;
 	@SuppressWarnings("rawtypes")
@@ -362,6 +363,7 @@ public class DialogueEditor extends JSONElementEditor {
 		if (rewardObj != null) {
 			removeElementListener(rewardObj);
 		}
+		boolean immunity = false;
 		if (reward.type != null) {
 			switch (reward.type) {
 			case activateMapObjectGroup:
@@ -388,6 +390,8 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObj = null;
 				rewardValue = null;
 				break;
+			case actorConditionImmunity:
+				immunity = true;
 			case actorCondition:
 				
 				rewardMap = null;
@@ -399,13 +403,25 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardValue = addIntegerField(pane, "Duration: ", reward.reward_value, false, writable, listener);
 				rewardConditionForever = new JRadioButton("Forever");
 				pane.add(rewardConditionForever, JideBoxLayout.FIX);
-
+				if (!immunity) {
+					rewardConditionClear = new JRadioButton("Clear actor condition");
+					pane.add(rewardConditionClear, JideBoxLayout.FIX);
+				}
+				
 				ButtonGroup radioGroup = new ButtonGroup();
 				radioGroup.add(rewardConditionTimed);
 				radioGroup.add(rewardConditionForever);
+				if (!immunity) radioGroup.add(rewardConditionClear);
 				
-				rewardConditionTimed.setSelected(reward.reward_value == null || reward.reward_value != ActorCondition.FOREVER_DURATION);
-				rewardConditionForever.setSelected(!rewardConditionTimed.isSelected());
+				if (immunity) {
+					rewardConditionTimed.setSelected(reward.reward_value == null || (reward.reward_value != ActorCondition.DURATION_FOREVER && reward.reward_value != ActorCondition.MAGNITUDE_CLEAR));
+					rewardConditionForever.setSelected(reward.reward_value != null && reward.reward_value != ActorCondition.DURATION_FOREVER);
+					rewardConditionClear.setSelected(reward.reward_value != null && reward.reward_value != ActorCondition.MAGNITUDE_CLEAR);
+				} else {
+					rewardConditionTimed.setSelected(reward.reward_value != null && reward.reward_value != ActorCondition.DURATION_FOREVER);
+					rewardConditionForever.setSelected(reward.reward_value == null || reward.reward_value == ActorCondition.DURATION_FOREVER);
+				}
+				rewardValue.setEnabled(rewardConditionTimed.isSelected());
 				
 				rewardConditionTimed.addActionListener(new ActionListener() {
 					@Override
@@ -419,7 +435,14 @@ public class DialogueEditor extends JSONElementEditor {
 						listener.valueChanged(rewardConditionForever, new Boolean(rewardConditionForever.isSelected()));
 					}
 				});
-				
+				if (!immunity) {
+					rewardConditionClear.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							listener.valueChanged(rewardConditionClear, new Boolean(rewardConditionClear.isSelected()));
+						}
+					});
+				}
 				break;
 			case alignmentChange:
 				rewardMap = null;
@@ -843,8 +866,18 @@ public class DialogueEditor extends JSONElementEditor {
 				label.setIcon(new ImageIcon(DefaultIcons.getObjectLayerIcon()));
 				break;
 			case actorCondition:
-				boolean rewardForever = reward.reward_value != null && reward.reward_value == ActorCondition.FOREVER_DURATION;
-				label.setText("Give actor condition "+rewardObjDesc+(rewardForever ? " forever" : " for "+reward.reward_value+" turns"));
+				boolean rewardClear = reward.reward_value != null && reward.reward_value.intValue() == ActorCondition.MAGNITUDE_CLEAR;
+				if (rewardClear) {
+					label.setText("Clear actor condition "+rewardObjDesc);
+				} else {
+					boolean rewardForever = reward.reward_value != null && reward.reward_value.intValue() == ActorCondition.DURATION_FOREVER;
+					label.setText("Give actor condition "+rewardObjDesc+(rewardForever ? " forever" : " for "+reward.reward_value+" turns"));
+				}
+				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				break;
+			case actorConditionImmunity:
+				boolean rewardForever = reward.reward_value == null || reward.reward_value.intValue() == ActorCondition.DURATION_FOREVER;
+				label.setText("Give immunity to actor condition "+rewardObjDesc+(rewardForever ? " forever" : " for "+reward.reward_value+" turns"));
 				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
 				break;
 			case alignmentChange:
@@ -1231,11 +1264,15 @@ public class DialogueEditor extends JSONElementEditor {
 					if (stage != null) stage.addBacklink(dialogue);
 				}
 				rewardsListModel.itemChanged(selectedReward);
-			} else if (source == rewardConditionForever) {
-				selectedReward.reward_value = ActorCondition.FOREVER_DURATION;
+			} else if (source == rewardConditionClear) {
+				selectedReward.reward_value = ActorCondition.MAGNITUDE_CLEAR;
 				rewardValue.setEnabled(false);
 				rewardsListModel.itemChanged(selectedReward);
-			}  else if (source == rewardConditionTimed) {
+			} else if (source == rewardConditionForever) {
+				selectedReward.reward_value = ActorCondition.DURATION_FOREVER;
+				rewardValue.setEnabled(false);
+				rewardsListModel.itemChanged(selectedReward);
+			} else if (source == rewardConditionTimed) {
 				selectedReward.reward_value = (Integer) ((JSpinner)rewardValue).getValue();
 				rewardValue.setEnabled(true);
 				rewardsListModel.itemChanged(selectedReward);
