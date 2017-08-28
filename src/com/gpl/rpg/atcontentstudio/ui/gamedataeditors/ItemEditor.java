@@ -39,6 +39,7 @@ import com.gpl.rpg.atcontentstudio.ui.CollapsiblePanel;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
+import com.gpl.rpg.atcontentstudio.ui.OverlayIcon;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class ItemEditor extends JSONElementEditor {
@@ -512,7 +513,7 @@ public class ItemEditor extends JSONElementEditor {
 		
 		hitSourceConditionTimed = new JRadioButton("For a number of rounds");
 		pane.add(hitSourceConditionTimed, JideBoxLayout.FIX);
-		hitSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		hitSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
 		hitSourceConditionForever = new JRadioButton("Forever");
 		pane.add(hitSourceConditionForever, JideBoxLayout.FIX);
 		
@@ -608,7 +609,7 @@ public class ItemEditor extends JSONElementEditor {
 		
 		hitTargetConditionTimed = new JRadioButton("For a number of rounds");
 		pane.add(hitTargetConditionTimed, JideBoxLayout.FIX);
-		hitTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		hitTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
 		hitTargetConditionForever = new JRadioButton("Forever");
 		pane.add(hitTargetConditionForever, JideBoxLayout.FIX);
 		
@@ -704,7 +705,7 @@ public class ItemEditor extends JSONElementEditor {
 		
 		killSourceConditionTimed = new JRadioButton("For a number of rounds");
 		pane.add(killSourceConditionTimed, JideBoxLayout.FIX);
-		killSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		killSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
 		killSourceConditionForever = new JRadioButton("Forever");
 		pane.add(killSourceConditionForever, JideBoxLayout.FIX);
 		
@@ -951,17 +952,19 @@ public class ItemEditor extends JSONElementEditor {
 				Item.TimedConditionEffect effect = (Item.TimedConditionEffect) value;
 				
 				if (effect.condition != null) {
-					label.setIcon(new ImageIcon(effect.condition.getIcon()));
 					
 					boolean immunity = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration != null && effect.duration > ActorCondition.DURATION_NONE);
 					boolean clear = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration == null || effect.duration == ActorCondition.DURATION_NONE);
 					boolean forever = effect.duration != null && effect.duration == ActorCondition.DURATION_FOREVER;
 					
 					if (clear) {
+						label.setIcon(new ImageIcon(effect.condition.getIcon()));
 						label.setText(effect.chance+"% chances to clear actor condition "+effect.condition.getDesc());
 					} else if (immunity) {
+						label.setIcon(new OverlayIcon(effect.condition.getIcon(), DefaultIcons.getImmunityIcon()));
 						label.setText(effect.chance+"% chances to give immunity to "+effect.condition.getDesc()+(forever ? " forever" : " for "+effect.duration+" rounds"));
 					} else {
+						label.setIcon(new ImageIcon(effect.condition.getIcon()));
 						label.setText(effect.chance+"% chances to give actor condition "+effect.condition.getDesc()+" x"+effect.magnitude+(forever ? " forever" : " for "+effect.duration+" rounds"));
 					}
 				} else {
@@ -1045,10 +1048,11 @@ public class ItemEditor extends JSONElementEditor {
 				Item.ConditionEffect effect = (Item.ConditionEffect) value;
 				
 				if (effect.condition != null) {
-					label.setIcon(new ImageIcon(effect.condition.getIcon()));
 					if (effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) {
+						label.setIcon(new OverlayIcon(effect.condition.getIcon(), DefaultIcons.getImmunityIcon()));
 						label.setText("Immune to actor condition "+effect.condition.getDesc());
 					} else {
+						label.setIcon(new ImageIcon(effect.condition.getIcon()));
 						label.setText("Give actor condition "+effect.condition.getDesc()+" x"+effect.magnitude);
 					}
 				} else {
@@ -1269,9 +1273,11 @@ public class ItemEditor extends JSONElementEditor {
 			} else if (source == equipConditionImmunity && (Boolean) value) {
 				selectedEquipEffectCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
 				equipConditionMagnitude.setEnabled(false);
+				equipConditionsModel.itemChanged(selectedEquipEffectCondition);
 			} else if (source == equipConditionWithMagnitude && (Boolean) value) {
 				selectedEquipEffectCondition.magnitude = (Integer) equipConditionMagnitude.getValue();
 				equipConditionMagnitude.setEnabled(true);
+				equipConditionsModel.itemChanged(selectedEquipEffectCondition);
 			} else if (source == hitHPMin) {
 				hitEffect.hp_boost_min = (Integer) value;
 				updatePrice = true;
@@ -1397,7 +1403,7 @@ public class ItemEditor extends JSONElementEditor {
 				updateHit = true;
 			} else if (source == hitTargetConditionTimed && (Boolean) value) {
 				selectedHitEffectTargetCondition.duration = (Integer) hitTargetConditionDuration.getValue();
-				if (selectedHitEffectTargetCondition.duration == null) {
+				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
 				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
@@ -1477,7 +1483,7 @@ public class ItemEditor extends JSONElementEditor {
 				updateKill = true;
 			} else if (source == killSourceConditionTimed && (Boolean) value) {
 				selectedKillEffectCondition.duration = (Integer) killSourceConditionDuration.getValue();
-				if (selectedKillEffectCondition.duration == null) {
+				if (selectedKillEffectCondition.duration == null || selectedKillEffectCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedKillEffectCondition.duration = 1;
 				}
 				updateKillSourceTimedConditionWidgets(selectedKillEffectCondition);

@@ -52,6 +52,7 @@ import com.gpl.rpg.atcontentstudio.ui.BooleanBasedCheckBox;
 import com.gpl.rpg.atcontentstudio.ui.CollapsiblePanel;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
+import com.gpl.rpg.atcontentstudio.ui.OverlayIcon;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.dialoguetree.DialogueGraphView;
 import com.jidesoft.swing.JideBoxLayout;
 
@@ -400,7 +401,7 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardObj = addActorConditionBox(pane, ((Dialogue)target).getProject(), "Actor Condition: ", (ActorCondition) reward.reward_obj, writable, listener);
 				rewardConditionTimed = new JRadioButton("For a number of rounds");
 				pane.add(rewardConditionTimed, JideBoxLayout.FIX);
-				rewardValue = addIntegerField(pane, "Duration: ", reward.reward_value, false, writable, listener);
+				rewardValue = addIntegerField(pane, "Duration: ", reward.reward_value, 1, false, writable, listener);
 				rewardConditionForever = new JRadioButton("Forever");
 				pane.add(rewardConditionForever, JideBoxLayout.FIX);
 				if (!immunity) {
@@ -878,7 +879,7 @@ public class DialogueEditor extends JSONElementEditor {
 			case actorConditionImmunity:
 				boolean rewardForever = reward.reward_value == null || reward.reward_value.intValue() == ActorCondition.DURATION_FOREVER;
 				label.setText("Give immunity to actor condition "+rewardObjDesc+(rewardForever ? " forever" : " for "+reward.reward_value+" turns"));
-				if (reward.reward_obj != null) label.setIcon(new ImageIcon(reward.reward_obj.getIcon()));
+				if (reward.reward_obj != null) label.setIcon(new OverlayIcon(reward.reward_obj.getIcon(), DefaultIcons.getImmunityIcon()));
 				break;
 			case alignmentChange:
 				label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);

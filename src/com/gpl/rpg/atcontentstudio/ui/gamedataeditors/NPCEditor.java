@@ -41,6 +41,7 @@ import com.gpl.rpg.atcontentstudio.ui.CollapsiblePanel;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.FieldUpdateListener;
 import com.gpl.rpg.atcontentstudio.ui.IntegerBasedCheckBox;
+import com.gpl.rpg.atcontentstudio.ui.OverlayIcon;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.dialoguetree.DialogueGraphView;
 import com.jidesoft.swing.JideBoxLayout;
 
@@ -352,7 +353,7 @@ public class NPCEditor extends JSONElementEditor {
 		
 		sourceConditionTimed = new JRadioButton("For a number of rounds");
 		pane.add(sourceConditionTimed, JideBoxLayout.FIX);
-		sourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		sourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
 		sourceConditionForever = new JRadioButton("Forever");
 		pane.add(sourceConditionForever, JideBoxLayout.FIX);
 		
@@ -442,7 +443,7 @@ public class NPCEditor extends JSONElementEditor {
 		
 		targetConditionTimed = new JRadioButton("For a number of rounds");
 		pane.add(targetConditionTimed, JideBoxLayout.FIX);
-		targetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, false, writable, listener);
+		targetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
 		targetConditionForever = new JRadioButton("Forever");
 		pane.add(targetConditionForever, JideBoxLayout.FIX);
 		
@@ -640,17 +641,19 @@ public class NPCEditor extends JSONElementEditor {
 				NPC.TimedConditionEffect effect = (NPC.TimedConditionEffect) value;
 				
 				if (effect.condition != null) {
-					label.setIcon(new ImageIcon(effect.condition.getIcon()));
 
 					boolean immunity = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration != null && effect.duration > ActorCondition.DURATION_NONE);
 					boolean clear = (effect.magnitude == null || effect.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (effect.duration == null || effect.duration == ActorCondition.DURATION_NONE);
 					boolean forever = effect.duration != null && effect.duration == ActorCondition.DURATION_FOREVER;
 					
 					if (clear) {
+						label.setIcon(new ImageIcon(effect.condition.getIcon()));
 						label.setText(effect.chance+"% chances to clear actor condition "+effect.condition.getDesc());
 					} else if (immunity) {
+						label.setIcon(new OverlayIcon(effect.condition.getIcon(), DefaultIcons.getImmunityIcon()));
 						label.setText(effect.chance+"% chances to give immunity to "+effect.condition.getDesc()+(forever ? " forever" : " for "+effect.duration+" rounds"));
 					} else {
+						label.setIcon(new ImageIcon(effect.condition.getIcon()));
 						label.setText(effect.chance+"% chances to give actor condition "+effect.condition.getDesc()+" x"+effect.magnitude+(forever ? " forever" : " for "+effect.duration+" rounds"));
 					}
 				} else {
@@ -795,7 +798,7 @@ public class NPCEditor extends JSONElementEditor {
 			}  else if (source == sourceConditionApply && (Boolean) value) {
 				selectedHitEffectSourceCondition.magnitude = (Integer) sourceConditionMagnitude.getValue();
 				selectedHitEffectSourceCondition.duration = sourceConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) sourceConditionDuration.getValue();
-				if (selectedHitEffectSourceCondition.duration == null) {
+				if (selectedHitEffectSourceCondition.duration == null || selectedHitEffectSourceCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectSourceCondition.duration = 1;
 				}
 				updateSourceTimedConditionWidgets(selectedHitEffectSourceCondition);
@@ -857,7 +860,7 @@ public class NPCEditor extends JSONElementEditor {
 			}  else if (source == targetConditionApply && (Boolean) value) {
 				selectedHitEffectTargetCondition.magnitude = (Integer) targetConditionMagnitude.getValue();
 				selectedHitEffectTargetCondition.duration = targetConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) targetConditionDuration.getValue();
-				if (selectedHitEffectTargetCondition.duration == null) {
+				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
 				updateSourceTimedConditionWidgets(selectedHitEffectTargetCondition);

@@ -139,6 +139,10 @@ public class DefaultIcons {
 	private static String SKILL_RES = "/com/gpl/rpg/atcontentstudio/img/ui_icon_skill.png";
 	public static Image getSkillImage() { return getImage(SKILL_RES); }
 	public static Image getSkillIcon() { return getIcon(SKILL_RES); }
+
+	private static String IMMUNITY_RES = "/com/gpl/rpg/atcontentstudio/img/ui_icon_immunity.png";
+	public static Image getImmunityImage() { return getImage(IMMUNITY_RES); }
+	public static Image getImmunityIcon() { return getIcon(IMMUNITY_RES); }
 	
 	private static String ITEM_CATEGORY_RES = "/com/gpl/rpg/atcontentstudio/img/equip_weapon.png";
 	public static Image getItemCategoryImage() { return getImage(ITEM_CATEGORY_RES); }
