@@ -57,7 +57,9 @@ public class ItemEditor extends JSONElementEditor {
 	private Item.TimedConditionEffect selectedHitEffectSourceCondition;
 	private Item.TimedConditionEffect selectedHitEffectTargetCondition;
 	private Item.TimedConditionEffect selectedKillEffectCondition;
-
+	private Item.TimedConditionEffect selectedHitReceivedEffectSourceCondition;
+	private Item.TimedConditionEffect selectedHitReceivedEffectTargetCondition;
+	
 	
 	private JButton itemIcon;
 	private JTextField idField;
@@ -143,6 +145,40 @@ public class ItemEditor extends JSONElementEditor {
 	private JRadioButton killSourceConditionForever;
 	private JSpinner killSourceConditionDuration;
 	
+	private CollapsiblePanel hitReceivedEffectPane;
+	private Item.HitReceivedEffect hitReceivedEffect;
+	private JSpinner hitReceivedHPMin;
+	private JSpinner hitReceivedHPMax;
+	private JSpinner hitReceivedAPMin;
+	private JSpinner hitReceivedAPMax;
+	private JSpinner hitReceivedHPMinTarget;
+	private JSpinner hitReceivedHPMaxTarget;
+	private JSpinner hitReceivedAPMinTarget;
+	private JSpinner hitReceivedAPMaxTarget;
+	private SourceTimedConditionsListModel hitReceivedSourceConditionsModel;
+	@SuppressWarnings("rawtypes")
+	private JList hitReceivedSourceConditionsList;
+	private MyComboBox hitReceivedSourceConditionBox;
+	private JSpinner hitReceivedSourceConditionChance;
+	private JRadioButton hitReceivedSourceConditionClear;
+	private JRadioButton hitReceivedSourceConditionApply;
+	private JRadioButton hitReceivedSourceConditionImmunity;
+	private JSpinner hitReceivedSourceConditionMagnitude;
+	private JRadioButton hitReceivedSourceConditionTimed;
+	private JRadioButton hitReceivedSourceConditionForever;
+	private JSpinner hitReceivedSourceConditionDuration;
+	private TargetTimedConditionsListModel hitReceivedTargetConditionsModel;
+	@SuppressWarnings("rawtypes")
+	private JList hitReceivedTargetConditionsList;
+	private MyComboBox hitReceivedTargetConditionBox;
+	private JSpinner hitReceivedTargetConditionChance;
+	private JRadioButton hitReceivedTargetConditionClear;
+	private JRadioButton hitReceivedTargetConditionApply;
+	private JRadioButton hitReceivedTargetConditionImmunity;
+	private JSpinner hitReceivedTargetConditionMagnitude;
+	private JRadioButton hitReceivedTargetConditionTimed;
+	private JRadioButton hitReceivedTargetConditionForever;
+	private JSpinner hitReceivedTargetConditionDuration;
 	
 	public ItemEditor(Item item) {
 		super(item, item.getDesc(), item.getIcon());
@@ -458,6 +494,142 @@ public class ItemEditor extends JSONElementEditor {
 			killEffectPane.collapse();
 		}
 		pane.add(killEffectPane, JideBoxLayout.FIX);
+		
+		
+		hitReceivedEffectPane = new CollapsiblePanel("Effect on every received hit: ");
+		hitReceivedEffectPane.setLayout(new JideBoxLayout(hitReceivedEffectPane, JideBoxLayout.PAGE_AXIS));
+		if (item.hit_received_effect == null) {
+			hitReceivedEffect = new Item.HitReceivedEffect();
+		} else {
+			hitReceivedEffect = item.hit_received_effect;
+		}
+		hitReceivedHPMin = addIntegerField(hitReceivedEffectPane, "Player HP bonus min: ", hitReceivedEffect.hp_boost_min, true, item.writable, listener);
+		hitReceivedHPMax = addIntegerField(hitReceivedEffectPane, "Player HP bonus max: ", hitReceivedEffect.hp_boost_max, true, item.writable, listener);
+		hitReceivedAPMin = addIntegerField(hitReceivedEffectPane, "Player AP bonus min: ", hitReceivedEffect.ap_boost_min, true, item.writable, listener);
+		hitReceivedAPMax = addIntegerField(hitReceivedEffectPane, "Player AP bonus max: ", hitReceivedEffect.ap_boost_max, true, item.writable, listener);
+		hitReceivedHPMinTarget = addIntegerField(hitReceivedEffectPane, "Attacker HP bonus min: ", hitReceivedEffect.hp_boost_min_target, true, item.writable, listener);
+		hitReceivedHPMaxTarget = addIntegerField(hitReceivedEffectPane, "Attacker HP bonus max: ", hitReceivedEffect.hp_boost_max_target, true, item.writable, listener);
+		hitReceivedAPMinTarget = addIntegerField(hitReceivedEffectPane, "Attacker AP bonus min: ", hitReceivedEffect.ap_boost_min_target, true, item.writable, listener);
+		hitReceivedAPMaxTarget = addIntegerField(hitReceivedEffectPane, "Attacker AP bonus max: ", hitReceivedEffect.ap_boost_max_target, true, item.writable, listener);
+		final CollapsiblePanel hitReceivedSourceConditionsPane = new CollapsiblePanel("Actor Conditions applied to the player: ");
+		hitReceivedSourceConditionsPane.setLayout(new JideBoxLayout(hitReceivedSourceConditionsPane, JideBoxLayout.PAGE_AXIS));
+		hitReceivedSourceConditionsModel = new SourceTimedConditionsListModel(hitReceivedEffect);
+		hitReceivedSourceConditionsList = new JList(hitReceivedSourceConditionsModel);
+		hitReceivedSourceConditionsList.setCellRenderer(new TimedConditionsCellRenderer());
+		hitReceivedSourceConditionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		hitReceivedSourceConditionsPane.add(new JScrollPane(hitReceivedSourceConditionsList), JideBoxLayout.FIX);
+		final JPanel hitReceivedSourceTimedConditionsEditorPane = new JPanel();
+		final JButton createHitReceivedSourceCondition = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
+		final JButton deleteHitReceivedSourceCondition = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		hitReceivedSourceConditionsList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				selectedHitReceivedEffectSourceCondition = (Item.TimedConditionEffect) hitReceivedSourceConditionsList.getSelectedValue();
+				updateHitReceivedSourceTimedConditionEditorPane(hitReceivedSourceTimedConditionsEditorPane, selectedHitReceivedEffectSourceCondition, listener);
+				if (selectedHitReceivedEffectSourceCondition == null) {
+					deleteHitReceivedSourceCondition.setEnabled(false);
+				} else {
+					deleteHitReceivedSourceCondition.setEnabled(true);
+				}
+			}
+		});
+		if (item.writable) {
+			JPanel listButtonsPane = new JPanel();
+			listButtonsPane.setLayout(new JideBoxLayout(listButtonsPane, JideBoxLayout.LINE_AXIS, 6));
+			createHitReceivedSourceCondition.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Item.TimedConditionEffect condition = new Item.TimedConditionEffect();
+					hitReceivedSourceConditionsModel.addItem(condition);
+					hitReceivedSourceConditionsList.setSelectedValue(condition, true);
+					listener.valueChanged(hitReceivedSourceConditionsList, null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+				}
+			});
+			deleteHitReceivedSourceCondition.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (selectedHitReceivedEffectSourceCondition != null) {
+						hitReceivedSourceConditionsModel.removeItem(selectedHitReceivedEffectSourceCondition);
+						selectedHitReceivedEffectSourceCondition = null;
+						hitReceivedSourceConditionsList.clearSelection();
+						listener.valueChanged(hitReceivedSourceConditionsList, null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+					}
+				}
+			});
+			
+			listButtonsPane.add(createHitReceivedSourceCondition, JideBoxLayout.FIX);
+			listButtonsPane.add(deleteHitReceivedSourceCondition, JideBoxLayout.FIX);
+			listButtonsPane.add(new JPanel(), JideBoxLayout.VARY);
+			hitReceivedSourceConditionsPane.add(listButtonsPane, JideBoxLayout.FIX);
+		}
+		hitReceivedSourceTimedConditionsEditorPane.setLayout(new JideBoxLayout(hitReceivedSourceTimedConditionsEditorPane, JideBoxLayout.PAGE_AXIS));
+		hitReceivedSourceConditionsPane.add(hitReceivedSourceTimedConditionsEditorPane, JideBoxLayout.FIX);
+		if (item.hit_received_effect == null || item.hit_received_effect.conditions_source == null || item.hit_received_effect.conditions_source.isEmpty()) {
+			hitReceivedSourceConditionsPane.collapse();
+		}
+		hitReceivedEffectPane.add(hitReceivedSourceConditionsPane, JideBoxLayout.FIX);
+		final CollapsiblePanel hitReceivedTargetConditionsPane = new CollapsiblePanel("Actor Conditions applied to the attacker: ");
+		hitReceivedTargetConditionsPane.setLayout(new JideBoxLayout(hitReceivedTargetConditionsPane, JideBoxLayout.PAGE_AXIS));
+		hitReceivedTargetConditionsModel = new TargetTimedConditionsListModel(hitReceivedEffect);
+		hitReceivedTargetConditionsList = new JList(hitReceivedTargetConditionsModel);
+		hitReceivedTargetConditionsList.setCellRenderer(new TimedConditionsCellRenderer());
+		hitReceivedTargetConditionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		hitReceivedTargetConditionsPane.add(new JScrollPane(hitReceivedTargetConditionsList), JideBoxLayout.FIX);
+		final JPanel hitReceivedTargetTimedConditionsEditorPane = new JPanel();
+		final JButton createHitReceivedTargetCondition = new JButton(new ImageIcon(DefaultIcons.getCreateIcon()));
+		final JButton deleteHitReceivedTargetCondition = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		hitReceivedTargetConditionsList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				selectedHitReceivedEffectTargetCondition = (Item.TimedConditionEffect) hitReceivedTargetConditionsList.getSelectedValue();
+				updateHitReceivedTargetTimedConditionEditorPane(hitReceivedTargetTimedConditionsEditorPane, selectedHitReceivedEffectTargetCondition, listener);
+				if (selectedHitReceivedEffectTargetCondition == null) {
+					deleteHitReceivedTargetCondition.setEnabled(false);
+				} else {
+					deleteHitReceivedTargetCondition.setEnabled(true);
+				}
+			}
+		});
+		if (item.writable) {
+			JPanel listButtonsPane = new JPanel();
+			listButtonsPane.setLayout(new JideBoxLayout(listButtonsPane, JideBoxLayout.LINE_AXIS, 6));
+			createHitReceivedTargetCondition.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Item.TimedConditionEffect condition = new Item.TimedConditionEffect();
+					hitReceivedTargetConditionsModel.addItem(condition);
+					hitReceivedTargetConditionsList.setSelectedValue(condition, true);
+					listener.valueChanged(hitReceivedTargetConditionsList, null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+				}
+			});
+			deleteHitReceivedTargetCondition.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (selectedHitReceivedEffectTargetCondition != null) {
+						hitReceivedTargetConditionsModel.removeItem(selectedHitReceivedEffectTargetCondition);
+						selectedHitReceivedEffectTargetCondition = null;
+						hitReceivedTargetConditionsList.clearSelection();
+						listener.valueChanged(hitReceivedTargetConditionsList, null); //Item changed, but we took care of it, just do the usual notification and JSON update stuff.
+					}
+				}
+			});
+			
+			listButtonsPane.add(createHitReceivedTargetCondition, JideBoxLayout.FIX);
+			listButtonsPane.add(deleteHitReceivedTargetCondition, JideBoxLayout.FIX);
+			listButtonsPane.add(new JPanel(), JideBoxLayout.VARY);
+			hitReceivedTargetConditionsPane.add(listButtonsPane, JideBoxLayout.FIX);
+		}
+		hitReceivedTargetTimedConditionsEditorPane.setLayout(new JideBoxLayout(hitReceivedTargetTimedConditionsEditorPane, JideBoxLayout.PAGE_AXIS));
+		hitReceivedTargetConditionsPane.add(hitReceivedTargetTimedConditionsEditorPane, JideBoxLayout.FIX);
+		if (item.hit_received_effect == null || item.hit_received_effect.conditions_target == null || item.hit_received_effect.conditions_target.isEmpty()) {
+			hitReceivedTargetConditionsPane.collapse();
+		}
+		hitReceivedEffectPane.add(hitReceivedTargetConditionsPane, JideBoxLayout.FIX);
+		if (item.hit_received_effect == null) {
+			hitReceivedEffectPane.collapse();
+		}
+		pane.add(hitReceivedEffectPane, JideBoxLayout.FIX);
+		
 		
 		if (item.category == null || item.category.action_type == null || item.category.action_type == ItemCategory.ActionType.none) {
 			equipEffectPane.setVisible(false);
@@ -817,6 +989,199 @@ public class ItemEditor extends JSONElementEditor {
 		pane.repaint();
 	}
 	
+	public void updateHitReceivedSourceTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, final FieldUpdateListener listener) {
+		pane.removeAll();
+		if (hitReceivedSourceConditionBox != null) {
+			removeElementListener(hitReceivedSourceConditionBox);
+		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
+		}
+		
+		boolean writable = ((Item)target).writable;
+		Project proj = ((Item)target).getProject();
+		
+		hitReceivedSourceConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
+		hitReceivedSourceConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
+		
+		hitReceivedSourceConditionClear = new JRadioButton("Clear active condition");
+		pane.add(hitReceivedSourceConditionClear, JideBoxLayout.FIX);
+		hitReceivedSourceConditionApply = new JRadioButton("Apply condition with magnitude");
+		pane.add(hitReceivedSourceConditionApply, JideBoxLayout.FIX);
+		hitReceivedSourceConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
+		hitReceivedSourceConditionImmunity = new JRadioButton("Give immunity to condition");
+		pane.add(hitReceivedSourceConditionImmunity, JideBoxLayout.FIX);
+		
+		ButtonGroup radioEffectGroup = new ButtonGroup();
+		radioEffectGroup.add(hitReceivedSourceConditionApply);
+		radioEffectGroup.add(hitReceivedSourceConditionClear);
+		radioEffectGroup.add(hitReceivedSourceConditionImmunity);
+		
+		hitReceivedSourceConditionTimed = new JRadioButton("For a number of rounds");
+		pane.add(hitReceivedSourceConditionTimed, JideBoxLayout.FIX);
+		hitReceivedSourceConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
+		hitReceivedSourceConditionForever = new JRadioButton("Forever");
+		pane.add(hitReceivedSourceConditionForever, JideBoxLayout.FIX);
+		
+		ButtonGroup radioDurationGroup = new ButtonGroup();
+		radioDurationGroup.add(hitReceivedSourceConditionTimed);
+		radioDurationGroup.add(hitReceivedSourceConditionForever);
+		
+		updateHitReceivedSourceTimedConditionWidgets(condition);
+		
+		hitReceivedSourceConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedSourceConditionClear, new Boolean(hitReceivedSourceConditionClear.isSelected()));
+			}
+		});
+		hitReceivedSourceConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedSourceConditionApply, new Boolean(hitReceivedSourceConditionApply.isSelected()));
+			}
+		});
+		hitReceivedSourceConditionImmunity.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedSourceConditionImmunity, new Boolean(hitReceivedSourceConditionImmunity.isSelected()));
+			}
+		});
+		
+		hitReceivedSourceConditionTimed.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedSourceConditionTimed, new Boolean(hitReceivedSourceConditionTimed.isSelected()));
+			}
+		});
+		hitReceivedSourceConditionForever.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedSourceConditionForever, new Boolean(hitReceivedSourceConditionForever.isSelected()));
+			}
+		});
+		
+		pane.revalidate();
+		pane.repaint();
+	}
+	
+	public void updateHitReceivedSourceTimedConditionWidgets(Item.TimedConditionEffect condition) {
+
+		boolean immunity = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration != null && condition.duration > ActorCondition.DURATION_NONE);
+		boolean clear = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration == null || condition.duration == ActorCondition.DURATION_NONE);
+		boolean forever = condition.duration != null && condition.duration == ActorCondition.DURATION_FOREVER;
+		
+		hitReceivedSourceConditionClear.setSelected(clear);
+		hitReceivedSourceConditionApply.setSelected(!clear && !immunity);
+		hitReceivedSourceConditionMagnitude.setEnabled(!clear && !immunity);
+		hitReceivedSourceConditionImmunity.setSelected(immunity);
+		
+		hitReceivedSourceConditionTimed.setSelected(!forever);
+		hitReceivedSourceConditionTimed.setEnabled(!clear);
+		hitReceivedSourceConditionDuration.setEnabled(!clear && !forever);
+		hitReceivedSourceConditionForever.setSelected(forever);
+		hitReceivedSourceConditionForever.setEnabled(!clear);
+	}
+
+	public void updateHitReceivedTargetTimedConditionEditorPane(JPanel pane, Item.TimedConditionEffect condition, final FieldUpdateListener listener) {
+		pane.removeAll();
+		if (hitReceivedTargetConditionBox != null) {
+			removeElementListener(hitReceivedTargetConditionBox);
+		}
+		if (condition == null) {
+			pane.revalidate();
+			pane.repaint();
+			return;
+		}
+		
+		boolean writable = ((Item)target).writable;
+		Project proj = ((Item)target).getProject();
+
+		hitReceivedTargetConditionBox = addActorConditionBox(pane, proj, "Actor Condition: ", condition.condition, writable, listener);
+		hitReceivedTargetConditionChance = addDoubleField(pane, "Chance: ", condition.chance, writable, listener);
+
+		hitReceivedTargetConditionClear = new JRadioButton("Clear active condition");
+		pane.add(hitReceivedTargetConditionClear, JideBoxLayout.FIX);
+		hitReceivedTargetConditionApply = new JRadioButton("Apply condition with magnitude");
+		pane.add(hitReceivedTargetConditionApply, JideBoxLayout.FIX);
+		hitReceivedTargetConditionMagnitude = addIntegerField(pane, "Magnitude: ", condition.magnitude == null ? null : condition.magnitude >= 0 ? condition.magnitude : 0, 1, false, writable, listener);
+		hitReceivedTargetConditionImmunity = new JRadioButton("Give immunity to condition");
+		pane.add(hitReceivedTargetConditionImmunity, JideBoxLayout.FIX);
+		
+		ButtonGroup radioEffectGroup = new ButtonGroup();
+		radioEffectGroup.add(hitReceivedTargetConditionApply);
+		radioEffectGroup.add(hitReceivedTargetConditionClear);
+		radioEffectGroup.add(hitReceivedTargetConditionImmunity);
+		
+		hitReceivedTargetConditionTimed = new JRadioButton("For a number of rounds");
+		pane.add(hitReceivedTargetConditionTimed, JideBoxLayout.FIX);
+		hitReceivedTargetConditionDuration = addIntegerField(pane, "Duration: ", condition.duration, 1, false, writable, listener);
+		hitReceivedTargetConditionForever = new JRadioButton("Forever");
+		pane.add(hitReceivedTargetConditionForever, JideBoxLayout.FIX);
+		
+		ButtonGroup radioDurationGroup = new ButtonGroup();
+		radioDurationGroup.add(hitReceivedTargetConditionTimed);
+		radioDurationGroup.add(hitReceivedTargetConditionForever);
+		
+		updateHitReceivedTargetTimedConditionWidgets(condition);
+		
+		hitReceivedTargetConditionClear.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedTargetConditionClear, new Boolean(hitReceivedTargetConditionClear.isSelected()));
+			}
+		});
+		hitReceivedTargetConditionApply.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedTargetConditionApply, new Boolean(hitReceivedTargetConditionApply.isSelected()));
+			}
+		});
+		hitReceivedTargetConditionImmunity.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedTargetConditionImmunity, new Boolean(hitReceivedTargetConditionImmunity.isSelected()));
+			}
+		});
+		
+		hitReceivedTargetConditionTimed.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedTargetConditionTimed, new Boolean(hitReceivedTargetConditionTimed.isSelected()));
+			}
+		});
+		hitReceivedTargetConditionForever.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				listener.valueChanged(hitReceivedTargetConditionForever, new Boolean(hitReceivedTargetConditionForever.isSelected()));
+			}
+		});
+		
+		pane.revalidate();
+		pane.repaint();
+	}
+
+	public void updateHitReceivedTargetTimedConditionWidgets(Item.TimedConditionEffect condition) {
+
+		boolean immunity = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration != null && condition.duration > ActorCondition.DURATION_NONE);
+		boolean clear = (condition.magnitude == null || condition.magnitude == ActorCondition.MAGNITUDE_CLEAR) && (condition.duration == null || condition.duration == ActorCondition.DURATION_NONE);
+		boolean forever = condition.duration != null && condition.duration == ActorCondition.DURATION_FOREVER;
+		
+		hitReceivedTargetConditionClear.setSelected(clear);
+		hitReceivedTargetConditionApply.setSelected(!clear && !immunity);
+		hitReceivedTargetConditionMagnitude.setEnabled(!clear && !immunity);
+		hitReceivedTargetConditionImmunity.setSelected(immunity);
+		
+		hitReceivedTargetConditionTimed.setSelected(!forever);
+		hitReceivedTargetConditionTimed.setEnabled(!clear);
+		hitReceivedTargetConditionDuration.setEnabled(!clear && !forever);
+		hitReceivedTargetConditionForever.setSelected(forever);
+		hitReceivedTargetConditionForever.setEnabled(!clear);
+	}
+
+	
 	public static class SourceTimedConditionsListModel implements ListModel<Item.TimedConditionEffect> {
 		
 		Item.KillEffect source;
@@ -1102,13 +1467,28 @@ public class ItemEditor extends JSONElementEditor {
 		return true;
 	}
 	
+	public static boolean isNull(Item.HitReceivedEffect effect) {
+		if (effect.ap_boost_min != null) return false;
+		if (effect.ap_boost_max != null) return false;
+		if (effect.hp_boost_min != null) return false;
+		if (effect.hp_boost_max != null) return false;
+		if (effect.ap_boost_min_target != null) return false;
+		if (effect.ap_boost_max_target != null) return false;
+		if (effect.hp_boost_min_target != null) return false;
+		if (effect.hp_boost_max_target != null) return false;
+		if (effect.conditions_source != null) return false;
+		if (effect.conditions_target != null) return false;
+		return true;
+	}
+	
+	
 	public class ItemFieldUpdater implements FieldUpdateListener {
 
 		@Override
 		public void valueChanged(JComponent source, Object value) {
 			Item item = (Item)target;
-			boolean updatePrice, updateEquip, updateHit, updateKill;
-			updatePrice = updateEquip = updateHit = updateKill = false;
+			boolean updatePrice, updateEquip, updateHit, updateKill, updateHitReceived;
+			updatePrice = updateEquip = updateHit = updateKill = updateHitReceived = false;
 			if (source == idField) {
 				//Events caused by cancel an ID edition. Dismiss.
 				if (skipNext) {
@@ -1177,6 +1557,8 @@ public class ItemEditor extends JSONElementEditor {
 					item.hit_effect = null;
 					killEffectPane.setVisible(false);
 					item.kill_effect = null;
+					hitReceivedEffectPane.setVisible(false);
+					item.hit_received_effect = null;
 					ItemEditor.this.revalidate();
 					ItemEditor.this.repaint();
 				} else if (item.category.action_type == ItemCategory.ActionType.use) {
@@ -1186,6 +1568,8 @@ public class ItemEditor extends JSONElementEditor {
 					item.hit_effect = null;
 					killEffectPane.setVisible(true);
 					updateKill = true;
+					hitReceivedEffectPane.setVisible(false);
+					item.hit_received_effect = null;
 					killEffectPane.setTitle(useLabel);
 					ItemEditor.this.revalidate();
 					ItemEditor.this.repaint();
@@ -1196,6 +1580,8 @@ public class ItemEditor extends JSONElementEditor {
 					updateEquip = true;
 					killEffectPane.setVisible(true);
 					updateKill = true;
+					hitReceivedEffectPane.setVisible(true);
+					updateEquip = true;
 					killEffectPane.setTitle(killLabel);
 					ItemEditor.this.revalidate();
 					ItemEditor.this.repaint();
@@ -1502,6 +1888,166 @@ public class ItemEditor extends JSONElementEditor {
 				selectedKillEffectCondition.chance = (Double) value;
 				killSourceConditionsModel.itemChanged(selectedKillEffectCondition);
 				updateKill = true;
+			} else if (source == hitReceivedHPMin) {
+				hitReceivedEffect.hp_boost_min = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedHPMax) {
+				hitReceivedEffect.hp_boost_max = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedAPMin) {
+				hitReceivedEffect.ap_boost_min = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedAPMax) {
+				hitReceivedEffect.ap_boost_max = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedHPMinTarget) {
+				hitReceivedEffect.hp_boost_min_target = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedHPMaxTarget) {
+				hitReceivedEffect.hp_boost_max_target = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedAPMinTarget) {
+				hitReceivedEffect.ap_boost_min_target = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedAPMaxTarget) {
+				hitReceivedEffect.ap_boost_max_target = (Integer) value;
+				updatePrice = true;
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionsList) {
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionBox) {
+				if (selectedHitReceivedEffectSourceCondition.condition != null) {
+					selectedHitReceivedEffectSourceCondition.condition.removeBacklink(item);
+				}
+				selectedHitReceivedEffectSourceCondition.condition = (ActorCondition) value;
+				if (selectedHitReceivedEffectSourceCondition.condition != null) {
+					selectedHitReceivedEffectSourceCondition.condition_id = selectedHitReceivedEffectSourceCondition.condition.id;
+					selectedHitReceivedEffectSourceCondition.condition.addBacklink(item);
+				} else {
+					selectedHitReceivedEffectSourceCondition.condition_id = null;
+				}
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionClear && (Boolean) value) {
+				selectedHitReceivedEffectSourceCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitReceivedEffectSourceCondition.duration = null;
+				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectSourceCondition);
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			}  else if (source == hitReceivedSourceConditionApply && (Boolean) value) {
+				selectedHitReceivedEffectSourceCondition.magnitude = (Integer) hitReceivedSourceConditionMagnitude.getValue();
+				selectedHitReceivedEffectSourceCondition.duration = hitReceivedSourceConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) hitReceivedSourceConditionDuration.getValue();
+				if (selectedHitReceivedEffectSourceCondition.duration == null) {
+					selectedHitReceivedEffectSourceCondition.duration = 1;
+				}
+				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectSourceCondition);
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionImmunity && (Boolean) value) {
+				selectedHitReceivedEffectSourceCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitReceivedEffectSourceCondition.duration = hitReceivedSourceConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) hitReceivedSourceConditionDuration.getValue();
+				if (selectedHitReceivedEffectSourceCondition.duration == null || selectedHitReceivedEffectSourceCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitReceivedEffectSourceCondition.duration = 1;
+				}
+				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectSourceCondition);
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionMagnitude) {
+				selectedHitReceivedEffectSourceCondition.magnitude = (Integer) value;
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionTimed && (Boolean) value) {
+				selectedHitReceivedEffectSourceCondition.duration = (Integer) hitReceivedSourceConditionDuration.getValue();
+				if (selectedHitReceivedEffectSourceCondition.duration == null || selectedHitReceivedEffectSourceCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitReceivedEffectSourceCondition.duration = 1;
+				}
+				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectSourceCondition);
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionForever && (Boolean) value) {
+				selectedHitReceivedEffectSourceCondition.duration = ActorCondition.DURATION_FOREVER;
+				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectSourceCondition);
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionDuration) {
+				selectedHitReceivedEffectSourceCondition.duration = (Integer) value;
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedSourceConditionChance) {
+				selectedHitReceivedEffectSourceCondition.chance = (Double) value;
+				hitReceivedSourceConditionsModel.itemChanged(selectedHitReceivedEffectSourceCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionsList) {
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionBox) {
+				if (selectedHitReceivedEffectTargetCondition.condition != null) {
+					selectedHitReceivedEffectTargetCondition.condition.removeBacklink(item);
+				}
+				selectedHitReceivedEffectTargetCondition.condition = (ActorCondition) value;
+				if (selectedHitReceivedEffectTargetCondition.condition != null) {
+					selectedHitReceivedEffectTargetCondition.condition_id = selectedHitReceivedEffectTargetCondition.condition.id;
+					selectedHitReceivedEffectTargetCondition.condition.addBacklink(item);
+				} else {
+					selectedHitReceivedEffectTargetCondition.condition_id = null;
+				}
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionClear && (Boolean) value) {
+				selectedHitReceivedEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitReceivedEffectTargetCondition.duration = null;
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			}  else if (source == hitReceivedTargetConditionApply && (Boolean) value) {
+				selectedHitReceivedEffectTargetCondition.magnitude = (Integer) hitReceivedTargetConditionMagnitude.getValue();
+				selectedHitReceivedEffectTargetCondition.duration = hitReceivedTargetConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) hitReceivedTargetConditionDuration.getValue();
+				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitReceivedEffectTargetCondition.duration = 1;
+				}
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionImmunity && (Boolean) value) {
+				selectedHitReceivedEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
+				selectedHitReceivedEffectTargetCondition.duration = hitReceivedTargetConditionForever.isSelected() ? ActorCondition.DURATION_FOREVER : (Integer) hitReceivedTargetConditionDuration.getValue();
+				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitReceivedEffectTargetCondition.duration = 1;
+				}
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionMagnitude) {
+				selectedHitReceivedEffectTargetCondition.magnitude = (Integer) value;
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionTimed && (Boolean) value) {
+				selectedHitReceivedEffectTargetCondition.duration = (Integer) hitReceivedTargetConditionDuration.getValue();
+				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
+					selectedHitReceivedEffectTargetCondition.duration = 1;
+				}
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionForever && (Boolean) value) {
+				selectedHitReceivedEffectTargetCondition.duration = ActorCondition.DURATION_FOREVER;
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionDuration) {
+				selectedHitReceivedEffectTargetCondition.duration = (Integer) value;
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
+			} else if (source == hitReceivedTargetConditionChance) {
+				selectedHitReceivedEffectTargetCondition.chance = (Double) value;
+				hitReceivedTargetConditionsModel.itemChanged(selectedHitReceivedEffectTargetCondition);
+				updateHitReceived = true;
 			}
 			
 			if (updateEquip) {
@@ -1523,6 +2069,13 @@ public class ItemEditor extends JSONElementEditor {
 					item.kill_effect = null;
 				} else {
 					item.kill_effect = killEffect;
+				}
+			}
+			if (updateHitReceived) {
+				if (isNull(hitReceivedEffect)) {
+					item.hit_received_effect = null;
+				} else {
+					item.hit_received_effect = hitReceivedEffect;
 				}
 			}
 			if (updatePrice && !manualPriceBox.isSelected()) {

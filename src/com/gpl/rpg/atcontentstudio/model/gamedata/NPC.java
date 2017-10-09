@@ -47,6 +47,8 @@ public class NPC extends JSONElement {
 	public Integer block_chance = null;
 	public Integer damage_resistance = null;
 	public HitEffect hit_effect = null;
+	public HitReceivedEffect hit_received_effect = null;
+	public DeathEffect death_effect = null;
 	
 	//Available from linked state
 	public Dialogue dialogue = null;
@@ -70,15 +72,27 @@ public class NPC extends JSONElement {
         protectSpawn,
         wholeMap
 	}
-	
-	public static class HitEffect {
+
+	public static class DeathEffect {
 		//Available from parsed state
 		public Integer hp_boost_min = null;
 		public Integer hp_boost_max = null;
 		public Integer ap_boost_min = null;
 		public Integer ap_boost_max = null;
 		public List<TimedConditionEffect> conditions_source = null;
+	}
+	
+	public static class HitEffect extends DeathEffect {
+		//Available from parsed state
 		public List<TimedConditionEffect> conditions_target = null;
+	}
+	
+	public static class HitReceivedEffect extends HitEffect {
+		//Available from parsed state
+		public Integer hp_boost_min_target = null;
+		public Integer hp_boost_max_target = null;
+		public Integer ap_boost_min_target = null;
+		public Integer ap_boost_max_target = null;
 	}
 	
 	public static class TimedConditionEffect {
@@ -224,6 +238,79 @@ public class NPC extends JSONElement {
 			}
 		}
 	
+		Map hitReceivedEffect = (Map) npcJson.get("hitReceivedEffect");
+		if (hitReceivedEffect != null) {
+			this.hit_received_effect = new HitReceivedEffect();
+			if (hitReceivedEffect.get("increaseCurrentHP") != null) {
+				this.hit_received_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseCurrentHP")).get("max")));
+				this.hit_received_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseCurrentHP")).get("min")));
+			}
+			if (hitReceivedEffect.get("increaseCurrentAP") != null) {
+				this.hit_received_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseCurrentAP")).get("max")));
+				this.hit_received_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseCurrentAP")).get("min")));
+			}
+			if (hitReceivedEffect.get("increaseAttackerCurrentHP") != null) {
+				this.hit_received_effect.hp_boost_max_target = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseAttackerCurrentHP")).get("max")));
+				this.hit_received_effect.hp_boost_min_target = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseAttackerCurrentHP")).get("min")));
+			}
+			if (hitReceivedEffect.get("increaseAttackerCurrentAP") != null) {
+				this.hit_received_effect.ap_boost_max_target = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseAttackerCurrentAP")).get("max")));
+				this.hit_received_effect.ap_boost_min_target = JSONElement.getInteger((Number) (((Map)hitReceivedEffect.get("increaseAttackerCurrentAP")).get("min")));
+			}
+			List conditionsSourceJson = (List) hitReceivedEffect.get("conditionsSource");
+			if (conditionsSourceJson != null && !conditionsSourceJson.isEmpty()) {
+				this.hit_received_effect.conditions_source = new ArrayList<NPC.TimedConditionEffect>();
+				for (Object conditionJsonObj : conditionsSourceJson) {
+					Map conditionJson = (Map)conditionJsonObj;
+					TimedConditionEffect condition = new TimedConditionEffect();
+					condition.condition_id = (String) conditionJson.get("condition");
+					condition.magnitude = JSONElement.getInteger((Number) conditionJson.get("magnitude"));
+					condition.duration = JSONElement.getInteger((Number) conditionJson.get("duration"));
+					if (conditionJson.get("chance") != null) condition.chance = JSONElement.parseChance(conditionJson.get("chance").toString());
+					this.hit_received_effect.conditions_source.add(condition);
+				}
+			}
+			List conditionsTargetJson = (List) hitReceivedEffect.get("conditionsTarget");
+			if (conditionsTargetJson != null && !conditionsTargetJson.isEmpty()) {
+				this.hit_received_effect.conditions_target = new ArrayList<NPC.TimedConditionEffect>();
+				for (Object conditionJsonObj : conditionsTargetJson) {
+					Map conditionJson = (Map)conditionJsonObj;
+					TimedConditionEffect condition = new TimedConditionEffect();
+					condition.condition_id = (String) conditionJson.get("condition");
+					condition.magnitude = JSONElement.getInteger((Number) conditionJson.get("magnitude"));
+					condition.duration = JSONElement.getInteger((Number) conditionJson.get("duration"));
+					if (conditionJson.get("chance") != null) condition.chance = JSONElement.parseChance(conditionJson.get("chance").toString());
+					this.hit_received_effect.conditions_target.add(condition);
+				}
+			}
+		}
+		
+		Map deathEffect = (Map) npcJson.get("deathEffect");
+		if (deathEffect != null) {
+			this.death_effect = new HitEffect();
+			if (deathEffect.get("increaseCurrentHP") != null) {
+				this.death_effect.hp_boost_max = JSONElement.getInteger((Number) (((Map)deathEffect.get("increaseCurrentHP")).get("max")));
+				this.death_effect.hp_boost_min = JSONElement.getInteger((Number) (((Map)deathEffect.get("increaseCurrentHP")).get("min")));
+			}
+			if (deathEffect.get("increaseCurrentAP") != null) {
+				this.death_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)deathEffect.get("increaseCurrentAP")).get("max")));
+				this.death_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)deathEffect.get("increaseCurrentAP")).get("min")));
+			}
+			List conditionsSourceJson = (List) deathEffect.get("conditionsSource");
+			if (conditionsSourceJson != null && !conditionsSourceJson.isEmpty()) {
+				this.death_effect.conditions_source = new ArrayList<NPC.TimedConditionEffect>();
+				for (Object conditionJsonObj : conditionsSourceJson) {
+					Map conditionJson = (Map)conditionJsonObj;
+					TimedConditionEffect condition = new TimedConditionEffect();
+					condition.condition_id = (String) conditionJson.get("condition");
+					condition.magnitude = JSONElement.getInteger((Number) conditionJson.get("magnitude"));
+					condition.duration = JSONElement.getInteger((Number) conditionJson.get("duration"));
+					if (conditionJson.get("chance") != null) condition.chance = JSONElement.parseChance(conditionJson.get("chance").toString());
+					this.death_effect.conditions_source.add(condition);
+				}
+			}
+		}
+		
 	}
 	
 	@Override
@@ -263,6 +350,24 @@ public class NPC extends JSONElement {
 		}
 		if (this.hit_effect != null && this.hit_effect.conditions_target != null) {
 			for (TimedConditionEffect ce : this.hit_effect.conditions_target) {
+				if (ce.condition_id != null) ce.condition = proj.getActorCondition(ce.condition_id);
+				if (ce.condition != null) ce.condition.addBacklink(this);
+			}
+		}
+		if (this.hit_received_effect != null && this.hit_received_effect.conditions_source != null) {
+			for (TimedConditionEffect ce : this.hit_received_effect.conditions_source) {
+				if (ce.condition_id != null) ce.condition = proj.getActorCondition(ce.condition_id);
+				if (ce.condition != null) ce.condition.addBacklink(this);
+			}
+		}
+		if (this.hit_received_effect != null && this.hit_received_effect.conditions_target != null) {
+			for (TimedConditionEffect ce : this.hit_received_effect.conditions_target) {
+				if (ce.condition_id != null) ce.condition = proj.getActorCondition(ce.condition_id);
+				if (ce.condition != null) ce.condition.addBacklink(this);
+			}
+		}
+		if (this.death_effect != null && this.death_effect.conditions_source != null) {
+			for (TimedConditionEffect ce : this.death_effect.conditions_source) {
 				if (ce.condition_id != null) ce.condition = proj.getActorCondition(ce.condition_id);
 				if (ce.condition != null) ce.condition.addBacklink(this);
 			}
@@ -340,6 +445,69 @@ public class NPC extends JSONElement {
 						cclone.condition.addBacklink(clone);
 					}
 					clone.hit_effect.conditions_target.add(cclone);
+				}
+			}
+		}
+		if (this.hit_received_effect != null) {
+			clone.hit_received_effect = new HitReceivedEffect();
+			clone.hit_received_effect.ap_boost_max = this.hit_received_effect.ap_boost_max;
+			clone.hit_received_effect.ap_boost_min = this.hit_received_effect.ap_boost_min;
+			clone.hit_received_effect.hp_boost_max = this.hit_received_effect.hp_boost_max;
+			clone.hit_received_effect.hp_boost_min = this.hit_received_effect.hp_boost_min;
+			clone.hit_received_effect.ap_boost_max_target = this.hit_received_effect.ap_boost_max_target;
+			clone.hit_received_effect.ap_boost_min_target = this.hit_received_effect.ap_boost_min_target;
+			clone.hit_received_effect.hp_boost_max_target = this.hit_received_effect.hp_boost_max_target;
+			clone.hit_received_effect.hp_boost_min_target = this.hit_received_effect.hp_boost_min_target;
+			if (this.hit_received_effect.conditions_source != null) {
+				clone.hit_received_effect.conditions_source = new ArrayList<TimedConditionEffect>();
+				for (TimedConditionEffect c : this.hit_received_effect.conditions_source) {
+					TimedConditionEffect cclone = new TimedConditionEffect();
+					cclone.magnitude = c.magnitude;
+					cclone.condition_id = c.condition_id;
+					cclone.condition = c.condition;
+					cclone.chance = c.chance;
+					cclone.duration = c.duration;
+					if (cclone.condition != null) {
+						cclone.condition.addBacklink(clone);
+					}
+					clone.hit_received_effect.conditions_source.add(cclone);
+				}
+			}
+			if (this.hit_received_effect.conditions_target != null) {
+				clone.hit_received_effect.conditions_target = new ArrayList<TimedConditionEffect>();
+				for (TimedConditionEffect c : this.hit_received_effect.conditions_target) {
+					TimedConditionEffect cclone = new TimedConditionEffect();
+					cclone.magnitude = c.magnitude;
+					cclone.condition_id = c.condition_id;
+					cclone.condition = c.condition;
+					cclone.chance = c.chance;
+					cclone.duration = c.duration;
+					if (cclone.condition != null) {
+						cclone.condition.addBacklink(clone);
+					}
+					clone.hit_received_effect.conditions_target.add(cclone);
+				}
+			}
+		}
+		if (this.death_effect != null) {
+			clone.death_effect = new DeathEffect();
+			clone.death_effect.ap_boost_max = this.death_effect.ap_boost_max;
+			clone.death_effect.ap_boost_min = this.death_effect.ap_boost_min;
+			clone.death_effect.hp_boost_max = this.death_effect.hp_boost_max;
+			clone.death_effect.hp_boost_min = this.death_effect.hp_boost_min;
+			if (this.death_effect.conditions_source != null) {
+				clone.death_effect.conditions_source = new ArrayList<TimedConditionEffect>();
+				for (TimedConditionEffect c : this.death_effect.conditions_source) {
+					TimedConditionEffect cclone = new TimedConditionEffect();
+					cclone.magnitude = c.magnitude;
+					cclone.condition_id = c.condition_id;
+					cclone.condition = c.condition;
+					cclone.chance = c.chance;
+					cclone.duration = c.duration;
+					if (cclone.condition != null) {
+						cclone.condition.addBacklink(clone);
+					}
+					clone.death_effect.conditions_source.add(cclone);
 				}
 			}
 		}
@@ -467,6 +635,110 @@ public class NPC extends JSONElement {
 				for (TimedConditionEffect condition : this.hit_effect.conditions_target) {
 					Map conditionJson = new LinkedHashMap();
 					conditionsTargetJson.add(conditionJson);
+					if (condition.condition != null) {
+						conditionJson.put("condition", condition.condition.id);
+					} else if (condition.condition_id != null) {
+						conditionJson.put("condition", condition.condition_id);
+					}
+					if (condition.magnitude != null) conditionJson.put("magnitude", condition.magnitude);
+					if (condition.duration != null) conditionJson.put("duration", condition.duration);
+					if (condition.chance != null) conditionJson.put("chance", JSONElement.printJsonChance(condition.chance));
+				}
+			}
+		}
+		if (this.hit_received_effect != null) {
+			Map hitReceivedEffectJson = new LinkedHashMap();
+			npcJson.put("hitReceivedEffect", hitReceivedEffectJson);
+			if (this.hit_received_effect.hp_boost_min != null || this.hit_received_effect.hp_boost_max != null) {
+				Map hpJson = new LinkedHashMap();
+				hitReceivedEffectJson.put("increaseCurrentHP", hpJson);
+				if (this.hit_received_effect.hp_boost_min != null) hpJson.put("min", this.hit_received_effect.hp_boost_min);
+				else hpJson.put("min", 0);
+				if (this.hit_received_effect.hp_boost_max != null) hpJson.put("max", this.hit_received_effect.hp_boost_max);
+				else hpJson.put("max", 0);
+			}
+			if (this.hit_received_effect.ap_boost_min != null || this.hit_received_effect.ap_boost_max != null) {
+				Map apJson = new LinkedHashMap();
+				hitReceivedEffectJson.put("increaseCurrentAP", apJson);
+				if (this.hit_received_effect.ap_boost_min != null) apJson.put("min", this.hit_received_effect.ap_boost_min);
+				else apJson.put("min", 0);
+				if (this.hit_received_effect.ap_boost_max != null) apJson.put("max", this.hit_received_effect.ap_boost_max);
+				else apJson.put("max", 0);
+			}
+			if (this.hit_received_effect.hp_boost_min_target != null || this.hit_received_effect.hp_boost_max_target != null) {
+				Map hpJson = new LinkedHashMap();
+				hitReceivedEffectJson.put("increaseAttackerCurrentHP", hpJson);
+				if (this.hit_received_effect.hp_boost_min_target != null) hpJson.put("min", this.hit_received_effect.hp_boost_min_target);
+				else hpJson.put("min", 0);
+				if (this.hit_received_effect.hp_boost_max_target != null) hpJson.put("max", this.hit_received_effect.hp_boost_max_target);
+				else hpJson.put("max", 0);
+			}
+			if (this.hit_received_effect.ap_boost_min_target != null || this.hit_received_effect.ap_boost_max_target != null) {
+				Map apJson = new LinkedHashMap();
+				hitReceivedEffectJson.put("increaseAttackerCurrentAP", apJson);
+				if (this.hit_received_effect.ap_boost_min_target != null) apJson.put("min", this.hit_received_effect.ap_boost_min_target);
+				else apJson.put("min", 0);
+				if (this.hit_received_effect.ap_boost_max_target != null) apJson.put("max", this.hit_received_effect.ap_boost_max_target);
+				else apJson.put("max", 0);
+			}
+			if (this.hit_received_effect.conditions_source != null) {
+				List conditionsSourceJson = new ArrayList();
+				hitReceivedEffectJson.put("conditionsSource", conditionsSourceJson);
+				for (TimedConditionEffect condition : this.hit_received_effect.conditions_source) {
+					Map conditionJson = new LinkedHashMap();
+					conditionsSourceJson.add(conditionJson);
+					if (condition.condition != null) {
+						conditionJson.put("condition", condition.condition.id);
+					} else if (condition.condition_id != null) {
+						conditionJson.put("condition", condition.condition_id);
+					}
+					if (condition.magnitude != null) conditionJson.put("magnitude", condition.magnitude);
+					if (condition.duration != null) conditionJson.put("duration", condition.duration);
+					if (condition.chance != null) conditionJson.put("chance", JSONElement.printJsonChance(condition.chance));
+				}
+			}
+			if (this.hit_received_effect.conditions_target != null) {
+				List conditionsTargetJson = new ArrayList();
+				hitReceivedEffectJson.put("conditionsTarget", conditionsTargetJson);
+				for (TimedConditionEffect condition : this.hit_received_effect.conditions_target) {
+					Map conditionJson = new LinkedHashMap();
+					conditionsTargetJson.add(conditionJson);
+					if (condition.condition != null) {
+						conditionJson.put("condition", condition.condition.id);
+					} else if (condition.condition_id != null) {
+						conditionJson.put("condition", condition.condition_id);
+					}
+					if (condition.magnitude != null) conditionJson.put("magnitude", condition.magnitude);
+					if (condition.duration != null) conditionJson.put("duration", condition.duration);
+					if (condition.chance != null) conditionJson.put("chance", JSONElement.printJsonChance(condition.chance));
+				}
+			}
+		}
+		if (this.death_effect != null) {
+			Map deathEffectJson = new LinkedHashMap();
+			npcJson.put("deathEffect", deathEffectJson);
+			if (this.death_effect.hp_boost_min != null || this.death_effect.hp_boost_max != null) {
+				Map hpJson = new LinkedHashMap();
+				deathEffectJson.put("increaseCurrentHP", hpJson);
+				if (this.death_effect.hp_boost_min != null) hpJson.put("min", this.death_effect.hp_boost_min);
+				else hpJson.put("min", 0);
+				if (this.death_effect.hp_boost_max != null) hpJson.put("max", this.death_effect.hp_boost_max);
+				else hpJson.put("max", 0);
+			}
+			if (this.death_effect.ap_boost_min != null || this.death_effect.ap_boost_max != null) {
+				Map apJson = new LinkedHashMap();
+				deathEffectJson.put("increaseCurrentAP", apJson);
+				if (this.death_effect.ap_boost_min != null) apJson.put("min", this.death_effect.ap_boost_min);
+				else apJson.put("min", 0);
+				if (this.death_effect.ap_boost_max != null) apJson.put("max", this.death_effect.ap_boost_max);
+				else apJson.put("max", 0);
+			}
+			if (this.death_effect.conditions_source != null) {
+				List conditionsSourceJson = new ArrayList();
+				deathEffectJson.put("conditionsSource", conditionsSourceJson);
+				for (TimedConditionEffect condition : this.death_effect.conditions_source) {
+					Map conditionJson = new LinkedHashMap();
+					conditionsSourceJson.add(conditionJson);
 					if (condition.condition != null) {
 						conditionJson.put("condition", condition.condition.id);
 					} else if (condition.condition_id != null) {
