@@ -1546,7 +1546,7 @@ public class NPCEditor extends JSONElementEditor {
 			} else if (source == hitReceivedTargetConditionClear && (Boolean) value) {
 				selectedHitReceivedEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
 				selectedHitReceivedEffectTargetCondition.duration = null;
-				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
 				hitReceivedTargetConditionsListModel.itemChanged(selectedHitReceivedEffectTargetCondition);
 				updateHitReceived = true;
 			}  else if (source == hitReceivedTargetConditionApply && (Boolean) value) {
@@ -1555,7 +1555,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitReceivedEffectTargetCondition.duration = 1;
 				}
-				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
 				hitReceivedTargetConditionsListModel.itemChanged(selectedHitReceivedEffectTargetCondition);
 				updateHitReceived = true;
 			} else if (source == hitReceivedTargetConditionImmunity && (Boolean) value) {
@@ -1564,7 +1564,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitReceivedEffectTargetCondition.duration = 1;
 				}
-				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
 				hitReceivedTargetConditionsListModel.itemChanged(selectedHitReceivedEffectTargetCondition);
 				updateHitReceived = true;
 			} else if (source == hitReceivedTargetConditionMagnitude) {
@@ -1576,12 +1576,12 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitReceivedEffectTargetCondition.duration == null || selectedHitReceivedEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitReceivedEffectTargetCondition.duration = 1;
 				}
-				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
 				hitReceivedTargetConditionsListModel.itemChanged(selectedHitReceivedEffectTargetCondition);
 				updateHitReceived = true;
 			} else if (source == hitReceivedTargetConditionForever && (Boolean) value) {
 				selectedHitReceivedEffectTargetCondition.duration = ActorCondition.DURATION_FOREVER;
-				updateHitReceivedSourceTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
+				updateHitReceivedTargetTimedConditionWidgets(selectedHitReceivedEffectTargetCondition);
 				hitReceivedTargetConditionsListModel.itemChanged(selectedHitReceivedEffectTargetCondition);
 				updateHitReceived = true;
 			} else if (source == hitReceivedTargetConditionDuration) {

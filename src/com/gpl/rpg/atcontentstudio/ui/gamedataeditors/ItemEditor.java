@@ -496,7 +496,7 @@ public class ItemEditor extends JSONElementEditor {
 		pane.add(killEffectPane, JideBoxLayout.FIX);
 		
 		
-		hitReceivedEffectPane = new CollapsiblePanel("Effect on every received hit: ");
+		hitReceivedEffectPane = new CollapsiblePanel("Effect on every hit received: ");
 		hitReceivedEffectPane.setLayout(new JideBoxLayout(hitReceivedEffectPane, JideBoxLayout.PAGE_AXIS));
 		if (item.hit_received_effect == null) {
 			hitReceivedEffect = new Item.HitReceivedEffect();
