@@ -32,6 +32,17 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.FontUIResource;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.attributes.AttributesNodeProvider;
+import org.eclipse.jgit.internal.storage.file.FileRepository;
+import org.eclipse.jgit.lib.ObjectDatabase;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RefDatabase;
+import org.eclipse.jgit.lib.ReflogReader;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
+
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
@@ -72,6 +83,19 @@ public class ATContentStudio {
 				e.printStackTrace();
 			}
 		}
+		
+//		try {
+//			Git git = new Git(new FileRepository("/home/xxx/git_repos/andors-trail/.git/"));
+//			List<Ref> branches = git.branchList().call();
+//			for (Ref branch : branches) {
+//				System.out.println(branch.getName());
+//			}
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		} catch (GitAPIException e1) {
+//			e1.printStackTrace();
+//		}
+		
 		
 		ConfigCache.init();
 		
