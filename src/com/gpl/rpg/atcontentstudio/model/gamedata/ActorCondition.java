@@ -208,7 +208,7 @@ public class ActorCondition extends JSONElement {
 				this.full_round_effect.ap_boost_max = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("max")));
 				this.full_round_effect.ap_boost_min = JSONElement.getInteger((Number) (((Map)fullRoundEffect.get("increaseCurrentAP")).get("min")));
 			}
-			String vfx = (String) roundEffect.get("visualEffectID");
+			String vfx = (String) fullRoundEffect.get("visualEffectID");
 			this.full_round_effect.visual_effect = null;
 			if (vfx != null) {
 				try {
