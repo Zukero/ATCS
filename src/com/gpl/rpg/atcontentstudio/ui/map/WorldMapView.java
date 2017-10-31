@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.swing.JComponent;
@@ -191,7 +190,7 @@ public class WorldMapView extends JComponent implements Scrollable {
         FontMetrics mifm = g2.getFontMetrics();
         int mapIdLabelHeight = mifm.getHeight();
         
-        for (String s : mapLocations.keySet()) {
+        for (String s : new HashSet<String>(mapLocations.keySet())) {
 
         	int x = mapLocations.get(s).x;
         	int y = mapLocations.get(s).y;
@@ -481,6 +480,10 @@ public class WorldMapView extends JComponent implements Scrollable {
 		offsetX = worldmap.segmentX * TILE_SIZE;
 		offsetY = worldmap.segmentY * TILE_SIZE;
 		for (String s : worldmap.mapLocations.keySet()) {
+			if (proj.getMap(s) == null) {
+				System.err.println("Warning. Worldmap "+worldmap.id+" references map "+s+" but it doesn't exist in this project");
+				continue;
+			}
 			int x = worldmap.mapLocations.get(s).x * TILE_SIZE;
 			int w = proj.getMap(s).tmxMap.getWidth() * TILE_SIZE;
 			int y = worldmap.mapLocations.get(s).y * TILE_SIZE;
@@ -497,6 +500,10 @@ public class WorldMapView extends JComponent implements Scrollable {
 		worldmap.segmentX = offsetX / TILE_SIZE;
 		worldmap.segmentY = offsetY / TILE_SIZE;
 		for (String id : worldmap.mapLocations.keySet()) {
+			if (worldmap.getProject().getMap(id) == null) {
+				System.err.println("Warning. Worldmap "+worldmap.id+" references map "+id+" but it doesn't exist in this project");
+				continue;
+			}
 			worldmap.getProject().getMap(id).removeBacklink(worldmap);
 		}
 		worldmap.mapLocations.clear();
@@ -508,6 +515,10 @@ public class WorldMapView extends JComponent implements Scrollable {
 		}
 		
 		for (String id : worldmap.mapLocations.keySet()) {
+			if (worldmap.getProject().getMap(id) == null) {
+				System.err.println("Warning. Worldmap "+worldmap.id+" references map "+id+" but it doesn't exist in this project");
+				continue;
+			}
 			worldmap.getProject().getMap(id).addBacklink(worldmap);
 		}
 		
