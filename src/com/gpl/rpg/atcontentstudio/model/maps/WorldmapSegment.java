@@ -29,7 +29,6 @@ import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
 import com.gpl.rpg.atcontentstudio.model.gamedata.GameDataSet;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
-import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
 
 public class WorldmapSegment extends GameDataElement {
 
@@ -114,11 +113,19 @@ public class WorldmapSegment extends GameDataElement {
 				mapLocations.remove(oldOne.id);
 				modified = true;
 			}
+			List<String> deprecatedLabels = new ArrayList<String>();
 			for (String label : labelledMaps.keySet()) { 
 				if (labelledMaps.get(label).contains(oldOne.id)) {
 					labelledMaps.get(label).remove(oldOne.id);
 					modified = true;
+					if (labelledMaps.get(label).isEmpty()) {
+						deprecatedLabels.add(label);
+					}
 				}
+			}
+			for (String label : deprecatedLabels) {
+				labelledMaps.remove(label);
+				labels.remove(label);
 			}
 		}
 		
