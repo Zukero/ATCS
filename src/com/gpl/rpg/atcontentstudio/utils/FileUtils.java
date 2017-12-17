@@ -79,15 +79,18 @@ public class FileUtils {
 	}
 	
 	private static void zipDir(File dir, String prefix, ZipOutputStream zos) {
+		if (prefix != "") {
+			prefix = prefix + File.separator;
+		}
 		for (File f : dir.listFiles()) {
 			if (f.isDirectory()) {
-				zipDir(f, prefix+File.separator+f.getName(), zos);
+				zipDir(f, prefix+f.getName(), zos);
 			} else {
 				FileInputStream fis;
 				try {
 					fis = new FileInputStream(f);
 					BufferedInputStream origin = new BufferedInputStream(fis, BUFFER);
-					ZipEntry entry = new ZipEntry(prefix+File.separator+f.getName());
+					ZipEntry entry = new ZipEntry(prefix+f.getName());
 					try {
 						zos.putNextEntry(entry);
 						int count;

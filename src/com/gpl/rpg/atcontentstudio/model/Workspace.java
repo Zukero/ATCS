@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -332,7 +333,9 @@ public class Workspace implements ProjectTreeNode, Serializable {
 
 	private static boolean delete(File f) {
 		boolean b = true;
-		if (f.isDirectory()) {
+		if (Files.isSymbolicLink(f.toPath())) {
+			b &= f.delete();
+		} else if (f.isDirectory()) {
 			for (File c : f.listFiles())
 				b &= delete(c);
 		}

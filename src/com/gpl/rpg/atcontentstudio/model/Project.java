@@ -2,6 +2,9 @@ package com.gpl.rpg.atcontentstudio.model;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,6 +12,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,18 +21,31 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.tree.TreeNode;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.json.simple.JSONArray;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.io.JsonPrettyWriter;
 import com.gpl.rpg.atcontentstudio.io.SettingsSave;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
+import com.gpl.rpg.atcontentstudio.model.Project.ResourceSet;
 import com.gpl.rpg.atcontentstudio.model.gamedata.ActorCondition;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Droplist;
@@ -1054,24 +1071,43 @@ public class Project implements ProjectTreeNode, Serializable {
 				File tmpJsonDataDir = new File(tmpDir, GameDataSet.DEFAULT_REL_PATH_IN_SOURCE);
 				tmpJsonDataDir.mkdirs();
 
-				for (File createdJsonFile : createdContent.gameData.baseFolder.listFiles()) {
-					FileUtils.copyFile(createdJsonFile, new File(tmpJsonDataDir, createdJsonFile.getName()));
-				}
-				writeAltered(alteredContent.gameData.actorConditions, baseContent.gameData.actorConditions, ActorCondition.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.dialogues, baseContent.gameData.dialogues, Dialogue.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.droplists, baseContent.gameData.droplists, Droplist.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.itemCategories, baseContent.gameData.itemCategories, ItemCategory.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.items, baseContent.gameData.items, Item.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.npcs, baseContent.gameData.npcs, NPC.class, tmpJsonDataDir);
-				writeAltered(alteredContent.gameData.quests, baseContent.gameData.quests, Quest.class, tmpJsonDataDir);
+//				for (File createdJsonFile : createdContent.gameData.baseFolder.listFiles()) {
+//					FileUtils.copyFile(createdJsonFile, new File(tmpJsonDataDir, createdJsonFile.getName()));
+//				}
+				Map<Class<? extends GameDataElement>, Set<String>> writtenFilesPerDataType = new LinkedHashMap<Class<? extends GameDataElement>, Set<String>>();
+				Set<String> writtenFiles;
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.actorConditions, alteredContent.gameData.actorConditions, baseContent.gameData.actorConditions, ActorCondition.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(ActorCondition.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.dialogues, alteredContent.gameData.dialogues, baseContent.gameData.dialogues, Dialogue.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(Dialogue.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.droplists, alteredContent.gameData.droplists, baseContent.gameData.droplists, Droplist.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(Droplist.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.itemCategories, alteredContent.gameData.itemCategories, baseContent.gameData.itemCategories, ItemCategory.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(ItemCategory.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.items, alteredContent.gameData.items, baseContent.gameData.items, Item.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(Item.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.npcs, alteredContent.gameData.npcs, baseContent.gameData.npcs, NPC.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(NPC.class, writtenFiles);
+				writtenFiles = writeDataDeltaForDataType(createdContent.gameData.quests, alteredContent.gameData.quests, baseContent.gameData.quests, Quest.class, tmpJsonDataDir);
+				writtenFilesPerDataType.put(Quest.class, writtenFiles);
 
 				File tmpMapDir = new File(tmpDir, TMXMapSet.DEFAULT_REL_PATH_IN_SOURCE);
 				tmpMapDir.mkdirs();
+				writtenFiles = new LinkedHashSet<String>();
 				for (File createdMapFile : createdContent.gameMaps.mapFolder.listFiles()) {
 					FileUtils.copyFile(createdMapFile, new File(tmpMapDir, createdMapFile.getName()));
+					writtenFiles.add(createdMapFile.getName());
 				}
 				for (File alteredMapFile : alteredContent.gameMaps.mapFolder.listFiles()) {
 					FileUtils.copyFile(alteredMapFile, new File(tmpMapDir, alteredMapFile.getName()));
+					writtenFiles.add(alteredMapFile.getName());
+				}
+				writtenFilesPerDataType.put(TMXMap.class, writtenFiles);
+				
+				if (sourceSetToUse == ResourceSet.gameData) {
+					writeResourceListXml(writtenFilesPerDataType, GameSource.DEFAULT_REL_PATH_FOR_GAME_RESOURCE, baseContent.baseFolder, tmpDir);
+				} else if (sourceSetToUse == ResourceSet.debugData) {
+					writeResourceListXml(writtenFilesPerDataType, GameSource.DEFAULT_REL_PATH_FOR_DEBUG_RESOURCE, baseContent.baseFolder, tmpDir);
 				}
 				
 				
@@ -1097,31 +1133,48 @@ public class Project implements ProjectTreeNode, Serializable {
 				FileUtils.deleteDir(tmpDir);
 				Notification.addSuccess("Project \""+name+"\" exported as "+target.getAbsolutePath());
 			}
+
+			
 		});
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public void writeAltered(GameDataCategory<? extends JSONElement> altered, GameDataCategory<? extends JSONElement> source, Class<? extends JSONElement> gdeClass, File targetFolder) {
-		Set<String> alteredFileNames = new LinkedHashSet<String>();
-		Map<String, List<Map>> toWrite = new LinkedHashMap<String, List<Map>>();
+	public Set<String> writeDataDeltaForDataType(GameDataCategory<? extends JSONElement> created, GameDataCategory<? extends JSONElement> altered, GameDataCategory<? extends JSONElement> source, Class<? extends JSONElement> gdeClass, File targetFolder) {
+		Set<String> filenamesToWrite = new LinkedHashSet<String>();
+		Map<String, List<Map>> dataToWritePerFilename = new LinkedHashMap<String, List<Map>>();
 		for (JSONElement gde : altered) {
-			alteredFileNames.add(gde.jsonFile.getName());
+			filenamesToWrite.add(gde.jsonFile.getName());
 		}
-		for (String fName : alteredFileNames) {
+		for (JSONElement gde : created) {
+			if (!filenamesToWrite.contains(gde.jsonFile.getName())) {
+				filenamesToWrite.add(gde.jsonFile.getName());
+			}
+		}
+		for (String fName : filenamesToWrite) {
 			for (JSONElement gde : source) {
 				if (gde.jsonFile.getName().equals(fName)) {
-					if (toWrite.get(fName) == null) {
-						toWrite.put(fName, new ArrayList<Map>());
+					if (dataToWritePerFilename.get(fName) == null) {
+						dataToWritePerFilename.put(fName, new ArrayList<Map>());
 					}
-					toWrite.get(fName).add(getGameDataElement(gdeClass, gde.id).toJson());
+					//Automatically fetches altered element over source element.
+					dataToWritePerFilename.get(fName).add(getGameDataElement(gdeClass, gde.id).toJson());
+				}
+			}
+			for (JSONElement gde : created) {
+				if (gde.jsonFile.getName().equals(fName)) {
+					if (dataToWritePerFilename.get(fName) == null) {
+						dataToWritePerFilename.put(fName, new ArrayList<Map>());
+					}
+					//Add the created elements.
+					dataToWritePerFilename.get(fName).add(getGameDataElement(gdeClass, gde.id).toJson());
 				}
 			}
 		}
-		for (String fName : toWrite.keySet()) {
+		for (String fName : dataToWritePerFilename.keySet()) {
 			File jsonFile = new File(targetFolder, fName);
 			StringWriter writer = new JsonPrettyWriter();
 			try {
-				JSONArray.writeJSONString(toWrite.get(fName), writer);
+				JSONArray.writeJSONString(dataToWritePerFilename.get(fName), writer);
 			} catch (IOException e) {
 				//Impossible with a StringWriter
 			}
@@ -1136,8 +1189,103 @@ public class Project implements ProjectTreeNode, Serializable {
 				e.printStackTrace();
 			}
 		}
+		return filenamesToWrite;
 	}
 
+	
+	private void writeResourceListXml(Map<Class<? extends GameDataElement>, Set<String>> writtenFilesPerDataType, String xmlFileRelPath, File baseFolder, File tmpDir) {
+		File xmlFile =  new File(baseFolder, xmlFileRelPath);
+		File outputFile = new File(tmpDir, xmlFileRelPath);
+
+		Map<String, Class<? extends GameDataElement>> classNamesByArrayNames = new HashMap<String, Class<? extends GameDataElement>>();
+		classNamesByArrayNames.put("loadresource_itemcategories", ItemCategory.class);
+		classNamesByArrayNames.put("loadresource_actorconditions", ActorCondition.class);
+		classNamesByArrayNames.put("loadresource_items", Item.class);
+		classNamesByArrayNames.put("loadresource_droplists", Droplist.class);
+		classNamesByArrayNames.put("loadresource_quests", Quest.class);
+		classNamesByArrayNames.put("loadresource_conversationlists", Dialogue.class);
+		classNamesByArrayNames.put("loadresource_monsters", NPC.class);
+		classNamesByArrayNames.put("loadresource_maps", TMXMap.class);
+		
+		String jsonResPrefix = "@raw/";
+		String tmxResPrefix = "@xml/";
+		String jsonFileSuffix = ".json";
+		String tmxFileSuffix = ".xml";
+		
+		if (!xmlFile.exists()) return;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		Document doc;
+		try {
+			factory.setIgnoringComments(true);
+			factory.setIgnoringElementContentWhitespace(true);
+			factory.setExpandEntityReferences(false);
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			InputSource insrc = new InputSource(new FileInputStream(xmlFile));
+			//		            insrc.setSystemId("http://worldmap/");
+			insrc.setEncoding("UTF-8");
+			doc = builder.parse(insrc);
+
+			Element arrayNode;
+			String name, resPrefix, fileSuffix, resName, resToFile, fileToRes;
+			Class<? extends GameDataElement> clazz;
+			Set<String> writtenFiles;
+
+			Element root = (Element) doc.getElementsByTagName("resources").item(0);
+			if (root != null) {
+				NodeList arraysList = root.getElementsByTagName("array");
+				if (arraysList != null) {
+					for (int i = 0; i < arraysList.getLength(); i++) {
+						arrayNode = (Element) arraysList.item(i);
+						name = arrayNode.getAttribute("name");
+						clazz = classNamesByArrayNames.get(name);
+						if (clazz == null) continue;
+						writtenFiles = writtenFilesPerDataType.get(clazz);
+						if (writtenFiles == null) continue;
+						if (clazz == TMXMap.class) {
+							resPrefix = tmxResPrefix;
+							fileSuffix = tmxFileSuffix;
+						} else {
+							resPrefix = jsonResPrefix;
+							fileSuffix = jsonFileSuffix;
+						}
+						NodeList arrayItems = arrayNode.getElementsByTagName("item");
+						if (arrayItems != null) {
+							for (int j = 0; j < arrayItems.getLength(); j++) {
+								resName = ((Element)arrayItems.item(j)).getTextContent();
+								if (resName == null) continue;
+								resToFile = resName.replaceFirst("\\A"+resPrefix, "")+fileSuffix;
+								writtenFiles.remove(resToFile);
+							}
+						}
+						for (String missingRes : writtenFiles) {
+							Element item = doc.createElement("item");
+							fileToRes = resPrefix+missingRes.replaceFirst(fileSuffix+"\\z", "");
+							item.setTextContent(fileToRes);
+							arrayNode.appendChild(item);
+						}
+					}
+				}
+			}
+			
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			Result output = new StreamResult(new FileOutputStream(outputFile));
+			Source input = new DOMSource(doc);
+			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			transformer.transform(input, output);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public boolean needsSaving() {
