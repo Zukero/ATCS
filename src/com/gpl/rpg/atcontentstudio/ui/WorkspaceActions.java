@@ -34,7 +34,6 @@ import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Quest;
 import com.gpl.rpg.atcontentstudio.model.gamedata.QuestStage;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
-import com.gpl.rpg.atcontentstudio.model.maps.TMXMapSet;
 import com.gpl.rpg.atcontentstudio.model.maps.Worldmap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
 import com.gpl.rpg.atcontentstudio.model.saves.SavedGamesSet;
@@ -353,21 +352,7 @@ public class WorkspaceActions {
 	public ATCSAction exportProject = new ATCSAction("Export project", "Generates a zip file containing all the created & altered resources of the project, ready to merge with the game source."){
 		public void actionPerformed(ActionEvent e) {
 			if (selectedNode == null || selectedNode.getProject() == null) return;
-			JFileChooser chooser = new JFileChooser() {
-				private static final long serialVersionUID = 8039332384370636746L;
-				public boolean accept(File f) {
-					return f.isDirectory() || f.getName().endsWith(".zip") || f.getName().endsWith(".ZIP"); 
-				}
-			};
-			chooser.setMultiSelectionEnabled(false);
-			int result = chooser.showSaveDialog(ATContentStudio.frame);
-			if (result == JFileChooser.APPROVE_OPTION) {
-				File f = chooser.getSelectedFile();
-				if (!f.getAbsolutePath().substring(f.getAbsolutePath().length() - 4, f.getAbsolutePath().length()).equalsIgnoreCase(".zip")) {
-					f = new File(f.getAbsolutePath()+".zip");
-				}
-				selectedNode.getProject().generateExportPackage(f);
-			}
+			new ExportProjectWizard(selectedNode.getProject()).setVisible(true);
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode != null && selectedNode.getProject() != null);

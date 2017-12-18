@@ -39,7 +39,6 @@ import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
-import javax.swing.Scrollable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

@@ -78,6 +78,29 @@ public class FileUtils {
 
 	}
 	
+	/**
+	 * cp sourceFolder/* targetFolder/
+	 * @param sourceFolder
+	 * @param targetFolder
+	 */
+	public static void copyOver(File sourceFolder, File targetFolder) {
+		if (!sourceFolder.isDirectory() || !targetFolder.isDirectory()) return;
+		for (File f : sourceFolder.listFiles()) {
+			if (Files.isSymbolicLink(f.toPath())) {
+				//Skip symlinks
+				continue;
+			} else if (f.isDirectory()) {
+				File dest = new File(targetFolder, f.getName());
+				if (!dest.exists()) {
+					dest.mkdir();
+				}
+				copyOver(f, dest);
+			} else {
+				copyFile(f, new File(targetFolder, f.getName()));
+			}
+		}
+	}
+	
 	private static void zipDir(File dir, String prefix, ZipOutputStream zos) {
 		if (prefix != "") {
 			prefix = prefix + File.separator;
