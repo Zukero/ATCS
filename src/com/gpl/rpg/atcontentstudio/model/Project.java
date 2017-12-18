@@ -1290,6 +1290,9 @@ public class Project implements ProjectTreeNode, Serializable {
 			}
 			
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			if (!outputFile.getParentFile().exists()) {
+				outputFile.getParentFile().mkdirs();
+			}
 			Result output = new StreamResult(new FileOutputStream(outputFile));
 			Source input = new DOMSource(doc);
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
