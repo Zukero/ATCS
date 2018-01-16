@@ -470,7 +470,7 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardMap = null;
 				rewardObjId = null;
 				rewardObj = addItemBox(pane, ((Dialogue)target).getProject(), "Item: ", (Item) reward.reward_obj, writable, listener);
-				rewardValue = addIntegerField(pane, "Quantity: ", reward.reward_value, false, writable, listener);
+				rewardValue = addIntegerField(pane, "Quantity: ", reward.reward_value, true, writable, listener);
 				break;
 			case removeQuestProgress:
 			case questProgress:
