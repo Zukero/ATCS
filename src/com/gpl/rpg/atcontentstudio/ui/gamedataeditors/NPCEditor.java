@@ -1398,7 +1398,7 @@ public class NPCEditor extends JSONElementEditor {
 			} else if (source == hitTargetConditionClear && (Boolean) value) {
 				selectedHitEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
 				selectedHitEffectTargetCondition.duration = null;
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			}  else if (source == hitTargetConditionApply && (Boolean) value) {
@@ -1407,7 +1407,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionImmunity && (Boolean) value) {
@@ -1416,7 +1416,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionMagnitude) {
@@ -1428,12 +1428,12 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionForever && (Boolean) value) {
 				selectedHitEffectTargetCondition.duration = ActorCondition.DURATION_FOREVER;
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionDuration) {
