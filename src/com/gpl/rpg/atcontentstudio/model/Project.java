@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -31,6 +33,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.json.simple.JSONArray;
 import org.w3c.dom.Document;
@@ -1292,13 +1295,37 @@ public class Project implements ProjectTreeNode, Serializable {
 			if (!outputFile.getParentFile().exists()) {
 				outputFile.getParentFile().mkdirs();
 			}
-			Result output = new StreamResult(new FileOutputStream(outputFile));
+			StringWriter temp = new StringWriter();
+			Result output = new StreamResult(temp);// FileOutputStream(outputFile));
 			Source input = new DOMSource(doc);
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+//			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			transformer.transform(input, output);
+			
+			String tempString = temp.toString();
+			doc = builder.parse(new StringBufferInputStream(tempString));
+			input = new DOMSource(doc);
+			transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new StringReader(
+					"<?xml version=\"1.0\"?>\r\n" + 
+					"<xsl:stylesheet version=\"1.0\"\r\n" + 
+					"                xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">\r\n" + 
+					"  <xsl:strip-space elements=\"*\" />\r\n" + 
+					"  <xsl:output method=\"xml\" indent=\"yes\" />\r\n" + 
+					"\r\n" + 
+					"  <xsl:template match=\"node() | @*\">\r\n" + 
+					"    <xsl:copy>\r\n" + 
+					"      <xsl:apply-templates select=\"node() | @*\" />\r\n" + 
+					"    </xsl:copy>\r\n" + 
+					"  </xsl:template>\r\n" + 
+					"</xsl:stylesheet>")));
+			output = new StreamResult(new FileOutputStream(outputFile));
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.transform(input, output);
+			
+			
 		} catch (SAXException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
