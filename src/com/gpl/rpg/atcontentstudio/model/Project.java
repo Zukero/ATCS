@@ -1232,18 +1232,17 @@ public class Project implements ProjectTreeNode, Serializable {
 		String jsonResPrefix = "@raw/";
 		String tmxResPrefix = "@xml/";
 		String jsonFileSuffix = ".json";
-		String tmxFileSuffix = ".xml";
+		String tmxFileSuffix = ".tmx";
 		
 		if (!xmlFile.exists()) return;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		Document doc;
 		try {
-			factory.setIgnoringComments(true);
 			factory.setIgnoringElementContentWhitespace(true);
 			factory.setExpandEntityReferences(false);
 			DocumentBuilder builder = factory.newDocumentBuilder();
+			
 			InputSource insrc = new InputSource(new FileInputStream(xmlFile));
-			//		            insrc.setSystemId("http://worldmap/");
 			insrc.setEncoding("UTF-8");
 			doc = builder.parse(insrc);
 
@@ -1296,8 +1295,9 @@ public class Project implements ProjectTreeNode, Serializable {
 			Result output = new StreamResult(new FileOutputStream(outputFile));
 			Source input = new DOMSource(doc);
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.transform(input, output);
 		} catch (SAXException e) {
 			e.printStackTrace();

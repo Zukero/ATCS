@@ -92,7 +92,7 @@ public class TMXMapSet implements ProjectTreeNode {
 		});
 		if (source.type == GameSource.Type.created | source.type == GameSource.Type.altered) {
 			final Path folderPath = Paths.get(mapFolder.getAbsolutePath());
-			Thread watcher = new Thread("Map folder watcher for "+source.type) {
+			Thread watcher = new Thread("Map folder watcher for "+getProject().name+"/"+source.type) {
 				public void run() {
 					WatchService watchService;
 
