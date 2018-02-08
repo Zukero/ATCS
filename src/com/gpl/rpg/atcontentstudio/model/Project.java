@@ -12,10 +12,12 @@ import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -36,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.json.simple.JSONArray;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1105,8 +1108,8 @@ public class Project implements ProjectTreeNode, Serializable {
 //		for (File createdJsonFile : createdContent.gameData.baseFolder.listFiles()) {
 //			FileUtils.copyFile(createdJsonFile, new File(tmpJsonDataDir, createdJsonFile.getName()));
 //		}
-		Map<Class<? extends GameDataElement>, Set<String>> writtenFilesPerDataType = new LinkedHashMap<Class<? extends GameDataElement>, Set<String>>();
-		Set<String> writtenFiles;
+		Map<Class<? extends GameDataElement>, List<String>> writtenFilesPerDataType = new LinkedHashMap<Class<? extends GameDataElement>, List<String>>();
+		List<String> writtenFiles;
 		writtenFiles = writeDataDeltaForDataType(createdContent.gameData.actorConditions, alteredContent.gameData.actorConditions, baseContent.gameData.actorConditions, ActorCondition.class, tmpJsonDataDir);
 		writtenFilesPerDataType.put(ActorCondition.class, writtenFiles);
 		writtenFiles = writeDataDeltaForDataType(createdContent.gameData.dialogues, alteredContent.gameData.dialogues, baseContent.gameData.dialogues, Dialogue.class, tmpJsonDataDir);
@@ -1124,7 +1127,7 @@ public class Project implements ProjectTreeNode, Serializable {
 
 		File tmpMapDir = new File(tmpDir, TMXMapSet.DEFAULT_REL_PATH_IN_SOURCE);
 		tmpMapDir.mkdirs();
-		writtenFiles = new LinkedHashSet<String>();
+		writtenFiles = new LinkedList<String>();
 		for (File createdMapFile : createdContent.gameMaps.mapFolder.listFiles()) {
 			FileUtils.copyFile(createdMapFile, new File(tmpMapDir, createdMapFile.getName()));
 			writtenFiles.add(createdMapFile.getName());
@@ -1164,8 +1167,8 @@ public class Project implements ProjectTreeNode, Serializable {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public Set<String> writeDataDeltaForDataType(GameDataCategory<? extends JSONElement> created, GameDataCategory<? extends JSONElement> altered, GameDataCategory<? extends JSONElement> source, Class<? extends JSONElement> gdeClass, File targetFolder) {
-		Set<String> filenamesToWrite = new LinkedHashSet<String>();
+	public List<String> writeDataDeltaForDataType(GameDataCategory<? extends JSONElement> created, GameDataCategory<? extends JSONElement> altered, GameDataCategory<? extends JSONElement> source, Class<? extends JSONElement> gdeClass, File targetFolder) {
+		List<String> filenamesToWrite = new LinkedList<String>();
 		Map<String, List<Map>> dataToWritePerFilename = new LinkedHashMap<String, List<Map>>();
 		for (JSONElement gde : altered) {
 			filenamesToWrite.add(gde.jsonFile.getName());
@@ -1218,7 +1221,7 @@ public class Project implements ProjectTreeNode, Serializable {
 	}
 
 	
-	private void writeResourceListXml(Map<Class<? extends GameDataElement>, Set<String>> writtenFilesPerDataType, String xmlFileRelPath, File baseFolder, File tmpDir) {
+	private void writeResourceListXml(Map<Class<? extends GameDataElement>, List<String>> writtenFilesPerDataType, String xmlFileRelPath, File baseFolder, File tmpDir) {
 		File xmlFile =  new File(baseFolder, xmlFileRelPath);
 		File outputFile = new File(tmpDir, xmlFileRelPath);
 
@@ -1252,7 +1255,7 @@ public class Project implements ProjectTreeNode, Serializable {
 			Element arrayNode;
 			String name, resPrefix, fileSuffix, resName, resToFile, fileToRes;
 			Class<? extends GameDataElement> clazz;
-			Set<String> writtenFiles;
+			List<String> writtenFiles;
 
 			Element root = (Element) doc.getElementsByTagName("resources").item(0);
 			if (root != null) {
@@ -1281,11 +1284,16 @@ public class Project implements ProjectTreeNode, Serializable {
 								writtenFiles.remove(resToFile);
 							}
 						}
-						for (String missingRes : writtenFiles) {
-							Element item = doc.createElement("item");
-							fileToRes = resPrefix+missingRes.replaceFirst(fileSuffix+"\\z", "");
-							item.setTextContent(fileToRes);
-							arrayNode.appendChild(item);
+						if (!writtenFiles.isEmpty()) {
+							Comment com = doc.createComment("Added by ATCS "+ATContentStudio.APP_VERSION+" for project "+getProject().name);
+							arrayNode.appendChild(com);
+							Collections.sort(writtenFiles);
+							for (String missingRes : writtenFiles) {
+								Element item = doc.createElement("item");
+								fileToRes = resPrefix+missingRes.replaceFirst(fileSuffix+"\\z", "");
+								item.setTextContent(fileToRes);
+								arrayNode.appendChild(item);
+							}
 						}
 					}
 				}
@@ -1296,12 +1304,10 @@ public class Project implements ProjectTreeNode, Serializable {
 				outputFile.getParentFile().mkdirs();
 			}
 			StringWriter temp = new StringWriter();
-			Result output = new StreamResult(temp);// FileOutputStream(outputFile));
+			Result output = new StreamResult(temp);
 			Source input = new DOMSource(doc);
 			transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-//			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-//			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 			transformer.transform(input, output);
 			
 			String tempString = temp.toString();
@@ -1314,10 +1320,15 @@ public class Project implements ProjectTreeNode, Serializable {
 					"  <xsl:strip-space elements=\"*\" />\r\n" + 
 					"  <xsl:output method=\"xml\" indent=\"yes\" />\r\n" + 
 					"\r\n" + 
-					"  <xsl:template match=\"node() | @*\">\r\n" + 
+					"  <xsl:template match=\"node() | @*\" name=\"identity\">\r\n" + 
 					"    <xsl:copy>\r\n" + 
 					"      <xsl:apply-templates select=\"node() | @*\" />\r\n" + 
 					"    </xsl:copy>\r\n" + 
+					"  </xsl:template>\r\n" + 
+					"\r\n" + 
+					"  <xsl:template match=\"array\">\r\n" + 
+					"    <xsl:call-template name=\"identity\"/>\r\n" + 
+					"    <xsl:text>&#xA;&#xA;&#x20;&#x20;&#x20;&#x20;</xsl:text>\r\n" + 
 					"  </xsl:template>\r\n" + 
 					"</xsl:stylesheet>")));
 			output = new StreamResult(new FileOutputStream(outputFile));
