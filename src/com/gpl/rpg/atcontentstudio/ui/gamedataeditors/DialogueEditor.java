@@ -446,6 +446,7 @@ public class DialogueEditor extends JSONElementEditor {
 				}
 				break;
 			case alignmentChange:
+			case alignmentSet:
 				rewardMap = null;
 				rewardObjId = addTextField(pane, "Faction: ", reward.reward_obj_id, writable, listener);
 				rewardObjIdCombo = null;
@@ -883,6 +884,10 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case alignmentChange:
 				label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
+				label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
+				break;
+			case alignmentSet:
+				label.setText("Set alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
 				label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
 				break;
 			case createTimer:
