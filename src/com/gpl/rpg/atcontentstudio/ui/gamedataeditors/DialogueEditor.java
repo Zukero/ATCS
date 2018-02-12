@@ -695,7 +695,7 @@ public class DialogueEditor extends JSONElementEditor {
 			removeElementListener(requirementObj);
 		}
 		
-		requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), requirement.type, writable, listener);
+		requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), requirement == null ? null : requirement.type, writable, listener);
 		requirementParamsPane = new JPanel();
 		requirementParamsPane.setLayout(new JideBoxLayout(requirementParamsPane, JideBoxLayout.PAGE_AXIS));
 		updateRequirementParamsEditorPane(requirementParamsPane, requirement, listener);
