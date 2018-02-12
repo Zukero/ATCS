@@ -1129,10 +1129,12 @@ public class Project implements ProjectTreeNode, Serializable {
 		tmpMapDir.mkdirs();
 		writtenFiles = new LinkedList<String>();
 		for (File createdMapFile : createdContent.gameMaps.mapFolder.listFiles()) {
+			if (createdMapFile.getName().equalsIgnoreCase("worldmap.xml")) continue;
 			FileUtils.copyFile(createdMapFile, new File(tmpMapDir, createdMapFile.getName()));
 			writtenFiles.add(createdMapFile.getName());
 		}
 		for (File alteredMapFile : alteredContent.gameMaps.mapFolder.listFiles()) {
+			if (alteredMapFile.getName().equalsIgnoreCase("worldmap.xml")) continue;
 			FileUtils.copyFile(alteredMapFile, new File(tmpMapDir, alteredMapFile.getName()));
 			writtenFiles.add(alteredMapFile.getName());
 		}
