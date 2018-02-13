@@ -96,6 +96,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JPanel rewardsParamsPane;
 	private MyComboBox rewardMap;
 	private JTextField rewardObjId;
+	@SuppressWarnings("rawtypes")
 	private JComboBox rewardObjIdCombo;
 	private MyComboBox rewardObj;
 	private JComponent rewardValue;
@@ -120,6 +121,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JComboBox requirementTypeCombo;
 	private JPanel requirementParamsPane;
 	private MyComboBox requirementObj;
+	@SuppressWarnings("rawtypes")
 	private JComboBox requirementSkill;
 	private JTextField requirementObjId;
 	private JComponent requirementValue;

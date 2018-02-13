@@ -32,12 +32,12 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.FontUIResource;
 
+import prefuse.data.expression.parser.ExpressionParser;
+
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.gpl.rpg.atcontentstudio.ui.WorkspaceSelector;
-
-import prefuse.data.expression.parser.ExpressionParser;
 
 
 public class ATContentStudio {

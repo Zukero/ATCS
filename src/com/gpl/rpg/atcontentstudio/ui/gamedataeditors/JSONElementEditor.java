@@ -44,7 +44,6 @@ import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel;
 import com.gpl.rpg.atcontentstudio.ui.ScrollablePanel.ScrollableSizeHint;
 import com.gpl.rpg.atcontentstudio.ui.sprites.SpriteChooser;
 import com.jidesoft.swing.JideBoxLayout;
-import com.jidesoft.swing.JideScrollPane;
 import com.jidesoft.swing.JideTabbedPane;
 
 public abstract class JSONElementEditor extends Editor {
@@ -303,6 +302,7 @@ public abstract class JSONElementEditor extends Editor {
 	}
 	
 
+	@SuppressWarnings("unchecked")
 	public boolean idChanging() {
 		JSONElement node = (JSONElement) target;
 		List<GameDataElement> toModify = new LinkedList<GameDataElement>();

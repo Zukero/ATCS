@@ -99,7 +99,7 @@ public class TMXMapSet implements ProjectTreeNode {
 					while(getProject().open) {
 						try {
 							watchService = FileSystems.getDefault().newWatchService();
-							WatchKey watchKey = folderPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+							/*WatchKey watchKey = */folderPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 							WatchKey wk;
 							validService: while(getProject().open) {
 								wk = watchService.take();

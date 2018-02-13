@@ -158,7 +158,7 @@ public class WorkspaceSettings {
 			value = defaultValue;
 		}
 		
-		public abstract void readFromJson(Map json);
+		public abstract void readFromJson(@SuppressWarnings("rawtypes") Map json);
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void saveToJson(Map json) {
@@ -188,6 +188,7 @@ public class WorkspaceSettings {
 			super(id, null);
 		}
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void saveToJson(Map json) {
 			if (value != null) json.put(id,  value);
@@ -201,6 +202,7 @@ public class WorkspaceSettings {
 			this.value = this.defaultValue = defaultValue;
 		}
 		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public void readFromJson(Map json) {
 			value = new ArrayList<X>();

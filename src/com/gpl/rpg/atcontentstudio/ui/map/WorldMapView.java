@@ -85,7 +85,7 @@ public class WorldMapView extends JComponent implements Scrollable {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String selectedMap = null;
-				boolean update = false;
+//				boolean update = false;
 				int x = (int) (e.getX() / zoomLevel);
 				int y = (int) (e.getY() / zoomLevel);
 				for (String s : mapLocations.keySet()) {

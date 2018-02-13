@@ -1,6 +1,7 @@
 package com.gpl.rpg.atcontentstudio.model;
 
 import java.awt.Image;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -16,12 +16,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.swing.tree.TreeNode;
 import javax.xml.parsers.DocumentBuilder;
@@ -1313,7 +1311,7 @@ public class Project implements ProjectTreeNode, Serializable {
 			transformer.transform(input, output);
 			
 			String tempString = temp.toString();
-			doc = builder.parse(new StringBufferInputStream(tempString));
+			doc = builder.parse(new ByteArrayInputStream(tempString.getBytes("UTF-8")));
 			input = new DOMSource(doc);
 			transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new StringReader(
 					"<?xml version=\"1.0\"?>\r\n" + 

@@ -341,12 +341,12 @@ public class WriterModeEditor extends Editor {
     			}
     			
    				Node rNode;
-   				int i = 1;
+//   			int i = 1;
    				for (WriterModeData.WriterReply reply : dialogue.replies) {
    					if (reply instanceof EmptyReply && reply.next_dialogue != null) {
    						if (cells.get(reply.next_dialogue) == null) {
    							rNode = addDialogueNode(reply.next_dialogue);
-   							Edge e = graph.addEdge(dNode, rNode);
+   							/*Edge e = */graph.addEdge(dNode, rNode);
    						} else {
    							rNode = cells.get(reply.next_dialogue);
    							Edge e = graph.addEdge(dNode, rNode);
@@ -355,7 +355,7 @@ public class WriterModeEditor extends Editor {
    					} else {
    						if (cells.get(reply) == null) {
    							rNode = addReplyNode(reply);
-   							Edge e = graph.addEdge(dNode, rNode);
+   							/*Edge e = */graph.addEdge(dNode, rNode);
 //   						e.setString(LABEL, "#"+i++);
    						} else {
    							rNode = cells.get(reply);
@@ -380,7 +380,7 @@ public class WriterModeEditor extends Editor {
     				if (reply.next_dialogue != null) {
     					if (cells.get(reply.next_dialogue) == null) {
     						Node dNode = addDialogueNode(reply.next_dialogue);
-    						Edge e = graph.addEdge(rNode, dNode);
+    						/*Edge e = */graph.addEdge(rNode, dNode);
     					} else {
     						Node dNode = cells.get(reply.next_dialogue);
     						Edge e = graph.addEdge(rNode, dNode);
@@ -665,7 +665,7 @@ public class WriterModeEditor extends Editor {
 			cells.get(selected).set(LABEL, selected.text);
 		}
 
-        static final String createNextDefaultNodeString = "createNextDefaultNode";
+//        static final String createNextDefaultNodeString = "createNextDefaultNode";
 		final AbstractAction createNextDefaultNode = new AbstractAction("Create next default") {
 			private static final long serialVersionUID = 1658086056088672748L;
 
@@ -689,7 +689,7 @@ public class WriterModeEditor extends Editor {
 					}
 				}
 				if (newNode!= null) {
-					Edge edge = graph.addEdge(cells.get(selected), newNode);
+					/*Edge edge = */graph.addEdge(cells.get(selected), newNode);
 					setSelected(newWrNode);
 
 					m_vis.run("colors");
@@ -732,7 +732,7 @@ public class WriterModeEditor extends Editor {
 					temp.next_dialogue = newWrNode;
 					
 					newNode = addDialogueNode(newWrNode);
-					Edge edge = graph.addEdge(cells.get(selected), newNode);
+					/*Edge edge = */graph.addEdge(cells.get(selected), newNode);
 					setSelected(newWrNode);
 
 					m_vis.run("colors");
@@ -758,7 +758,7 @@ public class WriterModeEditor extends Editor {
 				if (selected instanceof WriterReply) {
 					newWrNode = data.new WriterReply(((WriterReply) selected).parent);
 					newNode = addReplyNode(newWrNode);
-					Edge edge = graph.addEdge(cells.get(((WriterReply) selected).parent), newNode);
+					/*Edge edge = */graph.addEdge(cells.get(((WriterReply) selected).parent), newNode);
 					setSelected(newWrNode);
 
 					m_vis.run("colors");
@@ -903,18 +903,18 @@ public class WriterModeEditor extends Editor {
 				}
 		}
         
-        public void selectScrollAndEdit(WriterNode node) {
-			if (node != null) {
-					setSelected(node);
-
-					m_vis.run("colors");
-					m_vis.run("layout");
-					m_vis.run("scrollToSelectedAndEdit");
-
-					revalidate();
-					repaint();
-				}
-		}
+//        public void selectScrollAndEdit(WriterNode node) {
+//			if (node != null) {
+//					setSelected(node);
+//
+//					m_vis.run("colors");
+//					m_vis.run("layout");
+//					m_vis.run("scrollToSelectedAndEdit");
+//
+//					revalidate();
+//					repaint();
+//				}
+//		}
         
         
         
