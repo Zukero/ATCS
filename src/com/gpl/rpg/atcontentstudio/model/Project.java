@@ -1171,7 +1171,9 @@ public class Project implements ProjectTreeNode, Serializable {
 		List<String> filenamesToWrite = new LinkedList<String>();
 		Map<String, List<Map>> dataToWritePerFilename = new LinkedHashMap<String, List<Map>>();
 		for (JSONElement gde : altered) {
-			filenamesToWrite.add(gde.jsonFile.getName());
+			if (!filenamesToWrite.contains(gde.jsonFile.getName())) {
+				filenamesToWrite.add(gde.jsonFile.getName());
+			}
 		}
 		for (JSONElement gde : created) {
 			if (!filenamesToWrite.contains(gde.jsonFile.getName())) {
