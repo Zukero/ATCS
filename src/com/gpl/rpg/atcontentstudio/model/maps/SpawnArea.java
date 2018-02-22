@@ -13,6 +13,7 @@ public class SpawnArea extends MapObject {
 	public int quantity = 1;
 	public int spawnchance = 10;
 	public boolean active = true;
+	public boolean ignoreAreas = false;
 	public String spawngroup_id;
 	public List<NPC> spawnGroup = new ArrayList<NPC>();
 	
@@ -25,6 +26,9 @@ public class SpawnArea extends MapObject {
 		}
 		if (obj.getProperties().getProperty("active") != null) {
 			this.active = Boolean.parseBoolean(obj.getProperties().getProperty("active"));
+		}
+		if (obj.getProperties().getProperty("ignoreAreas") != null) {
+			this.ignoreAreas = Boolean.parseBoolean(obj.getProperties().getProperty("ignoreAreas"));
 		}
 		if (obj.getProperties().getProperty("spawngroup") != null) {
 			this.spawngroup_id = obj.getProperties().getProperty("spawngroup");
@@ -83,6 +87,9 @@ public class SpawnArea extends MapObject {
 		}
 		if (!this.active) {
 			tmxObject.getProperties().setProperty("active", Boolean.toString(active));
+		}
+		if (this.ignoreAreas) {
+			tmxObject.getProperties().setProperty("ignoreAreas", Boolean.toString(ignoreAreas));
 		}
 	}
 	
