@@ -59,6 +59,7 @@ public class WorkspaceActions {
 		public void actionPerformed(ActionEvent e) {
 			if (!(selectedNode instanceof Project)) return;
 			Workspace.closeProject((Project) selectedNode);
+			selectedNode = null;
 		};
 		public void selectionChanged(ProjectTreeNode selectedNode, TreePath[] selectedPaths) {
 			setEnabled(selectedNode instanceof Project);
