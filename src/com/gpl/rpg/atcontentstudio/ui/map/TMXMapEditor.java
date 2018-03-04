@@ -212,7 +212,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		editorTabsHolder.add("TMX", tmxScroller);
 		editorTabsHolder.add("XML", xmlScroller);
 		//editorTabsHolder.add("Replacements", replScroller);
-		editorTabsHolder.add("Replacements", getReplacementSimulatorPane());
+		editorTabsHolder.add("Testing", getReplacementSimulatorPane());
 		
 	}
 	
@@ -782,7 +782,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	public JPanel getReplacementSimulatorPane() {
 		JPanel replacementSimulator = new JPanel();
 		replacementSimulator.setLayout(new JideBoxLayout(replacementSimulator, JideBoxLayout.PAGE_AXIS));
+		JPanel toolsPane = new JPanel();
+		toolsPane.setLayout(new JideBoxLayout(toolsPane, JideBoxLayout.LINE_AXIS));
 		final JCheckBox walkableVisibleBox = new JCheckBox("Show \""+TMXMap.WALKABLE_LAYER_NAME+"\" layer.");
+		final JCheckBox showHeroBox = new JCheckBox("Show hero on walkable tiles under the mouse pointer.");
+		final JCheckBox showTooltipBox = new JCheckBox("Show tooltip with stack of tiles.");
 		JPanel areasActivationPane = new JPanel();
 		areasActivationPane.setLayout(new JideBoxLayout(areasActivationPane, JideBoxLayout.PAGE_AXIS));
 		TreeModel areasTreeModel = new ReplaceAreasActivationTreeModel();
@@ -800,16 +804,36 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		activateAndViewPane.add(areasActivationPane, JideBoxLayout.FIX);
 		activateAndViewPane.add(new JScrollPane(viewer), JideBoxLayout.VARY);
 
-		replacementSimulator.add(walkableVisibleBox, JideBoxLayout.FIX);
+		toolsPane.add(walkableVisibleBox, JideBoxLayout.FIX);
+		toolsPane.add(showTooltipBox, JideBoxLayout.FIX);
+		toolsPane.add(showHeroBox, JideBoxLayout.FIX);
+		toolsPane.add(new JPanel(), JideBoxLayout.VARY);
+		
+		replacementSimulator.add(toolsPane, JideBoxLayout.FIX);
 		replacementSimulator.add(activateAndViewPane, JideBoxLayout.VARY);
 		
-		walkableVisibleBox.setSelected(true);
+		walkableVisibleBox.setSelected(viewer.showWalkable);
 		walkableVisibleBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				viewer.showWalkable = walkableVisibleBox.isSelected();
 				viewer.revalidate();
 				viewer.repaint();
+			}
+		});
+
+		showHeroBox.setSelected(viewer.showHeroWithMouse);
+		showHeroBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.showHeroWithMouse = showHeroBox.isSelected();
+			}
+		});
+		showTooltipBox.setSelected(viewer.showTooltip);
+		showTooltipBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.showTooltip = showTooltipBox.isSelected();
 			}
 		});
 		activate.addActionListener(new ActionListener() {
@@ -2183,7 +2207,8 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		private TMXMap map;
 		public ReplaceArea highlighted = null;
 		public boolean showWalkable = true;
-		public boolean walkableTest = true;
+		public boolean showHeroWithMouse = true;
+		public boolean showTooltip = true;
 	    private OrthogonalRenderer renderer;
 	    
 	    private String groundName, objectsName, aboveName, topName, walkableName;
@@ -2209,7 +2234,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        	public void mouseMoved(MouseEvent e) {
 	        		Point oldTooltippedTile = new Point(tooltippedTile);
 	        		tooltippedTile.setLocation(e.getX() / 32, e.getY() / 32);
-	        		if (!((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
+	        		if (!showTooltip || !((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
 	        			if (tooltipActivated) {
 	        				//Hides the tooltip...
 	        				ToolTipManager.sharedInstance().setEnabled(false);
@@ -2217,13 +2242,13 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        				tooltipActivated = false;
 	        			}
 	        		} else {
-	        			if (!tooltipActivated) {
+	        			if (showTooltip && !tooltipActivated) {
 	        				ToolTipManager.sharedInstance().registerComponent(TMXReplacementViewer.this);
 	        				ToolTipManager.sharedInstance().setEnabled(true);
 	        				tooltipActivated = true;
 	        			}
 	        		}
-	        		if (walkableTest && (oldTooltippedTile.x != tooltippedTile.x || oldTooltippedTile.y != tooltippedTile.y) ) {
+	        		if (showHeroWithMouse && (oldTooltippedTile.x != tooltippedTile.x || oldTooltippedTile.y != tooltippedTile.y) ) {
 	        			TMXReplacementViewer.this.revalidate();
 	        			TMXReplacementViewer.this.repaint();
 	        		}
@@ -2337,7 +2362,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        	renderer.paintTileLayer(g2d, objects);
 	        }
 	        
-	        if (walkableTest && tooltippedTile != null && ((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y) && 
+	        if (showHeroWithMouse && tooltippedTile != null && ((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y) && 
 	        		walkable != null && walkable.getTileAt(tooltippedTile.x, tooltippedTile.y) == null) {
 	        	g2d.drawImage(DefaultIcons.getHeroImage(), tooltippedTile.x * 32, tooltippedTile.y * 32, 32, 32, null);
 	        }

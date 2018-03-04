@@ -399,6 +399,7 @@ public class TMXMap extends GameDataElement {
 		return GROUND_LAYER_NAME.equalsIgnoreCase(name) ||
 				OBJECTS_LAYER_NAME.equalsIgnoreCase(name) ||
 				ABOVE_LAYER_NAME.equalsIgnoreCase(name) ||
+				TOP_LAYER_NAME.equalsIgnoreCase(name) ||
 				WALKABLE_LAYER_NAME.equalsIgnoreCase(name);
 	}
 
