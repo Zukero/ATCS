@@ -714,7 +714,7 @@ public class DialogueEditor extends JSONElementEditor {
 			removeElementListener(requirementObj);
 		}
 		
-		if (requirement.type != null) {
+		if (requirement != null && requirement.type != null) {
 			switch (requirement.type) {
 			case consumedBonemeals:
 			case spentGold:
