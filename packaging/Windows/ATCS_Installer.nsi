@@ -1,6 +1,6 @@
 !include MUI2.nsh
 
-!define VERSION "0.6.11"
+!define VERSION "0.6.12"
 !define TRAINER_VERSION "0.1.4"
 !define JAVA_BIN "javaw"
 
