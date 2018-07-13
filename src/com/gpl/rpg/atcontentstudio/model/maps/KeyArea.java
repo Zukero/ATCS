@@ -19,6 +19,7 @@ public class KeyArea extends MapObject {
 		String requireType = obj.getProperties().getProperty("requireType");
 		String requireId = obj.getProperties().getProperty("requireId");
 		String requireValue = obj.getProperties().getProperty("requireValue");
+		String requireNegation = obj.getProperties().getProperty("requireNegation");
 		oldSchoolRequirement = false;
 		if (requireType == null) {
 			String[] fields = obj.getName().split(":");
@@ -38,7 +39,9 @@ public class KeyArea extends MapObject {
 		if (requireType != null) requirement.type = Requirement.RequirementType.valueOf(requireType);
 		requirement.required_obj_id = requireId;
 		if (requireValue != null) requirement.required_value = Integer.parseInt(requireValue);
+		if (requireNegation != null) requirement.negated = Boolean.parseBoolean(requireNegation);
 		requirement.state = GameDataElement.State.parsed;
+		
 	}
 	
 	@Override
@@ -98,7 +101,7 @@ public class KeyArea extends MapObject {
 
 	public void updateNameFromRequirementChange() {
 		if (oldSchoolRequirement && Requirement.RequirementType.questProgress.equals(requirement.type) && (requirement.negated == null || !requirement.negated)) {
-			name = requirement.required_obj_id+":"+((requirement.required_value == null) ? "" : Integer.toString(requirement.required_value));
+			name = (requirement.negated != null && requirement.negated) ? "NOT " : "" + requirement.required_obj_id+":"+((requirement.required_value == null) ? "" : Integer.toString(requirement.required_value));
 		} else if (oldSchoolRequirement) {
 			int i = 0;
 			String futureName = requirement.type.toString() + "#" + Integer.toString(i);
