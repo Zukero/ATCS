@@ -78,6 +78,9 @@ public class AboutEditor extends Editor {
 			"<a href=\"https://jsoup.org/\">jsoup</a> by Jonathan Hedley<br/>" +
 			"License: <a href=\"https://jsoup.org/license\">MIT License</a><br/>" +
 			"<br/>" +
+			"A slightly modified version of <a href=\"https://launchpad.net/po-parser\">General PO Parser</a> by Balázs Tóth<br/>" +
+			"License: <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPL v3</a><br/>" +
+			"<br/>" +
 			"See the tabs below to find the full license text for each of these.<br/>" +
 			"<br/>" +
 			"The Windows installer was created with:<br/>" +
