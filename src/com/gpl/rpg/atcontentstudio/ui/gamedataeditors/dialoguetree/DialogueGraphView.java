@@ -49,11 +49,13 @@ import prefuse.visual.expression.InGroupPredicate;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
+import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class DialogueGraphView extends Display {
@@ -188,7 +190,7 @@ public class DialogueGraphView extends Display {
 			}
 			Node dNode = graph.addNode();
 			cells.put(dialogue, dNode);
-			dNode.setString(LABEL, dialogue.message != null ? dialogue.message : "[Selector]");
+			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() == null ? dialogue.message : dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText);
 			dNode.set(ICON, npcIcon);
 			dNode.set(TARGET, dialogue);
 			if (dialogue.replies != null) {
@@ -210,7 +212,7 @@ public class DialogueGraphView extends Display {
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-			rNode.setString(LABEL, r.text);
+			rNode.setString(LABEL, Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() == null ? r.text : r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText);
 			rNode.set(ICON, DefaultIcons.getHeroIcon());
 			rNode.set(TARGET, d);
 			rNode.set(REPLY, r);
