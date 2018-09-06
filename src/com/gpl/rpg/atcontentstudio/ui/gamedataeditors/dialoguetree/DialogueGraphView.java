@@ -79,6 +79,7 @@ public class DialogueGraphView extends Display {
 	private Dialogue dialogue;
 	private Image npcIcon;
 	private Graph graph;
+	private Boolean translatorMode;
 
 	private Map<Dialogue, Node> cells = new HashMap<Dialogue, Node>();
 
@@ -90,6 +91,7 @@ public class DialogueGraphView extends Display {
 		} else {
 			npcIcon = DefaultIcons.getNPCIcon();
 		}
+		translatorMode = Workspace.activeWorkspace.settings.useInternet.getCurrentValue() && Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null;
 		loadGraph();
 
 		 // add visual data groups
@@ -190,7 +192,7 @@ public class DialogueGraphView extends Display {
 			}
 			Node dNode = graph.addNode();
 			cells.put(dialogue, dNode);
-			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() == null ? dialogue.message : dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText);
+			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : !translatorMode ? dialogue.message : dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText);
 			dNode.set(ICON, npcIcon);
 			dNode.set(TARGET, dialogue);
 			if (dialogue.replies != null) {
@@ -212,7 +214,7 @@ public class DialogueGraphView extends Display {
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-			rNode.setString(LABEL, Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() == null ? r.text : r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText);
+			rNode.setString(LABEL, !translatorMode ? r.text : r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText);
 			rNode.set(ICON, DefaultIcons.getHeroIcon());
 			rNode.set(TARGET, d);
 			rNode.set(REPLY, r);
