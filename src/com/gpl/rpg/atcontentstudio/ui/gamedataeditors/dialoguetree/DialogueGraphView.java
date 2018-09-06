@@ -192,7 +192,7 @@ public class DialogueGraphView extends Display {
 			}
 			Node dNode = graph.addNode();
 			cells.put(dialogue, dNode);
-			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : !translatorMode ? dialogue.message : dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText);
+			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : translatorMode ? dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText : dialogue.message);
 			dNode.set(ICON, npcIcon);
 			dNode.set(TARGET, dialogue);
 			if (dialogue.replies != null) {
@@ -214,7 +214,7 @@ public class DialogueGraphView extends Display {
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-			rNode.setString(LABEL, !translatorMode ? r.text : r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText);
+			rNode.setString(LABEL, translatorMode ? r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText : r.text);
 			rNode.set(ICON, DefaultIcons.getHeroIcon());
 			rNode.set(TARGET, d);
 			rNode.set(REPLY, r);
