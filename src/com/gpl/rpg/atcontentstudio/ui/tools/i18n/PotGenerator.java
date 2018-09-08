@@ -1,8 +1,6 @@
 package com.gpl.rpg.atcontentstudio.ui.tools.i18n;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,30 +67,13 @@ public class PotGenerator {
 		}
 		
 		File f = new File(proj.alteredContent.baseFolder, "english.pot");
-		try {
-			FileWriter fw = new FileWriter(f);
-			for (String msg : stringsResources.keySet()) {
-				for (String ctx : stringsResources.get(msg)) {
-					fw.write("#: ");
-					fw.write(ctx);
-					fw.write("\n");
-				}
-				fw.write("msgid \"");
-				fw.write(msg);
-				fw.write("\"\nmsgstr \"\"\n\n");
-				
-			}
-			fw.flush();
-			fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		PoPotWriter.writePotFile(stringsResources, f);
 		
 	}
 	
 	private static void pushString (Map<String, List<String>> stringsResources, Map<String, String> resourcesStrings, String translatableString, String resourceIdentifier) {
 		if (translatableString == null) return;
+		if (translatableString.length() == 0) return;
 		if (translatableString.contains("\n")) {
 			translatableString = translatableString.replaceAll("\n", "\\\\n\"\n\"");
 			translatableString = "\"\n\""+translatableString;

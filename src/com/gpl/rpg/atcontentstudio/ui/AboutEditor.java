@@ -132,6 +132,7 @@ public class AboutEditor extends Editor {
 		editorTabsHolder.add("BeanShell License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.LGPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("SipHash for Java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.siphash-zackehh.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("jsoup License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.jsoup.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
+		editorTabsHolder.add("General PO Parser License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("ATCS License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		
 	}
