@@ -49,11 +49,13 @@ import prefuse.visual.expression.InGroupPredicate;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
+import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class DialogueGraphView extends Display {
@@ -77,6 +79,7 @@ public class DialogueGraphView extends Display {
 	private Dialogue dialogue;
 	private Image npcIcon;
 	private Graph graph;
+	private Boolean translatorMode;
 
 	private Map<Dialogue, Node> cells = new HashMap<Dialogue, Node>();
 
@@ -88,6 +91,7 @@ public class DialogueGraphView extends Display {
 		} else {
 			npcIcon = DefaultIcons.getNPCIcon();
 		}
+		translatorMode = Workspace.activeWorkspace.settings.useInternet.getCurrentValue() && Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null;
 		loadGraph();
 
 		 // add visual data groups
@@ -188,7 +192,7 @@ public class DialogueGraphView extends Display {
 			}
 			Node dNode = graph.addNode();
 			cells.put(dialogue, dNode);
-			dNode.setString(LABEL, dialogue.message != null ? dialogue.message : "[Selector]");
+			dNode.setString(LABEL, dialogue.message == null ? "[Selector]" : translatorMode ? dialogue.message + "\n---\n" + WeblateIntegration.getTranslationUnit(dialogue.message).translatedText : dialogue.message);
 			dNode.set(ICON, npcIcon);
 			dNode.set(TARGET, dialogue);
 			if (dialogue.replies != null) {
@@ -210,7 +214,7 @@ public class DialogueGraphView extends Display {
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-			rNode.setString(LABEL, r.text);
+			rNode.setString(LABEL, translatorMode ? r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText : r.text);
 			rNode.set(ICON, DefaultIcons.getHeroIcon());
 			rNode.set(TARGET, d);
 			rNode.set(REPLY, r);
