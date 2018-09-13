@@ -1779,6 +1779,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				}
 			});
 			savePane.add(delete, JideBoxLayout.FIX);
+			final JButton bookmark = new JButton(new ImageIcon(map.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+			savePane.add(bookmark, JideBoxLayout.FIX);
+			bookmark.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					if (map.bookmark == null) {
+						map.getProject().bookmark(map);
+						bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+					} else {
+						map.bookmark.delete();
+						bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
+					}
+				}
+			});
 		} else {
 			if (proj.getMap(map.id) != map) {
 				savePane.add(message = new JLabel(ALTERED_EXISTS_MESSAGE), JideBoxLayout.FIX);
@@ -1839,6 +1853,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				ProjectTreeNode nextNode = (ProjectTreeNode) map.getParent().getChildAt(map.getParent().getIndex(map) + 1);
 				if (nextNode != null && nextNode instanceof GameDataElement) {
 					ATContentStudio.frame.openEditor((GameDataElement) nextNode);
+				}
+			}
+		});
+		final JButton bookmark = new JButton(new ImageIcon(map.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+		savePane.add(bookmark, JideBoxLayout.FIX);
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (map.bookmark == null) {
+					map.getProject().bookmark(map);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					map.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
 				}
 			}
 		});

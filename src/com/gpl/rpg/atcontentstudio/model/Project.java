@@ -48,6 +48,7 @@ import com.gpl.rpg.atcontentstudio.Notification;
 import com.gpl.rpg.atcontentstudio.io.JsonPrettyWriter;
 import com.gpl.rpg.atcontentstudio.io.SettingsSave;
 import com.gpl.rpg.atcontentstudio.model.GameSource.Type;
+import com.gpl.rpg.atcontentstudio.model.bookmarks.BookmarksRoot;
 import com.gpl.rpg.atcontentstudio.model.gamedata.ActorCondition;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Droplist;
@@ -87,6 +88,8 @@ public class Project implements ProjectTreeNode, Serializable {
 	public GameSource referencedContent; //Pointers to base content
 	public transient GameSource alteredContent; //Copied from base content (does not overwrite yet)
 	public transient GameSource createdContent; //Stand-alone.
+	public transient BookmarksRoot bookmarks;
+	
 	
 	public SavedGamesSet saves; //For simulations.
 	
@@ -135,6 +138,7 @@ public class Project implements ProjectTreeNode, Serializable {
 
 		alteredContent = new GameSource(this, GameSource.Type.altered);
 		createdContent = new GameSource(this, GameSource.Type.created);
+		bookmarks = new BookmarksRoot(this);
 		
 		saves = new SavedGamesSet(this);
 
@@ -143,6 +147,7 @@ public class Project implements ProjectTreeNode, Serializable {
 //		v.add(referencedContent);
 		v.add(baseContent);
 		v.add(saves);
+		v.add(bookmarks);
 
 		linkAll();
 		
@@ -262,6 +267,7 @@ public class Project implements ProjectTreeNode, Serializable {
 //		referencedContent.refreshTransients(this);
 		alteredContent = new GameSource(this, GameSource.Type.altered);
 		createdContent = new GameSource(this, GameSource.Type.created);
+		bookmarks = new BookmarksRoot(this);
 		
 		saves.refreshTransients();
 
@@ -271,6 +277,7 @@ public class Project implements ProjectTreeNode, Serializable {
 //		v.add(referencedContent);
 		v.add(baseContent);
 		v.add(saves);
+		v.add(bookmarks);
 		
 
 		linkAll();
@@ -968,6 +975,10 @@ public class Project implements ProjectTreeNode, Serializable {
 		createdContent.writerModeDataSet.add(node);
 		node.link();
 		fireElementAdded(node, getNodeIndex(node));
+	}
+	
+	public void bookmark(GameDataElement gde) {
+		bookmarks.addBookmark(gde);
 	}
 	
 	
