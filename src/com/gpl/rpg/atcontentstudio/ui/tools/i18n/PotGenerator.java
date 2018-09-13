@@ -54,9 +54,11 @@ public class PotGenerator {
 		}
 		
 		for (Quest q : gsrc.gameData.quests) {
-			pushString(stringsResources, resourcesStrings, q.name, getPotContextComment(q));
-			for (QuestStage qs : q.stages) {
-				pushString(stringsResources, resourcesStrings, qs.log_text, getPotContextComment(q)+":"+Integer.toString(qs.progress));
+			if (q.visible_in_log != null && q.visible_in_log != 0) {
+				pushString(stringsResources, resourcesStrings, q.name, getPotContextComment(q));
+				for (QuestStage qs : q.stages) {
+					pushString(stringsResources, resourcesStrings, qs.log_text, getPotContextComment(q)+":"+Integer.toString(qs.progress));
+				}
 			}
 		}
 		
@@ -74,6 +76,9 @@ public class PotGenerator {
 	private static void pushString (Map<String, List<String>> stringsResources, Map<String, String> resourcesStrings, String translatableString, String resourceIdentifier) {
 		if (translatableString == null) return;
 		if (translatableString.length() == 0) return;
+		if (translatableString.contains("\"")) {
+			translatableString = translatableString.replaceAll("\"", "\\\\\"");
+		}
 		if (translatableString.contains("\n")) {
 			translatableString = translatableString.replaceAll("\n", "\\\\n\"\n\"");
 			translatableString = "\"\n\""+translatableString;
