@@ -58,6 +58,10 @@ public class POFile
     {
         return entries.length;
     }
+    
+    public POEntry getHeader() {
+    	return header;
+    }
 
     /**
      * Checks if the specified flag is set in the entry,

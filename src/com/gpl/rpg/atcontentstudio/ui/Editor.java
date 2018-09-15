@@ -812,7 +812,7 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 						if (text.length() > 60) {
 							text = text.substring(0, 57)+"...";
 						}
-						label.setText(((GameDataElement)value).getDataType().toString()+"/"+((Quest)((QuestStage)value).parent).id+":"+text);
+						label.setText(((GameDataElement)value).getDataType().toString()+"/"+((Quest)((QuestStage)value).parent).id+"#"+((QuestStage)value).progress+":"+text);
 					} else {
 						label.setText(((GameDataElement)value).getDataType().toString()+"/"+((GameDataElement)value).getDesc());
 					}

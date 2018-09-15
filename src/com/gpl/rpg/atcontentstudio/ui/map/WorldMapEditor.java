@@ -986,6 +986,20 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 				}
 			}
 		});
+		final JButton bookmark = new JButton(new ImageIcon(node.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+		savePane.add(bookmark, JideBoxLayout.FIX);
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (node.bookmark == null) {
+					node.getProject().bookmark(node);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					node.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
+				}
+			}
+		});
 		//Placeholder. Fills the eventual remaining space.
 		savePane.add(new JPanel(), JideBoxLayout.VARY);
 		return savePane;

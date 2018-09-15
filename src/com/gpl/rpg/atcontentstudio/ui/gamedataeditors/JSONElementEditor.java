@@ -204,6 +204,7 @@ public abstract class JSONElementEditor extends Editor {
 				}
 			});
 			savePane.add(delete, JideBoxLayout.FIX);
+			
 		} else {
 			if (proj.alteredContent.gameData.getGameDataElement(concreteNodeClass, node.id) != null) {
 				savePane.add(message = new JLabel(ALTERED_EXISTS_MESSAGE), JideBoxLayout.FIX);
@@ -242,8 +243,10 @@ public abstract class JSONElementEditor extends Editor {
 		}
 		JButton prev = new JButton(new ImageIcon(DefaultIcons.getArrowLeftIcon()));
 		JButton next = new JButton(new ImageIcon(DefaultIcons.getArrowRightIcon()));
+		final JButton bookmark = new JButton(new ImageIcon(node.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
 		savePane.add(prev, JideBoxLayout.FIX);
 		savePane.add(next, JideBoxLayout.FIX);
+		savePane.add(bookmark, JideBoxLayout.FIX);
 		if (node.getParent().getIndex(node) == 0) {
 			prev.setEnabled(false);
 		}
@@ -268,6 +271,20 @@ public abstract class JSONElementEditor extends Editor {
 				}
 			}
 		});
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (node.bookmark == null) {
+					node.getProject().bookmark(node);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					node.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
+				}
+			}
+		});
+
+		
 		//Placeholder. Fills the eventual remaining space.
 		savePane.add(new JPanel(), JideBoxLayout.VARY);
 		pane.add(savePane, JideBoxLayout.FIX);

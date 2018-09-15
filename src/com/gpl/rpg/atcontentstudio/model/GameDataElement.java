@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.tree.TreeNode;
 
+import com.gpl.rpg.atcontentstudio.model.bookmarks.BookmarkEntry;
+
 public abstract class GameDataElement implements ProjectTreeNode, Serializable {
 
 	private static final long serialVersionUID = 2028934451226743389L;
@@ -30,6 +32,8 @@ public abstract class GameDataElement implements ProjectTreeNode, Serializable {
 	public ProjectTreeNode parent;
 	
 	public boolean writable = false;
+	
+	public BookmarkEntry bookmark = null;
 	
 	//List of objects whose transition to "linked" state made them point to this instance.
 	private Map<GameDataElement, Integer> backlinks = new ConcurrentHashMap<GameDataElement, Integer>();

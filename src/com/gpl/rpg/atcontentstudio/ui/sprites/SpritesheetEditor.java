@@ -100,6 +100,20 @@ public class SpritesheetEditor extends Editor {
 		});
 		buttonPane.add(openImage, JideBoxLayout.FIX);
 		buttonPane.add(getWarningLabel(), JideBoxLayout.FIX);
+		final JButton bookmark = new JButton(new ImageIcon(sheet.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+		buttonPane.add(bookmark, JideBoxLayout.FIX);
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (target.bookmark == null) {
+					target.getProject().bookmark(target);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					target.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
+				}
+			}
+		});
 		buttonPane.add(new JPanel(), JideBoxLayout.VARY);
 		pane.add(buttonPane, JideBoxLayout.FIX);
 		addLabelField(pane, "Spritesheet ID: ", sheet.id);
