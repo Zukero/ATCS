@@ -75,7 +75,7 @@ public class DialogueGraphView extends Display {
     public static final String HIDDEN_REPLY = "hidden_reply";
     public static final String HAS_REQS = "has_reqs";
     
-    private static final String TRANSLATION_LOADING="Loading translation...";
+    private static final String TRANSLATION_LOADING="Loading translation for:\n";
     private String translationHeader="\n---[ Translation from weblate ]---\n";
 	
     
@@ -205,7 +205,7 @@ public class DialogueGraphView extends Display {
 			if (dialogue.message == null) {
 				label = "[Selector]";
 			} else if (translatorMode) {
-				label = dialogue.message+translationHeader+TRANSLATION_LOADING;
+				label = dialogue.message+translationHeader+TRANSLATION_LOADING+dialogue.message;
 				final String message = dialogue.message;
 				t = new Thread("Get weblate translation for "+message) {
 					public void run() {
@@ -239,11 +239,10 @@ public class DialogueGraphView extends Display {
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-//			rNode.setString(LABEL, translatorMode ? r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText : r.text);
 			String label;
 			Thread t = null;
 			if (translatorMode) {
-				label = r.text+translationHeader+TRANSLATION_LOADING;
+				label = r.text+translationHeader+TRANSLATION_LOADING+r.text;
 				final String message = r.text;
 				t = new Thread("Get weblate translation for "+message) {
 					public void run() {
