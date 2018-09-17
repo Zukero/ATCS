@@ -160,7 +160,7 @@ public class DialogueGraphView extends Display {
         
         // now create the main layout routine
         ActionList layout = new ActionList();//Activity.INFINITY);
-        NodeLinkTreeLayout treeLayout = new NodeLinkTreeLayout(GRAPH, prefuse.Constants.ORIENT_LEFT_RIGHT, 120, 40, 40);
+        NodeLinkTreeLayout treeLayout = new NodeLinkTreeLayout(GRAPH, prefuse.Constants.ORIENT_LEFT_RIGHT, 120, translatorMode ? 80 : 40, translatorMode ? 80 : 40);
         treeLayout.setLayoutAnchor(new Point2D.Double(25,300));
         layout.add(treeLayout);
         layout.add(new EdgesLabelDecoratorLayout(EDGES_LABELS));
@@ -252,7 +252,7 @@ public class DialogueGraphView extends Display {
 					};
 				};
 			} else {
-				label = dialogue.message;
+				label = r.text;
 			}
 			rNode.setString(LABEL, label);
 			if (t != null) t.start();
