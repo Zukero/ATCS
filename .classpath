@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="src" path="hacked-libtiled"/>
 	<classpathentry kind="src" path="siphash-zackehh/src/main/java"/>
+	<classpathentry kind="src" path="minify"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jide-oss.jar"/>
 	<classpathentry kind="lib" path="lib/json_simple-1.1.jar"/>

@@ -98,27 +98,42 @@ public class TileSet implements Iterable<Tile>
         
         File f = new File(imgFilename);
 
-        Image image = ImageIO.read(f.getCanonicalFile());
+        BufferedImage image = ImageIO.read(f.getCanonicalFile());
         if (image == null) {
-            throw new IOException("Failed to load " + tilebmpFile);
+            throw new IOException("Failed to load " + imgFilename);
         }
 
-        Toolkit tk = Toolkit.getDefaultToolkit();
+        tilebmpFile = f;
+        tileDimensions = new Rectangle(cutter.getTileDimensions());
+        
+//        Toolkit tk = Toolkit.getDefaultToolkit();
+//
+//        if (transparentColor != null) {
+//            int rgb = transparentColor.getRGB();
+//            image = tk.createImage(
+//                    new FilteredImageSource(image.getSource(),
+//                            new TransparentImageFilter(rgb)));
+//        }
+//
+//        BufferedImage buffered = new BufferedImage(
+//                image.getWidth(null),
+//                image.getHeight(null),
+//                BufferedImage.TYPE_INT_ARGB);
+//        buffered.getGraphics().drawImage(image, 0, 0, null);
 
-        if (transparentColor != null) {
-            int rgb = transparentColor.getRGB();
-            image = tk.createImage(
-                    new FilteredImageSource(image.getSource(),
-                            new TransparentImageFilter(rgb)));
-        }
+        importTileBitmap(image, cutter);
+    }
+    
+    public void weakImportTileBitmap(String imgFilename, TileCutter cutter)
+            throws IOException
+    {
+        setTilesetImageFilename(imgFilename);
+        
+        File f = new File(imgFilename);
 
-        BufferedImage buffered = new BufferedImage(
-                image.getWidth(null),
-                image.getHeight(null),
-                BufferedImage.TYPE_INT_ARGB);
-        buffered.getGraphics().drawImage(image, 0, 0, null);
+        tilebmpFile = f;
+        tileDimensions = new Rectangle(cutter.getTileDimensions());
 
-        importTileBitmap(buffered, cutter);
     }
     
     public void loadFromProject(String name, TMXMap tmxMap, int tileWidth, int tileHeight) {

@@ -1,4 +1,4 @@
-package com.gpl.rpg.atcontentstudio.ui.tools.i18n;
+package com.gpl.rpg.atcontentstudio.model.tools.i18n;
 
 import java.io.File;
 import java.io.FileWriter;

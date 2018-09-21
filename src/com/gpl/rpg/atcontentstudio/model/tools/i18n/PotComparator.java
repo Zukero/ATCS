@@ -1,4 +1,4 @@
-package com.gpl.rpg.atcontentstudio.ui.tools.i18n;
+package com.gpl.rpg.atcontentstudio.model.tools.i18n;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -24,15 +24,15 @@ import net.launchpad.tobal.poparser.POParser;
  * To use this, paste the following script in the beanshell console of ATCS.
  * Don't forget to change the project number to suit your needs.
  * 
- * import com.gpl.rpg.atcontentstudio.model.Workspace;
- * import com.gpl.rpg.atcontentstudio.ui.tools.i18n.PotGenerator;
- * import com.gpl.rpg.atcontentstudio.ui.tools.i18n.PotComparator;
- * 
- * proj = Workspace.activeWorkspace.projects.get(7);
- * PotGenerator.generatePotFileForProject(proj);
- * comp = new PotComparator(proj);
- * comp.compare();
- * comp.updatePoFiles(proj);
+import com.gpl.rpg.atcontentstudio.model.Workspace;
+import com.gpl.rpg.atcontentstudio.model.tools.i18n.PotGenerator;
+import com.gpl.rpg.atcontentstudio.model.tools.i18n.PotComparator;
+ 
+proj = Workspace.activeWorkspace.projects.get(7);
+PotGenerator.generatePotFileForProject(proj);
+comp = new PotComparator(proj);
+comp.compare();
+comp.updatePoFiles(proj);
  * 
  * 
  *

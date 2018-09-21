@@ -22,6 +22,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
+import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class BeanShellView extends JFrame {
@@ -85,17 +86,29 @@ public class BeanShellView extends JFrame {
 		run.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Interpreter shInt = new Interpreter();
-				PrintStream printOut = new PrintStream(new AreaOutputStream(outArea));
+				final Interpreter shInt = new Interpreter();
+				final PrintStream printOut = new PrintStream(new AreaOutputStream(outArea));
 				shInt.setOut(printOut);
-				PrintStream printErr = new PrintStream(new AreaOutputStream(errArea));
+				final PrintStream printErr = new PrintStream(new AreaOutputStream(errArea));
 				shInt.setErr(printErr);
 				
-				try {
-					shInt.eval(shArea.getText());
-				} catch (EvalError e1) {
-					e1.printStackTrace(printErr);
-				}
+				WorkerDialog.showTaskMessage("Running your script...", null, new Runnable() {
+					@Override
+					public void run() {
+						
+						try {
+							shInt.eval(shArea.getText());
+						} catch (EvalError e1) {
+							e1.printStackTrace(printErr);
+						}
+						printOut.flush();
+						printErr.flush();
+						printOut.close();
+						printErr.close();
+						
+					}
+				});
+				
 			}
 		});
 		
