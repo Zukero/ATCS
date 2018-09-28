@@ -82,6 +82,9 @@ public class AboutEditor extends Editor {
 			"A slightly modified version of <a href=\"https://launchpad.net/po-parser\">General PO Parser</a> by Balázs Tóth<br/>" +
 			"License: <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPL v3</a><br/>" +
 			"<br/>" +
+			"A slightly modified version of <a href=\"www.whoischarles.com\">Minify.java</a> by Charles Bihis<br/>" +
+			"License: <a href=\"https://github.com/charlesbihis/minify#license\">Douglas Crockford variant of MIT License</a><br/>" +
+			"<br/>" +
 			"See the tabs below to find the full license text for each of these.<br/>" +
 			"<br/>" +
 			"The Windows installer was created with:<br/>" +
@@ -134,6 +137,7 @@ public class AboutEditor extends Editor {
 		editorTabsHolder.add("SipHash for Java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.siphash-zackehh.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("jsoup License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.jsoup.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("General PO Parser License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
+		editorTabsHolder.add("Minify.java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.minify.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("ATCS License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		
 	}
