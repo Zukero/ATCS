@@ -1,6 +1,11 @@
 package com.zackehh.siphash;
 
-import static com.zackehh.siphash.SipHashConstants.*;
+import static com.zackehh.siphash.SipHashConstants.DEFAULT_C;
+import static com.zackehh.siphash.SipHashConstants.DEFAULT_D;
+import static com.zackehh.siphash.SipHashConstants.INITIAL_V0;
+import static com.zackehh.siphash.SipHashConstants.INITIAL_V1;
+import static com.zackehh.siphash.SipHashConstants.INITIAL_V2;
+import static com.zackehh.siphash.SipHashConstants.INITIAL_V3;
 
 /**
  * Main entry point for SipHash, providing a basic hash

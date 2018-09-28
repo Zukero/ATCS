@@ -63,6 +63,7 @@ public class NPCEditor extends JSONElementEditor {
 	private JTextField idField;
 	private JTextField nameField;
 	private JTextField spawnGroupField;
+	private JTextField factionField;
 	private JSpinner experienceField;
 	private MyComboBox dialogueBox;
 	private MyComboBox droplistBox;
@@ -246,6 +247,7 @@ public class NPCEditor extends JSONElementEditor {
 		idField = addTextField(pane, "Internal ID: ", npc.id, npc.writable, listener);
 		nameField = addTranslatableTextField(pane, "Display name: ", npc.name, npc.writable, listener);
 		spawnGroupField = addTextField(pane, "Spawn group ID: ", npc.spawngroup_id, npc.writable, listener);
+		factionField = addTextField(pane, "Faction ID: ", npc.faction_id, npc.writable, listener);
 		experienceField = addIntegerField(pane, "Experience reward: ", npc.getMonsterExperience(), false, false, listener);
 		dialogueBox = addDialogueBox(pane, npc.getProject(), "Initial phrase: ", npc.dialogue, npc.writable, listener);
 		droplistBox = addDroplistBox(pane, npc.getProject(), "Droplist / Shop inventory: ", npc.droplist, npc.writable, listener);
@@ -1256,6 +1258,8 @@ public class NPCEditor extends JSONElementEditor {
 				npcIcon.repaint();
 			} else if (source == spawnGroupField) {
 				npc.spawngroup_id = (String) value;
+			}  else if (source == factionField) {
+				npc.faction_id = (String) value;
 			} else if (source == dialogueBox) {
 				if (npc.dialogue != null) {
 					npc.dialogue.removeBacklink(npc);
@@ -1398,7 +1402,7 @@ public class NPCEditor extends JSONElementEditor {
 			} else if (source == hitTargetConditionClear && (Boolean) value) {
 				selectedHitEffectTargetCondition.magnitude = ActorCondition.MAGNITUDE_CLEAR;
 				selectedHitEffectTargetCondition.duration = null;
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			}  else if (source == hitTargetConditionApply && (Boolean) value) {
@@ -1407,7 +1411,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionImmunity && (Boolean) value) {
@@ -1416,7 +1420,7 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionMagnitude) {
@@ -1428,12 +1432,12 @@ public class NPCEditor extends JSONElementEditor {
 				if (selectedHitEffectTargetCondition.duration == null || selectedHitEffectTargetCondition.duration == ActorCondition.DURATION_NONE) {
 					selectedHitEffectTargetCondition.duration = 1;
 				}
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionForever && (Boolean) value) {
 				selectedHitEffectTargetCondition.duration = ActorCondition.DURATION_FOREVER;
-				updateHitSourceTimedConditionWidgets(selectedHitEffectTargetCondition);
+				updateHitTargetTimedConditionWidgets(selectedHitEffectTargetCondition);
 				hitTargetConditionsListModel.itemChanged(selectedHitEffectTargetCondition);
 				updateHit = true;
 			} else if (source == hitTargetConditionDuration) {

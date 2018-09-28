@@ -36,6 +36,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 	private IntegerBasedCheckBox stackingBox;
 	
 	//private JTextField roundVisualField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox roundVisualField;
 	private JSpinner roundHpMinField;
 	private JSpinner roundHpMaxField;
@@ -43,6 +44,7 @@ public class ActorConditionEditor extends JSONElementEditor {
 	private JSpinner roundApMaxField;
 	
 	//private JTextField fullRoundVisualField;
+	@SuppressWarnings("rawtypes")
 	private JComboBox fullRoundVisualField;
 	private JSpinner fullRoundHpMinField;
 	private JSpinner fullRoundHpMaxField;

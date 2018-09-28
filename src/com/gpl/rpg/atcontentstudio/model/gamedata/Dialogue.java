@@ -60,6 +60,7 @@ public class Dialogue extends JSONElement {
 			actorCondition,
 			actorConditionImmunity,
 			alignmentChange,
+			alignmentSet,
 			giveItem,
 			createTimer,
 			spawnAll,
@@ -255,7 +256,8 @@ public class Dialogue extends JSONElement {
 						reward.reward_obj = proj.getActorCondition(reward.reward_obj_id);
 						break;
 					case alignmentChange:
-						//Nothing to do (yet ?).
+					case alignmentSet:
+							//Nothing to do (yet ?).
 						break;
 					case createTimer:
 						//Nothing to do.

@@ -182,9 +182,16 @@ public class WorkspaceSettingsEditor extends JDialog {
 		useInternetBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				translatorLanguagesBox.setEnabled(useInternetBox.isSelected());
+				translatorLanguagesBox.setEnabled(useInternetBox.isSelected() && translatorModeBox.isSelected());
 				translatorModeBox.setEnabled(useInternetBox.isSelected());
 				checkUpdatesBox.setEnabled(useInternetBox.isSelected());
+			}
+		});
+		
+		translatorModeBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				translatorLanguagesBox.setEnabled(translatorModeBox.isSelected());
 			}
 		});
 		

@@ -40,8 +40,6 @@ public class QuestEditor extends JSONElementEditor {
 
 	private static final long serialVersionUID = 5701667955210615366L;
 
-	private static final Integer one = 1;
-	
 	private static final String form_view_id = "Form";
 	private static final String json_view_id = "JSON";
 	

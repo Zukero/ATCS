@@ -162,6 +162,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	private JComboBox evaluateTriggerBox;
 	private JSpinner quantityField;
 	private JCheckBox spawnActiveForNewGame;
+	private JCheckBox spawnIgnoreAreas;
 	private JTextField spawngroupField;
 	@SuppressWarnings("rawtypes")
 	private JList npcList;
@@ -211,7 +212,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		editorTabsHolder.add("TMX", tmxScroller);
 		editorTabsHolder.add("XML", xmlScroller);
 		//editorTabsHolder.add("Replacements", replScroller);
-		editorTabsHolder.add("Replacements", getReplacementSimulatorPane());
+		editorTabsHolder.add("Testing", getReplacementSimulatorPane());
 		
 	}
 	
@@ -629,6 +630,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 			spawngroupField = addTextField(pane, "Spawn group ID: ", ((SpawnArea)selected).spawngroup_id, ((TMXMap)target).writable, listener);
 			quantityField = addIntegerField(pane, "Number of spawned NPCs: ", ((SpawnArea)selected).quantity, false, ((TMXMap)target).writable, listener);
 			spawnActiveForNewGame = addBooleanBasedCheckBox(pane, "Active in a new game: ", ((SpawnArea)selected).active, ((TMXMap)target).writable, listener);
+			spawnIgnoreAreas = addBooleanBasedCheckBox(pane, "Monsters can walk on other game objects: ", ((SpawnArea)selected).ignoreAreas, ((TMXMap)target).writable, listener);
 			npcListModel = new SpawnGroupNpcListModel((SpawnArea) selected);
 			npcList = new JList(npcListModel);
 			npcList.setCellRenderer(new GDERenderer(true, ((TMXMap)target).writable));
@@ -780,7 +782,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	public JPanel getReplacementSimulatorPane() {
 		JPanel replacementSimulator = new JPanel();
 		replacementSimulator.setLayout(new JideBoxLayout(replacementSimulator, JideBoxLayout.PAGE_AXIS));
+		JPanel toolsPane = new JPanel();
+		toolsPane.setLayout(new JideBoxLayout(toolsPane, JideBoxLayout.LINE_AXIS));
 		final JCheckBox walkableVisibleBox = new JCheckBox("Show \""+TMXMap.WALKABLE_LAYER_NAME+"\" layer.");
+		final JCheckBox showHeroBox = new JCheckBox("Show hero on walkable tiles under the mouse pointer.");
+		final JCheckBox showTooltipBox = new JCheckBox("Show tooltip with stack of tiles.");
 		JPanel areasActivationPane = new JPanel();
 		areasActivationPane.setLayout(new JideBoxLayout(areasActivationPane, JideBoxLayout.PAGE_AXIS));
 		TreeModel areasTreeModel = new ReplaceAreasActivationTreeModel();
@@ -798,16 +804,36 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		activateAndViewPane.add(areasActivationPane, JideBoxLayout.FIX);
 		activateAndViewPane.add(new JScrollPane(viewer), JideBoxLayout.VARY);
 
-		replacementSimulator.add(walkableVisibleBox, JideBoxLayout.FIX);
+		toolsPane.add(walkableVisibleBox, JideBoxLayout.FIX);
+		toolsPane.add(showTooltipBox, JideBoxLayout.FIX);
+		toolsPane.add(showHeroBox, JideBoxLayout.FIX);
+		toolsPane.add(new JPanel(), JideBoxLayout.VARY);
+		
+		replacementSimulator.add(toolsPane, JideBoxLayout.FIX);
 		replacementSimulator.add(activateAndViewPane, JideBoxLayout.VARY);
 		
-		walkableVisibleBox.setSelected(true);
+		walkableVisibleBox.setSelected(viewer.showWalkable);
 		walkableVisibleBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				viewer.showWalkable = walkableVisibleBox.isSelected();
 				viewer.revalidate();
 				viewer.repaint();
+			}
+		});
+
+		showHeroBox.setSelected(viewer.showHeroWithMouse);
+		showHeroBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.showHeroWithMouse = showHeroBox.isSelected();
+			}
+		});
+		showTooltipBox.setSelected(viewer.showTooltip);
+		showTooltipBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				viewer.showTooltip = showTooltipBox.isSelected();
 			}
 		});
 		activate.addActionListener(new ActionListener() {
@@ -1753,6 +1779,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				}
 			});
 			savePane.add(delete, JideBoxLayout.FIX);
+			final JButton bookmark = new JButton(new ImageIcon(map.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+			savePane.add(bookmark, JideBoxLayout.FIX);
+			bookmark.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					if (map.bookmark == null) {
+						map.getProject().bookmark(map);
+						bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+					} else {
+						map.bookmark.delete();
+						bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
+					}
+				}
+			});
 		} else {
 			if (proj.getMap(map.id) != map) {
 				savePane.add(message = new JLabel(ALTERED_EXISTS_MESSAGE), JideBoxLayout.FIX);
@@ -1813,6 +1853,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				ProjectTreeNode nextNode = (ProjectTreeNode) map.getParent().getChildAt(map.getParent().getIndex(map) + 1);
 				if (nextNode != null && nextNode instanceof GameDataElement) {
 					ATContentStudio.frame.openEditor((GameDataElement) nextNode);
+				}
+			}
+		});
+		final JButton bookmark = new JButton(new ImageIcon(map.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+		savePane.add(bookmark, JideBoxLayout.FIX);
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (map.bookmark == null) {
+					map.getProject().bookmark(map);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					map.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
 				}
 			}
 		});
@@ -1992,6 +2046,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				if (selectedMapObject instanceof SpawnArea) {
 					SpawnArea area = (SpawnArea) selectedMapObject;
 					area.active = (Boolean) value;
+				}
+			} else if (source == spawnIgnoreAreas) {
+				if (selectedMapObject instanceof SpawnArea) {
+					SpawnArea area = (SpawnArea) selectedMapObject;
+					area.ignoreAreas = (Boolean) value;
 				}
 			} else if (source == requirementTypeCombo) {
 				if (selectedMapObject instanceof KeyArea) {
@@ -2176,11 +2235,13 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 		private TMXMap map;
 		public ReplaceArea highlighted = null;
 		public boolean showWalkable = true;
+		public boolean showHeroWithMouse = true;
+		public boolean showTooltip = true;
 	    private OrthogonalRenderer renderer;
 	    
-	    private String groundName, objectsName, aboveName, walkableName;
+	    private String groundName, objectsName, aboveName, topName, walkableName;
 	    private Map<String, tiled.core.TileLayer> layersByName = new LinkedHashMap<String, tiled.core.TileLayer>();
-	    private tiled.core.TileLayer ground, objects, above, walkable;
+	    private tiled.core.TileLayer ground, objects, above, top, walkable;
 	    
 	    private Map<String, List<ReplaceArea>> replacementsForLayer = new LinkedHashMap<String, List<ReplaceArea>>();
 	    public Map<ReplaceArea, Boolean> activeReplacements = new LinkedHashMap<ReplaceArea, Boolean>();
@@ -2199,8 +2260,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        addMouseMotionListener(new MouseMotionAdapter() {
 	        	@Override
 	        	public void mouseMoved(MouseEvent e) {
+	        		Point oldTooltippedTile = new Point(tooltippedTile);
 	        		tooltippedTile.setLocation(e.getX() / 32, e.getY() / 32);
-	        		if (!((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
+	        		if (!showTooltip || !((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y)) {
 	        			if (tooltipActivated) {
 	        				//Hides the tooltip...
 	        				ToolTipManager.sharedInstance().setEnabled(false);
@@ -2208,11 +2270,15 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        				tooltipActivated = false;
 	        			}
 	        		} else {
-	        			if (!tooltipActivated) {
+	        			if (showTooltip && !tooltipActivated) {
 	        				ToolTipManager.sharedInstance().registerComponent(TMXReplacementViewer.this);
 	        				ToolTipManager.sharedInstance().setEnabled(true);
 	        				tooltipActivated = true;
 	        			}
+	        		}
+	        		if (showHeroWithMouse && (oldTooltippedTile.x != tooltippedTile.x || oldTooltippedTile.y != tooltippedTile.y) ) {
+	        			TMXReplacementViewer.this.revalidate();
+	        			TMXReplacementViewer.this.repaint();
 	        		}
 	        	}
 			});
@@ -2223,9 +2289,9 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    }
 	    
 	    public void init() {
-	    	groundName = objectsName = aboveName = walkableName = null;
+	    	groundName = objectsName = aboveName = walkableName = topName = null;
 	    	layersByName.clear();
-	    	ground = objects = above = walkable = null;
+	    	ground = objects = above = walkable = top = null;
 	    	replacementsForLayer.clear();
 	    	
 	    	for (tiled.core.MapLayer layer : map.tmxMap.getLayers()) {
@@ -2237,6 +2303,8 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        			objectsName = layer.getName();
 	        		} else if (TMXMap.ABOVE_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
 	        			aboveName = layer.getName();
+	        		} else if (TMXMap.TOP_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
+	        			topName = layer.getName();
 	        		} else if (TMXMap.WALKABLE_LAYER_NAME.equalsIgnoreCase(layer.getName())) {
 	        			walkableName = layer.getName();
 	        		}
@@ -2266,6 +2334,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    	ground = mergeReplacements(groundName);
 	    	objects = mergeReplacements(objectsName);
 	    	above = mergeReplacements(aboveName);
+	    	top = mergeReplacements(topName);
 	    	walkable = mergeReplacements(walkableName);
 	    }
 	    
@@ -2321,10 +2390,18 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        	renderer.paintTileLayer(g2d, objects);
 	        }
 	        
+	        if (showHeroWithMouse && tooltippedTile != null && ((TMXMap)target).tmxMap.contains(tooltippedTile.x, tooltippedTile.y) && 
+	        		walkable != null && walkable.getTileAt(tooltippedTile.x, tooltippedTile.y) == null) {
+	        	g2d.drawImage(DefaultIcons.getHeroImage(), tooltippedTile.x * 32, tooltippedTile.y * 32, 32, 32, null);
+	        }
+	        
 	        if (above != null) {
 	        	renderer.paintTileLayer(g2d, above);
 	        }
-	        
+
+	        if (top != null) {
+	        	renderer.paintTileLayer(g2d, top);
+	        }
 	        if (walkable != null && showWalkable) {
 	        	renderer.paintTileLayer(g2d, walkable);
 	        }
@@ -2381,10 +2458,12 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    JLabel noTileGround = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
 	    JLabel noTileObjects = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
 	    JLabel noTileAbove = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
+	    JLabel noTileTop = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
 	    {
 	    	noTileGround.setPreferredSize(new Dimension(32, 32));
 	    	noTileObjects.setPreferredSize(new Dimension(32, 32));
 	    	noTileAbove.setPreferredSize(new Dimension(32, 32));
+	    	noTileTop.setPreferredSize(new Dimension(32, 32));
 	    }
 	    Point tooltippedTile = new Point();
 	    JToolTip tt = null;
@@ -2406,6 +2485,20 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    	if (tooltippedTile != null) {
 	    		Image tile;
 	    		JLabel label;
+
+	    		if (top != null && top.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
+	    			tile = top.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    		} else {
+	    			tile = null;
+	    		}
+	    		if (tile != null) {
+	    			label = new JLabel(new ImageIcon(tile));
+	    			label.setPreferredSize(new Dimension(32,32));
+	    			content.add(label, JideBoxLayout.FIX);
+	    			//Fix when (if?) Top is advertised publicly. 
+//	    		} else {
+//	    			content.add(noTileTop, JideBoxLayout.FIX);
+	    		}
 	    		
 	    		if (above != null && above.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
 	    			tile = above.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();

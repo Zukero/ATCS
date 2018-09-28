@@ -51,6 +51,7 @@ public class AboutEditor extends Editor {
 			"<br/>" +
 			"Contributors: <br/>" +
 			"Quentin Delvallet<br/>" +
+			"Žižkin<br/>" +
 			"<br/>" +
 			"This project uses the following libraries:<br/>" +
 			"<a href=\"http://code.google.com/p/json-simple/\">JSON.simple</a> by Yidong Fang & Chris Nokleberg.<br/>" +
@@ -77,6 +78,12 @@ public class AboutEditor extends Editor {
 			"<br/>" +
 			"<a href=\"https://jsoup.org/\">jsoup</a> by Jonathan Hedley<br/>" +
 			"License: <a href=\"https://jsoup.org/license\">MIT License</a><br/>" +
+			"<br/>" +
+			"A slightly modified version of <a href=\"https://launchpad.net/po-parser\">General PO Parser</a> by Balázs Tóth<br/>" +
+			"License: <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPL v3</a><br/>" +
+			"<br/>" +
+			"A slightly modified version of <a href=\"www.whoischarles.com\">Minify.java</a> by Charles Bihis<br/>" +
+			"License: <a href=\"https://github.com/charlesbihis/minify#license\">Douglas Crockford variant of MIT License</a><br/>" +
 			"<br/>" +
 			"See the tabs below to find the full license text for each of these.<br/>" +
 			"<br/>" +
@@ -129,6 +136,8 @@ public class AboutEditor extends Editor {
 		editorTabsHolder.add("BeanShell License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.LGPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("SipHash for Java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.siphash-zackehh.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("jsoup License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.jsoup.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
+		editorTabsHolder.add("General PO Parser License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
+		editorTabsHolder.add("Minify.java License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.minify.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		editorTabsHolder.add("ATCS License", getInfoPane(new Scanner(ATContentStudio.class.getResourceAsStream("/LICENSE.GPLv3.txt"), "UTF-8").useDelimiter("\\A").next(), "text/text"));
 		
 	}

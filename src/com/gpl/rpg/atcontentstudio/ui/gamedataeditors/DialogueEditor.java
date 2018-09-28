@@ -96,6 +96,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JPanel rewardsParamsPane;
 	private MyComboBox rewardMap;
 	private JTextField rewardObjId;
+	@SuppressWarnings("rawtypes")
 	private JComboBox rewardObjIdCombo;
 	private MyComboBox rewardObj;
 	private JComponent rewardValue;
@@ -120,6 +121,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private JComboBox requirementTypeCombo;
 	private JPanel requirementParamsPane;
 	private MyComboBox requirementObj;
+	@SuppressWarnings("rawtypes")
 	private JComboBox requirementSkill;
 	private JTextField requirementObjId;
 	private JComponent requirementValue;
@@ -446,6 +448,7 @@ public class DialogueEditor extends JSONElementEditor {
 				}
 				break;
 			case alignmentChange:
+			case alignmentSet:
 				rewardMap = null;
 				rewardObjId = addTextField(pane, "Faction: ", reward.reward_obj_id, writable, listener);
 				rewardObjIdCombo = null;
@@ -470,7 +473,7 @@ public class DialogueEditor extends JSONElementEditor {
 				rewardMap = null;
 				rewardObjId = null;
 				rewardObj = addItemBox(pane, ((Dialogue)target).getProject(), "Item: ", (Item) reward.reward_obj, writable, listener);
-				rewardValue = addIntegerField(pane, "Quantity: ", reward.reward_value, false, writable, listener);
+				rewardValue = addIntegerField(pane, "Quantity: ", reward.reward_value, true, writable, listener);
 				break;
 			case removeQuestProgress:
 			case questProgress:
@@ -694,7 +697,7 @@ public class DialogueEditor extends JSONElementEditor {
 			removeElementListener(requirementObj);
 		}
 		
-		requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), requirement.type, writable, listener);
+		requirementTypeCombo = addEnumValueBox(pane, "Requirement type: ", Requirement.RequirementType.values(), requirement == null ? null : requirement.type, writable, listener);
 		requirementParamsPane = new JPanel();
 		requirementParamsPane.setLayout(new JideBoxLayout(requirementParamsPane, JideBoxLayout.PAGE_AXIS));
 		updateRequirementParamsEditorPane(requirementParamsPane, requirement, listener);
@@ -711,7 +714,7 @@ public class DialogueEditor extends JSONElementEditor {
 			removeElementListener(requirementObj);
 		}
 		
-		if (requirement.type != null) {
+		if (requirement != null && requirement.type != null) {
 			switch (requirement.type) {
 			case consumedBonemeals:
 			case spentGold:
@@ -883,6 +886,10 @@ public class DialogueEditor extends JSONElementEditor {
 				break;
 			case alignmentChange:
 				label.setText("Change alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
+				label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
+				break;
+			case alignmentSet:
+				label.setText("Set alignment for faction "+rewardObjDesc+" : "+reward.reward_value);
 				label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
 				break;
 			case createTimer:

@@ -43,18 +43,18 @@ import org.eclipse.jgit.lib.ReflogReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 
+import prefuse.data.expression.parser.ExpressionParser;
+
 import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.ui.StudioFrame;
 import com.gpl.rpg.atcontentstudio.ui.WorkerDialog;
 import com.gpl.rpg.atcontentstudio.ui.WorkspaceSelector;
 
-import prefuse.data.expression.parser.ExpressionParser;
-
 
 public class ATContentStudio {
 
 	public static final String APP_NAME = "Andor's Trail Content Studio";
-	public static final String APP_VERSION = "v0.6.8";
+	public static final String APP_VERSION = "v0.6.14";
 	
 	public static final String CHECK_UPDATE_URL = "https://andorstrail.com/static/ATCS_latest";
 	public static final String DOWNLOAD_URL = "https://andorstrail.com/viewtopic.php?f=6&t=4806";

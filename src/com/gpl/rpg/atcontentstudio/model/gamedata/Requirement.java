@@ -172,6 +172,7 @@ public class Requirement extends JSONElement {
 		case skillLevel:
 		case spentGold:
 		case timerElapsed:
+		case factionScore:
 			break;
 		}
 		if (this.required_obj != null) this.required_obj.addBacklink((GameDataElement) this.parent);
@@ -190,6 +191,7 @@ public class Requirement extends JSONElement {
 		clone.state = this.state;
 		clone.required_obj_id = this.required_obj_id;
 		clone.required_value = this.required_value;
+		clone.negated = this.negated;
 		clone.required_obj = this.required_obj;
 		clone.type = this.type;
 		if (clone.required_obj != null && parent != null) {

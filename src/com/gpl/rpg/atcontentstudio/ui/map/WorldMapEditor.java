@@ -316,7 +316,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				String selectedMap = null;
-				boolean update = false;
+//				boolean update = false;
 				int x = (int) (e.getX() / mapView.zoomLevel);
 				int y = (int) (e.getY() / mapView.zoomLevel);
 				for (String s : mapView.mapLocations.keySet()) {
@@ -333,19 +333,19 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 								if (mapView.getSelectedMapsIDs().size() > 1) {
 									removeFromSelection(selectedMap);
 //									mapView.selected.remove(selectedMap);
-									update = true;
+//									update = true;
 								}
 							} else {
 								addToSelection(selectedMap);
 //								mapView.selected.add(selectedMap);
-								update = true;
+//								update = true;
 							}
 						} else {
 							clearSelection();
 //							mapView.selected.clear();
 							addToSelection(selectedMap);
 //							mapView.selected.add(selectedMap);
-							update = true;
+//							update = true;
 						}
 					}
 				} else if (editMode == EditMode.addMap && mapBeingAddedID != null) {
@@ -354,7 +354,7 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 						pushToModel();
 					}
 					mapView.updateFromModel();
-					update = true;
+//					update = true;
 					mapBeingAddedID = null;
 				}
 //				if (update) {
@@ -983,6 +983,20 @@ public class WorldMapEditor extends Editor implements FieldUpdateListener {
 				ProjectTreeNode nextNode = (ProjectTreeNode) node.getParent().getChildAt(node.getParent().getIndex(node) + 1);
 				if (nextNode != null && nextNode instanceof GameDataElement) {
 					ATContentStudio.frame.openEditor((GameDataElement) nextNode);
+				}
+			}
+		});
+		final JButton bookmark = new JButton(new ImageIcon(node.bookmark != null ? DefaultIcons.getBookmarkActiveIcon() : DefaultIcons.getBookmarkInactiveIcon()));
+		savePane.add(bookmark, JideBoxLayout.FIX);
+		bookmark.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (node.bookmark == null) {
+					node.getProject().bookmark(node);
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkActiveIcon()));
+				} else {
+					node.bookmark.delete();
+					bookmark.setIcon(new ImageIcon(DefaultIcons.getBookmarkInactiveIcon()));
 				}
 			}
 		});

@@ -38,7 +38,7 @@ public class WorkspaceSettings {
 	public static String DEFAULT_IMG_EDITOR_COMMAND = "gimp";
 	public Setting<String> imageEditorCommand = new PrimitiveSetting<String>("imageEditorCommand", DEFAULT_IMG_EDITOR_COMMAND);
 
-	public static String[] LANGUAGE_LIST = new String[]{null, "de", "ru", "pl", "fr", "it", "es", "nl", "uk", "ca", "sv", "pt", "pt_BR", "zh_Hant", "zh_Hans", "ja", "cs", "tr", "ko", "hu", "sl", "bg", "id", "fi", "th", "gl", "ms" ,"pa", "az"};
+	public static String[] LANGUAGE_LIST = new String[]{null, "de", "ru", "pl", "fr", "it", "es", "nl", "uk", "ca", "sv", "pt", "pt_BR", "zh_Hant", "zh_Hans", "ja", "cs", "tr", "ko", "hu", "sl", "bg", "id", "fi", "th", "gl", "ms" ,"pa", "az", "nb"};
 	public Setting<String> translatorLanguage = new NullDefaultPrimitiveSetting<String>("translatorLanguage");
 	public static Boolean DEFAULT_ALLOW_INTERNET = true;
 	public Setting<Boolean> useInternet = new PrimitiveSetting<Boolean>("useInternet", DEFAULT_ALLOW_INTERNET);
@@ -158,7 +158,7 @@ public class WorkspaceSettings {
 			value = defaultValue;
 		}
 		
-		public abstract void readFromJson(Map json);
+		public abstract void readFromJson(@SuppressWarnings("rawtypes") Map json);
 		
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		public void saveToJson(Map json) {
@@ -188,6 +188,7 @@ public class WorkspaceSettings {
 			super(id, null);
 		}
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		@Override
 		public void saveToJson(Map json) {
 			if (value != null) json.put(id,  value);
@@ -201,6 +202,7 @@ public class WorkspaceSettings {
 			this.value = this.defaultValue = defaultValue;
 		}
 		
+		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public void readFromJson(Map json) {
 			value = new ArrayList<X>();

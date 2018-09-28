@@ -33,6 +33,7 @@ import com.gpl.rpg.andorstrainer.AndorsTrainer;
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.Workspace;
+import com.gpl.rpg.atcontentstudio.model.bookmarks.BookmarkEntry;
 import com.gpl.rpg.atcontentstudio.model.gamedata.JSONElement;
 import com.gpl.rpg.atcontentstudio.model.maps.TMXMap;
 import com.gpl.rpg.atcontentstudio.model.maps.WorldmapSegment;
@@ -595,6 +596,8 @@ public class ProjectsTree extends JPanel {
 			ATContentStudio.frame.openEditor((WorldmapSegment)node);
 		}  else if (node instanceof WriterModeData) {
 			ATContentStudio.frame.openEditor((WriterModeData)node);
+		}  else if (node instanceof BookmarkEntry) {
+			ATContentStudio.frame.openEditor(((BookmarkEntry)node).bookmarkedElement);
 		} else if (node instanceof SavedGame) {
 			if (konamiCodeEntered) {
 				ATContentStudio.frame.openEditor((SavedGame)node);

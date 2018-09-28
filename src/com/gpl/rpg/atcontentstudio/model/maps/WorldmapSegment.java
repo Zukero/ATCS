@@ -23,6 +23,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
 import com.gpl.rpg.atcontentstudio.model.ProjectTreeNode;
 import com.gpl.rpg.atcontentstudio.model.SaveEvent;
@@ -112,11 +113,19 @@ public class WorldmapSegment extends GameDataElement {
 				mapLocations.remove(oldOne.id);
 				modified = true;
 			}
+			List<String> deprecatedLabels = new ArrayList<String>();
 			for (String label : labelledMaps.keySet()) { 
 				if (labelledMaps.get(label).contains(oldOne.id)) {
 					labelledMaps.get(label).remove(oldOne.id);
 					modified = true;
+					if (labelledMaps.get(label).isEmpty()) {
+						deprecatedLabels.add(label);
+					}
 				}
+			}
+			for (String label : deprecatedLabels) {
+				labelledMaps.remove(label);
+				labels.remove(label);
 			}
 		}
 		
@@ -126,6 +135,7 @@ public class WorldmapSegment extends GameDataElement {
 		if (modified) {
 			this.state = GameDataElement.State.modified;
 			childrenChanged(new ArrayList<ProjectTreeNode>());
+			ATContentStudio.frame.editorChanged(this);
 		}
 	}
 

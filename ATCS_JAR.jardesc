@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="ATCS/ATCS_v0.6.7.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/ATCS/ATCS_JAR.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="ATContentStudio/ATCS_v0.6.14.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ATContentStudio/ATCS_JAR.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,9 +11,9 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=ATCS/res"/>
-        <javaElement handleIdentifier="=ATCS/src"/>
-        <javaElement handleIdentifier="=ATCS/siphash-zackehh\/src\/main\/java"/>
-        <javaElement handleIdentifier="=ATCS/hacked-libtiled"/>
+        <javaElement handleIdentifier="=ATContentStudio/hacked-libtiled"/>
+        <javaElement handleIdentifier="=ATContentStudio/siphash-zackehh\/src\/main\/java"/>
+        <javaElement handleIdentifier="=ATContentStudio/src"/>
+        <javaElement handleIdentifier="=ATContentStudio/res"/>
     </selectedElements>
 </jardesc>

@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.tree.TreeNode;
 
@@ -92,29 +93,31 @@ public class TMXMapSet implements ProjectTreeNode {
 		});
 		if (source.type == GameSource.Type.created | source.type == GameSource.Type.altered) {
 			final Path folderPath = Paths.get(mapFolder.getAbsolutePath());
-			Thread watcher = new Thread("Map folder watcher for "+source.type) {
+			Thread watcher = new Thread("Map folder watcher for "+getProject().name+"/"+source.type) {
 				public void run() {
 					WatchService watchService;
 
 					while(getProject().open) {
 						try {
 							watchService = FileSystems.getDefault().newWatchService();
-							WatchKey watchKey = folderPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+							/*WatchKey watchKey = */folderPath.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
 							WatchKey wk;
 							validService: while(getProject().open) {
-								wk = watchService.take();
-								for (WatchEvent<?> event : wk.pollEvents()) {
-									Path changed = (Path) event.context();
-									String name = changed.getFileName().toString();
-									String id = name.substring(0, name.length() - 4);
-									TMXMap map = getMap(id);
-									if (map != null) {
-										map.mapChangedOnDisk();
+								wk = watchService.poll(10, TimeUnit.SECONDS);
+								if (wk != null) {
+									for (WatchEvent<?> event : wk.pollEvents()) {
+										Path changed = (Path) event.context();
+										String name = changed.getFileName().toString();
+										String id = name.substring(0, name.length() - 4);
+										TMXMap map = getMap(id);
+										if (map != null) {
+											map.mapChangedOnDisk();
+										}
 									}
-								}
-								if(!wk.reset()) {
-									watchService.close();
-									break validService;
+									if(!wk.reset()) {
+										watchService.close();
+										break validService;
+									}
 								}
 							}
 						} catch (IOException e) {

@@ -75,6 +75,14 @@ public class DefaultIcons {
 	private static String FOLDER_AT_OPEN_RES = "/com/gpl/rpg/atcontentstudio/img/folder_at_open.png";
 	public static Image getATOpenImage() { return getImage(FOLDER_AT_OPEN_RES); }
 	public static Image getATOpenIcon() { return getIcon(FOLDER_AT_OPEN_RES); }
+	
+	private static String FOLDER_BOOKMARK_CLOSED_RES = "/com/gpl/rpg/atcontentstudio/img/folder_bookmark_closed.png";
+	public static Image getBookmarkClosedImage() { return getImage(FOLDER_BOOKMARK_CLOSED_RES); }
+	public static Image getBookmarkClosedIcon() { return getIcon(FOLDER_BOOKMARK_CLOSED_RES); }
+
+	private static String FOLDER_BOOKMARK_OPEN_RES = "/com/gpl/rpg/atcontentstudio/img/folder_bookmark_open.png";
+	public static Image getBookmarkOpenImage() { return getImage(FOLDER_BOOKMARK_OPEN_RES); }
+	public static Image getBookmarkOpenIcon() { return getIcon(FOLDER_BOOKMARK_OPEN_RES); }
 
 	private static String TILED_ICON_RES = "/com/gpl/rpg/atcontentstudio/img/tiled-icon.png";
 	public static Image getTiledIconImage() { return getImage(TILED_ICON_RES); }
@@ -275,6 +283,14 @@ public class DefaultIcons {
 	private static String STATUS_UNKNOWN_RES = "/com/gpl/rpg/atcontentstudio/img/status_unknown.png";
 	public static Image getStatusUnknownImage() { return getImage(STATUS_UNKNOWN_RES); }
 	public static Image getStatusUnknownIcon() { return getIcon(STATUS_UNKNOWN_RES); }
+	
+	private static String BOOKMARK_INACTIVE = "/com/gpl/rpg/atcontentstudio/img/bookmark_inactive.png";
+	public static Image getBookmarkInactiveImage() { return getImage(BOOKMARK_INACTIVE); }
+	public static Image getBookmarkInactiveIcon() { return getIcon(BOOKMARK_INACTIVE); }
+	
+	private static String BOOKMARK_ACTIVE = "/com/gpl/rpg/atcontentstudio/img/bookmark_active.png";
+	public static Image getBookmarkActiveImage() { return getImage(BOOKMARK_ACTIVE); }
+	public static Image getBookmarkActiveIcon() { return getIcon(BOOKMARK_ACTIVE); }
 	
 	
 	private static Image getImage(String res) {

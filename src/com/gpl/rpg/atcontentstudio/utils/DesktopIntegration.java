@@ -3,6 +3,9 @@ package com.gpl.rpg.atcontentstudio.utils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import com.gpl.rpg.atcontentstudio.model.Workspace;
@@ -18,7 +21,7 @@ public class DesktopIntegration {
 			}
 		} else {
 			try {
-				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.mapEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\"");
+				Runtime.getRuntime().exec(tokenize(Workspace.activeWorkspace.settings.mapEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\""));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -40,7 +43,7 @@ public class DesktopIntegration {
 			}
 		} else {
 			try {
-				Runtime.getRuntime().exec(Workspace.activeWorkspace.settings.imageEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\"");
+				Runtime.getRuntime().exec(tokenize(Workspace.activeWorkspace.settings.imageEditorCommand.getCurrentValue()+" \""+f.getAbsolutePath()+"\""));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -61,6 +64,44 @@ public class DesktopIntegration {
 		if (os.indexOf("win") >= 0) return OSType.Windows;
 		if ((os.indexOf("nux") >= 0) || (os.indexOf("nix") >= 0) || (os.indexOf("aix") >= 0) || (os.indexOf("sunos") >= 0) || (os.indexOf("solaris") >= 0)) return OSType.NIX;
 		return OSType.Other;
+	}
+	
+	
+	private static List<Character> quotes = Arrays.asList(new Character[]{'\'', '"'});
+	private static List<Character> delims = Arrays.asList(new Character[]{' ', '\r', '\n', '\t'});
+	
+	private static String[] tokenize(String command) {
+		List<String> tokens = new ArrayList<String>();
+		boolean inQuote = false;
+		char usedQuote = '\0';
+		StringBuilder sb = new StringBuilder();
+		
+		for (char c : command.toCharArray()) {
+			if (inQuote) {
+				if (c == usedQuote) {
+					inQuote = false;
+					continue;
+				} else {
+					sb.append(c);
+				}
+			} else {
+				if (quotes.contains(c)) {
+					inQuote = true;
+					usedQuote = c;
+				} else if (delims.contains(c)) {
+					if (sb.length() > 0) {
+						tokens.add(sb.toString());
+						sb = new StringBuilder();
+					}
+				} else {
+					sb.append(c);
+				}
+			}
+		}
+		if (sb.length() > 0) {
+			tokens.add(sb.toString());
+		}
+		return tokens.toArray(new String[tokens.size()]);
 	}
 	
 

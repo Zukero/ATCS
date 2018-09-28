@@ -213,6 +213,8 @@ public class StudioFrame extends JFrame {
 			openEditor((Spritesheet) node);
 		} else if (node instanceof TMXMap) {
 			openEditor((TMXMap) node);
+		} else if (node instanceof WorldmapSegment) {
+			openEditor((WorldmapSegment) node);
 		} else if (node instanceof WriterModeData) {
 			openEditor((WriterModeData) node);
 		}

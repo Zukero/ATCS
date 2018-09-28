@@ -49,11 +49,14 @@ import prefuse.visual.expression.InGroupPredicate;
 
 import com.gpl.rpg.atcontentstudio.ATContentStudio;
 import com.gpl.rpg.atcontentstudio.model.GameDataElement;
+import com.gpl.rpg.atcontentstudio.model.Workspace;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Dialogue;
 import com.gpl.rpg.atcontentstudio.model.gamedata.NPC;
 import com.gpl.rpg.atcontentstudio.model.gamedata.Requirement;
 import com.gpl.rpg.atcontentstudio.ui.DefaultIcons;
 import com.gpl.rpg.atcontentstudio.ui.gamedataeditors.DialogueEditor;
+import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration;
+import com.gpl.rpg.atcontentstudio.utils.WeblateIntegration.WeblateTranslationUnit;
 import com.jidesoft.swing.JideBoxLayout;
 
 public class DialogueGraphView extends Display {
@@ -72,11 +75,16 @@ public class DialogueGraphView extends Display {
     public static final String HIDDEN_REPLY = "hidden_reply";
     public static final String HAS_REQS = "has_reqs";
     
+    private static final String TRANSLATION_LOADING="Loading translation...";
+    private String translationHeader="\n---[ Translation from weblate ]---\n";
+	
+    
     private static final Schema DECORATOR_SCHEMA = PrefuseLib.getVisualItemSchema(); 
     
 	private Dialogue dialogue;
 	private Image npcIcon;
 	private Graph graph;
+	private Boolean translatorMode;
 
 	private Map<Dialogue, Node> cells = new HashMap<Dialogue, Node>();
 
@@ -87,6 +95,10 @@ public class DialogueGraphView extends Display {
 			npcIcon = npc.getIcon();
 		} else {
 			npcIcon = DefaultIcons.getNPCIcon();
+		}
+		translatorMode = Workspace.activeWorkspace.settings.useInternet.getCurrentValue() && Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue() != null;
+		if (translatorMode) {
+			translationHeader = "\n---[ Translation in "+Workspace.activeWorkspace.settings.translatorLanguage.getCurrentValue()+" ]---\n";
 		}
 		loadGraph();
 
@@ -148,7 +160,7 @@ public class DialogueGraphView extends Display {
         
         // now create the main layout routine
         ActionList layout = new ActionList();//Activity.INFINITY);
-        NodeLinkTreeLayout treeLayout = new NodeLinkTreeLayout(GRAPH, prefuse.Constants.ORIENT_LEFT_RIGHT, 120, 40, 40);
+        NodeLinkTreeLayout treeLayout = new NodeLinkTreeLayout(GRAPH, prefuse.Constants.ORIENT_LEFT_RIGHT, 120, translatorMode ? 80 : 40, translatorMode ? 80 : 40);
         treeLayout.setLayoutAnchor(new Point2D.Double(25,300));
         layout.add(treeLayout);
         layout.add(new EdgesLabelDecoratorLayout(EDGES_LABELS));
@@ -186,9 +198,26 @@ public class DialogueGraphView extends Display {
 			if (dialogue.switch_to_npc != null) {
 				npcIcon = dialogue.switch_to_npc.getIcon();
 			}
-			Node dNode = graph.addNode();
+			final Node dNode = graph.addNode();
 			cells.put(dialogue, dNode);
-			dNode.setString(LABEL, dialogue.message != null ? dialogue.message : "[Selector]");
+			String label;
+			Thread t = null;
+			if (dialogue.message == null) {
+				label = "[Selector]";
+			} else if (translatorMode) {
+				label = dialogue.message+translationHeader+TRANSLATION_LOADING;
+				final String message = dialogue.message;
+				t = new Thread("Get weblate translation for "+message) {
+					public void run() {
+						WeblateTranslationUnit unit = WeblateIntegration.getTranslationUnit(message);
+						dNode.setString(LABEL, message+translationHeader+unit.translatedText);
+					};
+				};
+			} else {
+				label = dialogue.message;
+			}
+			dNode.setString(LABEL, label);
+			if (t != null) t.start();
 			dNode.set(ICON, npcIcon);
 			dNode.set(TARGET, dialogue);
 			if (dialogue.replies != null) {
@@ -206,11 +235,27 @@ public class DialogueGraphView extends Display {
 	}
 	
 	public Node addReply(Dialogue d, Dialogue.Reply r, Image npcIcon) {
-		Node rNode;
+		final Node rNode;
 		if (r.text != null && !r.text.equals(Dialogue.Reply.GO_NEXT_TEXT)) {
 			//Normal reply...
 			rNode = graph.addNode();
-			rNode.setString(LABEL, r.text);
+//			rNode.setString(LABEL, translatorMode ? r.text + "\n---\n" + WeblateIntegration.getTranslationUnit(r.text).translatedText : r.text);
+			String label;
+			Thread t = null;
+			if (translatorMode) {
+				label = r.text+translationHeader+TRANSLATION_LOADING;
+				final String message = r.text;
+				t = new Thread("Get weblate translation for "+message) {
+					public void run() {
+						WeblateTranslationUnit unit = WeblateIntegration.getTranslationUnit(message);
+						rNode.setString(LABEL, message+translationHeader+unit.translatedText);
+					};
+				};
+			} else {
+				label = r.text;
+			}
+			rNode.setString(LABEL, label);
+			if (t != null) t.start();
 			rNode.set(ICON, DefaultIcons.getHeroIcon());
 			rNode.set(TARGET, d);
 			rNode.set(REPLY, r);

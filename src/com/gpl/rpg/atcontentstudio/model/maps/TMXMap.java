@@ -38,6 +38,7 @@ public class TMXMap extends GameDataElement {
 	public static final String GROUND_LAYER_NAME = "Ground";
 	public static final String OBJECTS_LAYER_NAME = "Objects";
 	public static final String ABOVE_LAYER_NAME = "Above";
+	public static final String TOP_LAYER_NAME = "Top";
 	public static final String WALKABLE_LAYER_NAME = "Walkable";
 	
 	public enum ColorFilter {
@@ -398,6 +399,7 @@ public class TMXMap extends GameDataElement {
 		return GROUND_LAYER_NAME.equalsIgnoreCase(name) ||
 				OBJECTS_LAYER_NAME.equalsIgnoreCase(name) ||
 				ABOVE_LAYER_NAME.equalsIgnoreCase(name) ||
+				TOP_LAYER_NAME.equalsIgnoreCase(name) ||
 				WALKABLE_LAYER_NAME.equalsIgnoreCase(name);
 	}
 
