@@ -722,6 +722,11 @@ public class DialogueEditor extends JSONElementEditor {
 				requirementObjId = null;
 				requirementValue = addIntegerField(pane, "Quantity: ", requirement.required_value, false, writable, listener);
 				break;
+			case random:
+				requirementObj = null;
+				requirementObjId = null;
+				requirementValue = addIntegerField(pane, "Chance: ", requirement.required_value, false, writable, listener);
+				break;
 			case hasActorCondition:
 				requirementObj = addActorConditionBox(pane, project, "Actor Condition: ", (ActorCondition) requirement.required_obj, writable, listener);
 				requirementObjId = null;

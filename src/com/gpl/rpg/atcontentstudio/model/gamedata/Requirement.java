@@ -54,7 +54,8 @@ public class Requirement extends JSONElement {
 		spentGold,
 		consumedBonemeals,
 		hasActorCondition,
-		factionScore
+		factionScore,
+		random
 	}
 	
 	public enum SkillID {
@@ -173,6 +174,7 @@ public class Requirement extends JSONElement {
 		case spentGold:
 		case timerElapsed:
 		case factionScore:
+		case random:
 			break;
 		}
 		if (this.required_obj != null) this.required_obj.addBacklink((GameDataElement) this.parent);
