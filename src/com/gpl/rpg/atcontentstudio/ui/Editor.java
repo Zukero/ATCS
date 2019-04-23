@@ -348,6 +348,138 @@ public abstract class Editor extends JPanel implements ProjectElementListener {
 		return spinner;
 	}
 	
+	
+	private static final String percent = "%";
+	private static final String ratio = "x/y";
+	public static JComponent addChanceField(JPanel pane, String label, String initialValue, String defaultValue, boolean editable, final FieldUpdateListener listener) {
+		int defaultChance = 1;
+		int defaultMaxChance = 100;
+		if (defaultValue != null) {
+			if (defaultValue.contains("/")) {
+				int c = defaultValue.indexOf('/');
+				try { defaultChance = Integer.parseInt(defaultValue.substring(0, c)); } catch (NumberFormatException nfe) {};
+				try { defaultMaxChance = Integer.parseInt(defaultValue.substring(c+1)); } catch (NumberFormatException nfe) {};
+			} else {
+				try { defaultChance = Integer.parseInt(defaultValue); } catch (NumberFormatException nfe) {};
+			}
+		}
+		
+		boolean currentFormIsRatio = true; 
+		int chance = defaultChance;
+		int maxChance = defaultMaxChance;
+		if (initialValue != null) {
+			if (initialValue.contains("/")) {
+				int c = initialValue.indexOf('/');
+				try { chance = Integer.parseInt(initialValue.substring(0, c)); } catch (NumberFormatException nfe) {};
+				try { maxChance = Integer.parseInt(initialValue.substring(c+1)); } catch (NumberFormatException nfe) {};
+			} else {
+				try { 
+					chance = Integer.parseInt(initialValue); 
+					currentFormIsRatio = false;
+				} catch (NumberFormatException nfe) {};
+			}
+		}
+		
+		final JPanel tfPane = new JPanel();
+		tfPane.setLayout(new JideBoxLayout(tfPane, JideBoxLayout.LINE_AXIS, 6));
+		JLabel tfLabel = new JLabel(label);
+		tfPane.add(tfLabel, JideBoxLayout.FIX);
+		
+		final JComboBox<String> entryTypeBox = new JComboBox<String>(new String[] {percent, ratio});
+		if (currentFormIsRatio) {
+			entryTypeBox.setSelectedItem(ratio);
+		} else {
+			entryTypeBox.setSelectedItem(percent);
+		}
+		entryTypeBox.setEnabled(editable);
+		tfPane.add(entryTypeBox, JideBoxLayout.FIX);
+		/////////////////////////////////////////////////////////////////////////////////////////////////// make sure "chance" is between 1 and 100. If lower than 1 get 1. If higher than 100, get chance/maxChance * 100... Then do the same with defaultChance, in case no value exist.
+		final SpinnerNumberModel percentModel = new SpinnerNumberModel(initialValue != null ? ((chance > 1 ? chance : 1) < 100 ? chance : (chance * 100 / maxChance)) : ((defaultChance > 1 ? defaultChance : 1) < 100 ? defaultChance : (defaultChance * 100 / defaultMaxChance)) , 1, 100, 1);
+		final SpinnerNumberModel ratioChanceModel = new SpinnerNumberModel(initialValue != null ? chance : defaultChance, 1, Integer.MAX_VALUE, 1);
+		
+		final JSpinner chanceSpinner = new JSpinner(currentFormIsRatio ? ratioChanceModel : percentModel);
+		if (!currentFormIsRatio) ((JSpinner.DefaultEditor)chanceSpinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.LEFT);
+		chanceSpinner.setEnabled(editable);
+		((DefaultFormatter)((NumberEditor)chanceSpinner.getEditor()).getTextField().getFormatter()).setCommitsOnValidEdit(true);
+		tfPane.add(chanceSpinner, JideBoxLayout.FLEXIBLE);
+		
+		final JLabel ratioLabel = new JLabel("/");
+		tfPane.add(ratioLabel, JideBoxLayout.FIX);
+		
+		final JSpinner maxChanceSpinner = new JSpinner(new SpinnerNumberModel(initialValue != null ? maxChance : defaultMaxChance, 1, Integer.MAX_VALUE, 1));
+		((JSpinner.DefaultEditor)maxChanceSpinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.LEFT);
+		maxChanceSpinner.setEnabled(editable);
+		((DefaultFormatter)((NumberEditor)maxChanceSpinner.getEditor()).getTextField().getFormatter()).setCommitsOnValidEdit(true);
+		tfPane.add(maxChanceSpinner, JideBoxLayout.FLEXIBLE);
+		
+		if (!currentFormIsRatio) {
+			ratioLabel.setVisible(false);
+			maxChanceSpinner.setVisible(false);
+			tfPane.revalidate();
+			tfPane.repaint();
+		}
+		
+		final JButton nullify = new JButton(new ImageIcon(DefaultIcons.getNullifyIcon()));
+		tfPane.add(nullify, JideBoxLayout.FIX);
+		nullify.setEnabled(editable);
+		pane.add(tfPane, JideBoxLayout.FIX);
+		
+		entryTypeBox.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (entryTypeBox.getSelectedItem() == percent) {
+					int chance = ((Integer)chanceSpinner.getValue());
+					int maxChance = ((Integer)maxChanceSpinner.getValue());
+					chance *= 100;
+					chance /= maxChance;
+					chance = Math.max(0,  Math.min(100, chance));
+					chanceSpinner.setModel(percentModel);
+					chanceSpinner.setValue(chance);
+					((JSpinner.DefaultEditor)chanceSpinner.getEditor()).getTextField().setHorizontalAlignment(JTextField.LEFT);
+					ratioLabel.setVisible(false);
+					maxChanceSpinner.setVisible(false);
+					tfPane.revalidate();
+					tfPane.repaint();
+					listener.valueChanged(chanceSpinner, chanceSpinner.getValue().toString());
+				} else if (entryTypeBox.getSelectedItem() == ratio) {
+					int chance = ((Integer)chanceSpinner.getValue());
+					chanceSpinner.setModel(ratioChanceModel);
+					chanceSpinner.setValue(chance);
+					maxChanceSpinner.setValue(100);
+					ratioLabel.setVisible(true);
+					maxChanceSpinner.setVisible(true);
+					tfPane.revalidate();
+					tfPane.repaint();
+					listener.valueChanged(chanceSpinner, chanceSpinner.getValue().toString() + "/" + maxChanceSpinner.getValue().toString());
+				}
+			}
+		});
+		chanceSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (entryTypeBox.getSelectedItem() == percent) {
+					listener.valueChanged(chanceSpinner, chanceSpinner.getValue().toString());
+				} else if (entryTypeBox.getSelectedItem() == ratio) {
+					listener.valueChanged(chanceSpinner, chanceSpinner.getValue().toString() + "/" + maxChanceSpinner.getValue().toString());
+				}
+			}
+		});
+		maxChanceSpinner.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				listener.valueChanged(chanceSpinner, chanceSpinner.getValue().toString() + "/" + maxChanceSpinner.getValue().toString());
+			}
+		});
+		nullify.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				chanceSpinner.setValue(1);
+				listener.valueChanged(chanceSpinner, null);
+			}
+		});
+		return chanceSpinner;
+	}
+	
 //	public static JSpinner addDoubleField(JPanel pane, String label, Double initialValue, boolean editable) {
 //		return addDoubleField(pane, label, initialValue, editable, nullListener);
 //	}

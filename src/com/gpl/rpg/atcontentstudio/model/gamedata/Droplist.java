@@ -36,7 +36,7 @@ public class Droplist extends JSONElement {
 	public static class DroppedItem {
 		//Available from parsed state;
 		public String item_id = null;
-		public Double chance = null;
+		public String chance = null;
 		public Integer quantity_min = null;
 		public Integer quantity_max = null;
 		
@@ -114,7 +114,8 @@ public class Droplist extends JSONElement {
 				Map droppedItemJson = (Map)droppedItemJsonObj;
 				DroppedItem droppedItem = new DroppedItem();
 				droppedItem.item_id = (String) droppedItemJson.get("itemID");
-				if (droppedItemJson.get("chance") != null) droppedItem.chance = JSONElement.parseChance(droppedItemJson.get("chance").toString());
+				//if (droppedItemJson.get("chance") != null) droppedItem.chance = JSONElement.parseChance(droppedItemJson.get("chance").toString());
+				droppedItem.chance = (String) droppedItemJson.get("chance");
 				Map droppedItemQtyJson = (Map) droppedItemJson.get("quantity");
 				if (droppedItemQtyJson != null) {
 					droppedItem.quantity_min = JSONElement.getInteger((Number) droppedItemQtyJson.get("min"));
@@ -217,7 +218,8 @@ public class Droplist extends JSONElement {
 				} else if (droppedItem.item_id != null) {
 					droppedItemJson.put("itemID", droppedItem.item_id);
 				}
-				if (droppedItem.chance != null) droppedItemJson.put("chance", JSONElement.printJsonChance(droppedItem.chance));
+				//if (droppedItem.chance != null) droppedItemJson.put("chance", JSONElement.printJsonChance(droppedItem.chance));
+				if (droppedItem.chance != null) droppedItemJson.put("chance", droppedItem.chance);
 				if (droppedItem.quantity_min != null || droppedItem.quantity_max != null) {
 					Map quantityJson = new LinkedHashMap();
 					droppedItemJson.put("quantity", quantityJson);

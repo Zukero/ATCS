@@ -26,7 +26,9 @@ public class AboutEditor extends Editor {
 	private static final long serialVersionUID = 6230549148222457139L;
 
 	public static final String WELCOME_STRING = 
-			"<html><body>" +
+			"<html><head>" + 
+			"<meta http-equiv=\\\"Content-Type\\\" content=\\\"text/html; charset=UTF-8\\\" />" +
+			"</head><body>" +
 			"<table><tr valign=\"top\">" +
 			"<td><img src=\""+ATContentStudio.class.getResource("/com/gpl/rpg/atcontentstudio/img/atcs_border_banner.png")+"\"/></td>" +
 			"<td><font size=+1>Welcome to "+ATContentStudio.APP_NAME+" "+ATContentStudio.APP_VERSION+"</font><br/>" +
@@ -51,7 +53,7 @@ public class AboutEditor extends Editor {
 			"<br/>" +
 			"Contributors: <br/>" +
 			"Quentin Delvallet<br/>" +
-			"Žižkin<br/>" +
+			"Å½iÅ¾kin<br/>" +
 			"<br/>" +
 			"This project uses the following libraries:<br/>" +
 			"<a href=\"http://code.google.com/p/json-simple/\">JSON.simple</a> by Yidong Fang & Chris Nokleberg.<br/>" +
@@ -79,7 +81,7 @@ public class AboutEditor extends Editor {
 			"<a href=\"https://jsoup.org/\">jsoup</a> by Jonathan Hedley<br/>" +
 			"License: <a href=\"https://jsoup.org/license\">MIT License</a><br/>" +
 			"<br/>" +
-			"A slightly modified version of <a href=\"https://launchpad.net/po-parser\">General PO Parser</a> by Balázs Tóth<br/>" +
+			"A slightly modified version of <a href=\"https://launchpad.net/po-parser\">General PO Parser</a> by Balï¿½zs Tï¿½th<br/>" +
 			"License: <a href=\"http://www.gnu.org/licenses/gpl-3.0.html\">GPL v3</a><br/>" +
 			"<br/>" +
 			"A slightly modified version of <a href=\"www.whoischarles.com\">Minify.java</a> by Charles Bihis<br/>" +

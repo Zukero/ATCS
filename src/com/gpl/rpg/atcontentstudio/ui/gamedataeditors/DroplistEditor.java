@@ -50,7 +50,7 @@ public class DroplistEditor extends JSONElementEditor {
 	private DroppedItemsListModel droppedItemsListModel;
 	private JSpinner qtyMinField;
 	private JSpinner qtyMaxField;
-	private JSpinner chanceField;
+	private JComponent chanceField;
 	
 	public DroplistEditor(Droplist droplist) {
 		super(droplist, droplist.getDesc(), droplist.getIcon());
@@ -142,7 +142,7 @@ public class DroplistEditor extends JSONElementEditor {
 			itemCombo = addItemBox(pane, proj, "Item: ", di.item, writable, listener);
 			qtyMinField = addIntegerField(pane, "Quantity min: ", di.quantity_min, false, writable, listener);
 			qtyMaxField = addIntegerField(pane, "Quantity max: ", di.quantity_max, false, writable, listener);
-			chanceField = addDoubleField(pane, "Chance: ", di.chance, writable, listener);
+			chanceField = addChanceField(pane, "Chance: ", di.chance, "100", writable, listener);//addDoubleField(pane, "Chance: ", di.chance, writable, listener);
 		}
 		pane.revalidate();
 		pane.repaint();
@@ -221,9 +221,9 @@ public class DroplistEditor extends JSONElementEditor {
 				Droplist.DroppedItem di = (Droplist.DroppedItem)value;
 				if (di.item != null) {
 					label.setIcon(new ImageIcon(di.item.getIcon()));
-					label.setText(di.chance+"% to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item.getDesc());
+					label.setText(di.chance+(di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item.getDesc());
 				} else if (!isNull(di)) {
-					label.setText(di.chance+"% to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item_id);
+					label.setText(di.chance+(di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item_id);
 				} else {
 					label.setText("New, undefined, dropped item.");
 				}
@@ -283,7 +283,7 @@ public class DroplistEditor extends JSONElementEditor {
 				selectedItem.quantity_max = (Integer) value;
 				droppedItemsListModel.itemChanged(selectedItem);
 			} else if (source == chanceField) {
-				selectedItem.chance = (Double) value;
+				selectedItem.chance = (String) value;
 				droppedItemsListModel.itemChanged(selectedItem);
 			}
 
