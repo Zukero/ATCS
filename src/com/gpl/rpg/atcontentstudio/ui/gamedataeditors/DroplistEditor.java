@@ -221,9 +221,9 @@ public class DroplistEditor extends JSONElementEditor {
 				Droplist.DroppedItem di = (Droplist.DroppedItem)value;
 				if (di.item != null) {
 					label.setIcon(new ImageIcon(di.item.getIcon()));
-					label.setText(di.chance+(di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item.getDesc());
+					label.setText(di.chance+(di.chance != null && di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item.getDesc());
 				} else if (!isNull(di)) {
-					label.setText(di.chance+(di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item_id);
+					label.setText(di.chance+(di.chance != null && di.chance.contains("/") ? "" : "%")+" to get "+di.quantity_min+"-"+di.quantity_max+" "+di.item_id);
 				} else {
 					label.setText("New, undefined, dropped item.");
 				}

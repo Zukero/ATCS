@@ -54,7 +54,8 @@ public class Requirement extends JSONElement {
 		spentGold,
 		consumedBonemeals,
 		hasActorCondition,
-		factionScore
+		factionScore,
+		random
 	}
 	
 	public enum SkillID {
@@ -104,9 +105,21 @@ public class Requirement extends JSONElement {
 	
 	@Override
 	public String getDesc() {
+		String obj_id = "";
+		if (required_obj_id != null)
+		{
+			obj_id = required_obj_id;
+			if (type != null && type == RequirementType.random){
+				obj_id = " Chance " + obj_id + (required_obj_id.contains("/") ? "" : "%"); 
+			}
+			else {
+				obj_id += ":";
+			}
+		}
+		
 		return ((negated != null && negated) ? "NOT " : "")
 				+(type == null ? "" : type.toString()+":")
-				+(required_obj_id == null ? "" : required_obj_id+":")
+				+obj_id
 				+(required_value == null ? "" : required_value.toString());
 	}
 
@@ -173,6 +186,7 @@ public class Requirement extends JSONElement {
 		case spentGold:
 		case timerElapsed:
 		case factionScore:
+		case random:
 			break;
 		}
 		if (this.required_obj != null) this.required_obj.addBacklink((GameDataElement) this.parent);
@@ -225,6 +239,12 @@ public class Requirement extends JSONElement {
 			required_obj_id = null;
 			required_value = null;
 		}
+		
+		if(destType==RequirementType.random)
+		{
+			required_obj_id = "50/100";
+		}
+		
 		type = destType;
 	}
 

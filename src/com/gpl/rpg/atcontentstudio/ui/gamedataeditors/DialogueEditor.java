@@ -123,7 +123,7 @@ public class DialogueEditor extends JSONElementEditor {
 	private MyComboBox requirementObj;
 	@SuppressWarnings("rawtypes")
 	private JComboBox requirementSkill;
-	private JTextField requirementObjId;
+	private JComponent requirementObjId;
 	private JComponent requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
@@ -721,6 +721,11 @@ public class DialogueEditor extends JSONElementEditor {
 				requirementObj = null;
 				requirementObjId = null;
 				requirementValue = addIntegerField(pane, "Quantity: ", requirement.required_value, false, writable, listener);
+				break;
+			case random:
+				requirementObj = null;
+				requirementObjId = addChanceField(pane, "Chance: ", requirement.required_obj_id, "50/100", writable, listener);
+				requirementValue = null;
 				break;
 			case hasActorCondition:
 				requirementObj = addActorConditionBox(pane, project, "Actor Condition: ", (ActorCondition) requirement.required_obj, writable, listener);

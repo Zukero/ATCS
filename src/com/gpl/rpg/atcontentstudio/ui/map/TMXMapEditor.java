@@ -173,7 +173,7 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	private JPanel requirementParamsPane;
 	@SuppressWarnings("rawtypes")
 	private JComboBox requirementObj;
-	private JTextField requirementObjId;
+	private JComponent requirementObjId;
 	private JComponent requirementValue;
 	private BooleanBasedCheckBox requirementNegated;
 	
@@ -674,6 +674,11 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 				requirementObj = null;
 				requirementObjId = null;
 				requirementValue = addIntegerField(pane, "Quantity: ", requirement.required_value, false, writable, listener);
+				break;
+			case random:
+				requirementObj = null;
+				requirementObjId = addChanceField(pane, "Chance: ", requirement.required_obj_id, "50/100", writable, listener);
+				requirementValue = null;
 				break;
 			case hasActorCondition:
 				requirementObj = addActorConditionBox(pane, project, "Actor Condition: ", (ActorCondition) requirement.required_obj, writable, listener);
@@ -2318,11 +2323,14 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        			if (!activeReplacements.containsKey(area)) {
 	        				activeReplacements.put(area, true);
 	        			}
-	        			for (ReplaceArea.Replacement repl : area.replacements) {
-	        				if (replacementsForLayer.get(repl.sourceLayer) == null) {
-	        					replacementsForLayer.put(repl.sourceLayer, new ArrayList<ReplaceArea>());
-	        				}
-	        				replacementsForLayer.get(repl.sourceLayer).add(area);
+	        			
+	        			if(area.replacements != null) {
+		        			for (ReplaceArea.Replacement repl : area.replacements) {
+		        				if (replacementsForLayer.get(repl.sourceLayer) == null) {
+		        					replacementsForLayer.put(repl.sourceLayer, new ArrayList<ReplaceArea>());
+		        				}
+		        				replacementsForLayer.get(repl.sourceLayer).add(area);
+		        			}
 	        			}
 	        		}
 	        	}
