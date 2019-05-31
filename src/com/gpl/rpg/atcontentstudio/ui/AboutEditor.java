@@ -54,6 +54,7 @@ public class AboutEditor extends Editor {
 			"Contributors: <br/>" +
 			"Quentin Delvallet<br/>" +
 			"Žižkin<br/>" +
+			"Gonk<br/>" +
 			"<br/>" +
 			"This project uses the following libraries:<br/>" +
 			"<a href=\"http://code.google.com/p/json-simple/\">JSON.simple</a> by Yidong Fang & Chris Nokleberg.<br/>" +
