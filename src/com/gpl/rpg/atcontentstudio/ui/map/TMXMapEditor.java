@@ -2463,10 +2463,10 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	        return false;
 	    }
 	    
-	    JLabel noTileGround = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
-	    JLabel noTileObjects = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
-	    JLabel noTileAbove = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
-	    JLabel noTileTop = new JLabel(new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)));
+	    JLabel noTileGround = new JLabel("None", new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)), SwingConstants.LEFT);
+	    JLabel noTileObjects = new JLabel("None", new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)), SwingConstants.LEFT);
+	    JLabel noTileAbove = new JLabel("None", new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)), SwingConstants.LEFT);
+	    JLabel noTileTop = new JLabel("None", new ImageIcon(DefaultIcons.getNullifyImage().getScaledInstance(32, 32, Image.SCALE_DEFAULT)), SwingConstants.LEFT);
 	    {
 	    	noTileGround.setPreferredSize(new Dimension(32, 32));
 	    	noTileObjects.setPreferredSize(new Dimension(32, 32));
@@ -2491,16 +2491,19 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    	JPanel content = new JPanel();
 	    	content.setLayout(new JideBoxLayout(content, JideBoxLayout.PAGE_AXIS));
 	    	if (tooltippedTile != null) {
-	    		Image tile;
+	    		tiled.core.Tile tile;
+	    		Image tileImage;
 	    		JLabel label;
 
 	    		if (top != null && top.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
-	    			tile = top.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    			tile = top.getTileAt(tooltippedTile.x, tooltippedTile.y);
+	    			tileImage = tile.getImage();
 	    		} else {
 	    			tile = null;
+	    			tileImage = null;
 	    		}
-	    		if (tile != null) {
-	    			label = new JLabel(new ImageIcon(tile));
+	    		if (tileImage != null) {
+	    			label = new JLabel(tile.getTileSet().getName(), new ImageIcon(tileImage), SwingConstants.LEFT);
 	    			label.setPreferredSize(new Dimension(32,32));
 	    			content.add(label, JideBoxLayout.FIX);
 	    			//Fix when (if?) Top is advertised publicly. 
@@ -2509,12 +2512,14 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    		}
 	    		
 	    		if (above != null && above.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
-	    			tile = above.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    			tile = above.getTileAt(tooltippedTile.x, tooltippedTile.y);
+	    			tileImage = tile.getImage();
 	    		} else {
 	    			tile = null;
+	    			tileImage = null;
 	    		}
-	    		if (tile != null) {
-	    			label = new JLabel(new ImageIcon(tile));
+	    		if (tileImage != null) {
+	    			label = new JLabel(tile.getTileSet().getName(), new ImageIcon(tileImage), SwingConstants.LEFT);
 	    			label.setPreferredSize(new Dimension(32,32));
 	    			content.add(label, JideBoxLayout.FIX);
 	    		} else {
@@ -2522,12 +2527,14 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    		}
 	    		
 	    		if (objects != null && objects.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
-	    			tile = objects.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    			tile = objects.getTileAt(tooltippedTile.x, tooltippedTile.y);
+	    			tileImage = tile.getImage();
 	    		} else {
 	    			tile = null;
+	    			tileImage = null;
 	    		}
-	    		if (tile != null) {
-	    			label = new JLabel(new ImageIcon(tile));
+	    		if (tileImage != null) {
+	    			label = new JLabel(tile.getTileSet().getName(), new ImageIcon(tileImage), SwingConstants.LEFT);
 	    			label.setPreferredSize(new Dimension(32,32));
 	    			content.add(label, JideBoxLayout.FIX);
 	    		} else {
@@ -2535,12 +2542,14 @@ public class TMXMapEditor extends Editor implements TMXMap.MapChangedOnDiskListe
 	    		}
 	    		
 	    		if (ground != null && ground.getTileAt(tooltippedTile.x, tooltippedTile.y) != null) {
-	    			tile = ground.getTileAt(tooltippedTile.x, tooltippedTile.y).getImage();
+	    			tile = ground.getTileAt(tooltippedTile.x, tooltippedTile.y);
+	    			tileImage = tile.getImage();
 	    		} else {
 	    			tile = null;
+	    			tileImage = null;
 	    		}
-	    		if (tile != null) {
-	    			label = new JLabel(new ImageIcon(tile));
+	    		if (tileImage != null) {
+	    			label = new JLabel(tile.getTileSet().getName(), new ImageIcon(tileImage), SwingConstants.LEFT);
 	    			label.setPreferredSize(new Dimension(32,32));
 	    			content.add(label, JideBoxLayout.FIX);
 	    		} else {

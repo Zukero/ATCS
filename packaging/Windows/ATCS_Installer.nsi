@@ -1,7 +1,7 @@
 !include MUI2.nsh
 
-!define VERSION "0.6.14"
-!define TRAINER_VERSION "0.1.4"
+!define VERSION "0.6.15"
+!define TRAINER_VERSION "0.1.5"
 !define JAVA_BIN "javaw"
 
 Name "Andor's Trail Content Studio v${VERSION}"
