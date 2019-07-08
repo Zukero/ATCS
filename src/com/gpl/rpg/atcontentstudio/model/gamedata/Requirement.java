@@ -101,6 +101,7 @@ public class Requirement extends JSONElement {
 		,specializationDualWield
 		,specialization2hand
 		,specializationWeaponShield
+		,weaponProficiencyPole
 	}
 	
 	@Override
