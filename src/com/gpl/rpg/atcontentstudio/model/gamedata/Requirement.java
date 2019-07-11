@@ -91,6 +91,7 @@ public class Requirement extends JSONElement {
 		,weaponProficiencyAxe
 		,weaponProficiencyBlunt
 		,weaponProficiencyUnarmed
+		,weaponProficiencyPole
 		,armorProficiencyShield
 		,armorProficiencyUnarmored
 		,armorProficiencyLight
@@ -101,7 +102,6 @@ public class Requirement extends JSONElement {
 		,specializationDualWield
 		,specialization2hand
 		,specializationWeaponShield
-		,weaponProficiencyPole
 	}
 	
 	@Override
