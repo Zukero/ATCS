@@ -91,6 +91,7 @@ public class Requirement extends JSONElement {
 		,weaponProficiencyAxe
 		,weaponProficiencyBlunt
 		,weaponProficiencyUnarmed
+		,weaponProficiencyPole
 		,armorProficiencyShield
 		,armorProficiencyUnarmored
 		,armorProficiencyLight
