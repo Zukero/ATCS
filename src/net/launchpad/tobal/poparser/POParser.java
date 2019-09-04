@@ -12,6 +12,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Vector;
 
 public class POParser
@@ -60,11 +62,9 @@ public class POParser
     	POFile result = null;
         try
         {
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
+            BufferedReader br = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8);
             result = parse(br);
             br.close();
-            fr.close();
         }
         catch (java.io.FileNotFoundException e)
         {

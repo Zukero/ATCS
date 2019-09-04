@@ -1,9 +1,12 @@
 package com.gpl.rpg.atcontentstudio.model.tools.i18n;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +20,7 @@ public class PoPotWriter {
 	
 	public static void writePoFile(Map<String, List<String>> stringsResources, Map<String, String> translations, File destination) {
 		try {
-			FileWriter fw = new FileWriter(destination);
+			Writer fw = new OutputStreamWriter(new FileOutputStream(destination), StandardCharsets.UTF_8);
 			if (translations.get("") != null) {
 				fw.write(translations.get(""));
 				writeEndOfEntry(fw);
