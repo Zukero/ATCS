@@ -770,6 +770,11 @@ public class DialogueEditor extends JSONElementEditor {
 				requirementObjId = addTextField(pane, "Faction ID:", requirement.required_obj_id, writable, listener);
 				requirementValue = addIntegerField(pane, "Minimum score: ", requirement.required_value, true, writable, listener);
 				break;
+			case factionScoreEquals:
+				requirementObj = null;
+				requirementObjId = addTextField(pane, "Faction ID:", requirement.required_obj_id, writable, listener);
+				requirementValue = addIntegerField(pane, "Exact value: ", requirement.required_value, true, writable, listener);
+				break;
 			case wear:
 				requirementObj = addItemBox(pane, project, "Item: ", (Item) requirement.required_obj, writable, listener);
 				requirementObjId = null;
@@ -1174,7 +1179,7 @@ public class DialogueEditor extends JSONElementEditor {
 			label.setIcon(new ImageIcon(DefaultIcons.getBonemealIcon()));
 		} else if (req.type == Requirement.RequirementType.timerElapsed) {
 			label.setIcon(new ImageIcon(DefaultIcons.getTimerIcon()));
-		} else if (req.type == Requirement.RequirementType.factionScore) {
+		} else if (req.type == Requirement.RequirementType.factionScore || req.type == Requirement.RequirementType.factionScoreEquals) {
 			label.setIcon(new ImageIcon(DefaultIcons.getAlignmentIcon()));
 		}
 		if (req.type == null) {

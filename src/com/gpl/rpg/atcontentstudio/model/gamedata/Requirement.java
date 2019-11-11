@@ -55,7 +55,8 @@ public class Requirement extends JSONElement {
 		consumedBonemeals,
 		hasActorCondition,
 		factionScore,
-		random
+		random,
+		factionScoreEquals
 	}
 	
 	public enum SkillID {
@@ -186,6 +187,7 @@ public class Requirement extends JSONElement {
 		case spentGold:
 		case timerElapsed:
 		case factionScore:
+		case factionScoreEquals:
 		case random:
 			break;
 		}
