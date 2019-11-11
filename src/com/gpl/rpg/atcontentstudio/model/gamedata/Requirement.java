@@ -26,10 +26,13 @@ public class Requirement extends JSONElement {
 		countedItemTypes.add(RequirementType.inventoryRemove);
 		countedItemTypes.add(RequirementType.inventoryKeep);
 		countedItemTypes.add(RequirementType.usedItem);
+		countedItemTypes.add(RequirementType.wear);
+		countedItemTypes.add(RequirementType.wearRemove);
 		COMPATIBLE_TYPES.put(RequirementType.inventoryRemove, countedItemTypes);
 		COMPATIBLE_TYPES.put(RequirementType.inventoryKeep, countedItemTypes);
 		COMPATIBLE_TYPES.put(RequirementType.usedItem, countedItemTypes);
-		
+		COMPATIBLE_TYPES.put(RequirementType.wear, countedItemTypes);
+		COMPATIBLE_TYPES.put(RequirementType.wearRemove, countedItemTypes);
 	}
 	
 	//Available from parsed state
@@ -55,7 +58,8 @@ public class Requirement extends JSONElement {
 		consumedBonemeals,
 		hasActorCondition,
 		factionScore,
-		random
+		random,
+		wearRemove
 	}
 	
 	public enum SkillID {
@@ -166,6 +170,7 @@ public class Requirement extends JSONElement {
 		case inventoryRemove:
 		case usedItem:
 		case wear:
+		case wearRemove:
 			this.required_obj = proj.getItem(required_obj_id);
 			break;
 		case killedMonster:
